@@ -17,6 +17,14 @@
         <module>schedulingAlgorithm</module>
         <module>evaluateSystem</module>
         <module>dispatchingExecution</module>
+        <module>common</module>
+        <module>schedulingAlgorithm</module>
+        <module>resourcePortrait</module>
+        <module>loadForecasting</module>
+        <module>dataProcessing</module>
+        <module>evaluateSystem</module>
+        <module>dispatchingExecution</module>
+        <module>scenarioAnalysis</module>
     </modules>
 
 
