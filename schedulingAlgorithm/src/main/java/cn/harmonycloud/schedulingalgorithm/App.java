@@ -1,4 +1,4 @@
-package cn.harmonycloud;
+package cn.harmonycloud.schedulingalgorithm;
 
 /**
  * Hello world!

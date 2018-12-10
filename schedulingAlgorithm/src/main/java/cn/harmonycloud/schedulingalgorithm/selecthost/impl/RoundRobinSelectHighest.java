@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.selecthost.impl;
 
-import cn.harmonycloud.schedulingalgorithm.common.HostPriority;
+import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.selecthost.SelectHostRule;
 
 import java.util.List;

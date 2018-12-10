@@ -1,10 +1,9 @@
 package cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm;
 
-import cn.harmonycloud.schedulingalgorithm.Utils;
-import cn.harmonycloud.schedulingalgorithm.algorithm.NodeLister;
-import cn.harmonycloud.schedulingalgorithm.common.HostPriority;
-import cn.harmonycloud.schedulingalgorithm.common.Node;
-import cn.harmonycloud.schedulingalgorithm.common.Pod;
+import cn.harmonycloud.schedulingalgorithm.algorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.PodFitsResources;
 import cn.harmonycloud.schedulingalgorithm.presort.PresortRule;
@@ -20,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
+    private Cache cache;
     private PresortRule presortRule;
-    private NodeLister nodeLister;
     private List<PredicateRule> predicateRules;
     private List<PriorityRuleConfig> priorityRuleConfigs;
     private SelectHostRule selectHostRule;
@@ -33,7 +32,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         //TODO
         priorityRuleConfigs = new ArrayList<>();
         //TODO
-        nodeLister = new NodeLister();
+        cache = new Cache();
         selectHostRule = new RoundRobinSelectHighest();
     }
 
@@ -82,8 +81,8 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     }
 
     @Override
-    public NodeLister getNodeLister() {
-        return nodeLister;
+    public Cache getCache() {
+        return cache;
     }
 
     @Override

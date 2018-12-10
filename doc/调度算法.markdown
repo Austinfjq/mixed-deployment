@@ -1,4 +1,31 @@
-# 开发任务和接口
+# 调度算法模块接口
+1. 增加或减少pod的接口
+   接口功能：请求增加/减少某服务的pod，请求会被加进调度请求队列，等待下一轮调度时被读取. 
+   URL:http://hostname:port/schedulePod
+   支持格式:json
+   HTTP请求方式：POST
+   请求参数：
+   
+   | 参数 | 必选 | 类型 | 说明 |
+   | :--- | :--- | :--- | :--- |
+   | podList | true | Json字符串 | 单个或多个pod |
+       
+   Pod：
+   
+   | key | 必选 | value类型 | 说明 |
+   | :--- | :--- | :--- | :--- |
+   | operation | true | int | 0增加，1减少 |
+   | namespace | true | string | 服务所在的命名空间 |
+   | serviceName | true | string | 服务名 |
+   | number | true | string | 要增加/减少该类型的pod的数量 |
+       
+   返回字段：
+   
+   | 返回字段 | 字段类型 | 说明 |
+   | :--- | :--- | :--- |
+   | isSucceed | boolean | 是否成功加进调度请求队列 |
+
+# 开发任务
 1. 预处理策略
 2. 预选策略
     1. PodFitsResources  
@@ -22,7 +49,7 @@
     1. 预选node->rule，node并行
     2. 优选rule->node，rule并行
 5. 短期缓存维护
-6. 消息队列接口
+6. 消息队列维护
 
 # 需要的数据
 1. 要增/减的新pod和node上已经存在的旧pod，它们所属的服务，镜像名和镜像大小，需要或已经占用的端口，需要或已经占用资源cpu/mem/io，pod的nodeSelector,NodeAffinity,PodAffinity,toleration,tolerationList。已经存在的pod的PodController。
@@ -32,13 +59,13 @@
 
 # 需要的数据 分类后
 * 来自应用画像静态数据：
-1. 应用的pod基本信息：需要的镜像名和镜像大小，需要占用的端口，需要占用资源cpu/mem/io，应用的pod是什么密集型
+1. 应用的pod基本信息：需要的镜像名和镜像大小，需要占用的端口，需要占用资源cpu/mem/disk/io，应用的pod是什么密集型
 2. 应用的pod亲和性信息：PodSpec的NodeName字段，pod的nodeSelector,NodeAffinity,PodAffinity,toleration,tolerationList
 * 来自负载预测
 1. 对node负载的预测信息
 * 来自监控模块
 1. node上已经存在的pod有哪些，这些pod所属的服务，已经占用的端口，已经占用资源cpu/mem/io。
-2. node已经存在的镜像和大小，node的资源cpu/mem/io容量。
+2. node已经存在的镜像和大小，node的资源cpu/mem/disk/io容量。
 2. node是否进入了内存/硬盘压力状态，每个service对应的pod列表，每个replication controller对应的pod列表。
 
 # 面向的问题

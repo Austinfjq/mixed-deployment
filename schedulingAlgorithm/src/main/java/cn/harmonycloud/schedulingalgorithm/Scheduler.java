@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm;
 
-import cn.harmonycloud.schedulingalgorithm.common.Pod;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package cn.harmonycloud.schedulingalgorithm.predicate;
 
-import cn.harmonycloud.schedulingalgorithm.common.Node;
-import cn.harmonycloud.schedulingalgorithm.common.Pod;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 
 public interface PredicateRule {
     boolean predicate(Pod pod, Node node);

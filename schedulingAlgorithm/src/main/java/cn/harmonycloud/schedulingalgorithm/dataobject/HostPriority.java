@@ -1,4 +1,4 @@
-package cn.harmonycloud.schedulingalgorithm.common;
+package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 public class HostPriority {
     private String host;
