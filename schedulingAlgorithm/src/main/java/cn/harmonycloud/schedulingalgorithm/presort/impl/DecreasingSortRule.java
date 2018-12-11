@@ -14,18 +14,26 @@ public class DecreasingSortRule implements PresortRule {
     @Override
     public List<Pod> sort(List<Pod> pods, Cache cache) {
         Map<String, Service> serviceMap = cache.getServiceMap();
-        Double cpuSum = pods.stream().map(p -> serviceMap.get(p.getServiceName()))
+        Double cpuSum = pods.stream()
+                .map(p -> serviceMap.get(p.getServiceName()))
                 .filter(s -> Constants.INTENSIVE_TYPE_CPU.equals(s.getIntensiveType()))
-                .mapToDouble(Service::getPodCpu).sum();
-        Double memSum = pods.stream().map(p -> serviceMap.get(p.getServiceName()))
+                .mapToDouble(Service::getPodCpu)
+                .sum();
+        Double memSum = pods.stream()
+                .map(p -> serviceMap.get(p.getServiceName()))
                 .filter(s -> Constants.INTENSIVE_TYPE_MEMORY.equals(s.getIntensiveType()))
-                .mapToDouble(Service::getPodMemory).sum();
-        Double diskSum = pods.stream().map(p -> serviceMap.get(p.getServiceName()))
-                .filter(s -> Constants.INTENSIVE_TYPE_DISK.equals(s.getIntensiveType()))
-                .mapToDouble(Service::getPodDisk).sum();
-        Double ioSum = pods.stream().map(p -> serviceMap.get(p.getServiceName()))
+                .mapToDouble(Service::getPodMemory)
+                .sum();
+//        Double diskSum = pods.stream()
+//                .map(p -> serviceMap.get(p.getServiceName()))
+//                .filter(s -> Constants.INTENSIVE_TYPE_DISK.equals(s.getIntensiveType()))
+//                .mapToDouble(Service::getPodDisk)
+//                .sum();
+        Double ioSum = pods.stream()
+                .map(p -> serviceMap.get(p.getServiceName()))
                 .filter(s -> Constants.INTENSIVE_TYPE_IO.equals(s.getIntensiveType()))
-                .mapToDouble(Service::getPodIo).sum();
+                .mapToDouble(Service::getPodIo)
+                .sum();
         pods.sort((Pod l, Pod r) -> {
             // 删除优先于增加，operation: 0增加，1减少
             if (!l.getOperation().equals(r.getOperation())) {
@@ -44,10 +52,12 @@ public class DecreasingSortRule implements PresortRule {
                 } else if (Constants.INTENSIVE_TYPE_MEMORY.equals(lService.getIntensiveType())) {
                     lPriority = lService.getPodMemory() / memSum;
                     rPriority = rService.getPodMemory() / memSum;
-                } else if (Constants.INTENSIVE_TYPE_DISK.equals(lService.getIntensiveType())) {
-                    lPriority = lService.getPodDisk() / diskSum;
-                    rPriority = rService.getPodDisk() / diskSum;
-                } else if (Constants.INTENSIVE_TYPE_IO.equals(lService.getIntensiveType())) {
+                }
+//                else if (Constants.INTENSIVE_TYPE_DISK.equals(lService.getIntensiveType())) {
+//                    lPriority = lService.getPodDisk() / diskSum;
+//                    rPriority = rService.getPodDisk() / diskSum;
+//                }
+                else if (Constants.INTENSIVE_TYPE_IO.equals(lService.getIntensiveType())) {
                     lPriority = lService.getPodIo() / ioSum;
                     rPriority = rService.getPodIo() / ioSum;
                 } else {

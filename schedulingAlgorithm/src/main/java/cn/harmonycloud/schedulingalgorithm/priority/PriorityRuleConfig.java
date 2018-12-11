@@ -4,6 +4,11 @@ public class PriorityRuleConfig {
     private PriorityRule priorityRule;
     private Double weight;
 
+    public PriorityRuleConfig(PriorityRule priorityRule, Double weight) {
+        this.priorityRule = priorityRule;
+        this.weight = weight;
+    }
+
     public PriorityRule getPriorityRule() {
         return priorityRule;
     }

@@ -1,6 +1,5 @@
-package cn.harmonycloud.schedulingalgorithm;
+package cn.harmonycloud.schedulingalgorithm.utils;
 
-import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 
 import java.util.List;

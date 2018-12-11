@@ -5,40 +5,16 @@ import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgor
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import cn.harmonycloud.schedulingalgorithm.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GreedyScheduler implements Scheduler {
     private GreedyAlgorithm greedyAlgorithm;
 
-    public GreedyScheduler() {
+    GreedyScheduler() {
         super();
         greedyAlgorithm = new DefaultGreedyAlgorithm();
-    }
-
-    /**
-     * 从队列中消费请求，调用schedule()调度
-     */
-    public void consume() {
-        List<Pod> podList = new ArrayList<>();
-        while (true) {
-            try {
-                int size = PodProducer.requestQueue.size();
-                for (int i = 0; i < size; i++) {
-                    Pod pod = PodProducer.requestQueue.poll();
-                    if (pod != null) {
-                        podList.add(pod);
-                    }
-                }
-                if (!podList.isEmpty()) {
-                    schedule(podList);
-                    podList.clear();
-                }
-            } catch (Exception e) {
-                return; //TODO
-            }
-        }
     }
 
     /**
@@ -48,10 +24,8 @@ public class GreedyScheduler implements Scheduler {
      */
     @Override
     public void schedule(List<Pod> schedulingRequests) {
-        // TODO 可并行化 1 与 (2,3)
-
-        // 1. 更新节点数据
-        greedyAlgorithm.getCache().fetchNodes();
+        // 1. 更新缓存数据
+        greedyAlgorithm.getCache().fetchCacheData();
 
         // 2. 获取pod详细信息
         List<Pod> Pods = Utils.getPodsDetail(schedulingRequests);
@@ -64,11 +38,11 @@ public class GreedyScheduler implements Scheduler {
         }
     }
 
-    private void scheduleOne(Pod Pod) {
+    private void scheduleOne(Pod pod) {
         // 预选
-        List<Node> predicatedNodes = greedyAlgorithm.predicates(Pod, greedyAlgorithm.getCache().listNodes());
+        List<Node> predicatedNodes = greedyAlgorithm.predicates(pod);
         // 优选
-        List<HostPriority> hostPriorityList = greedyAlgorithm.priorities(Pod, predicatedNodes);
+        List<HostPriority> hostPriorityList = greedyAlgorithm.priorities(pod, predicatedNodes);
         // 挑选节点
         List<HostPriority> hostPriority = greedyAlgorithm.selectHost(hostPriorityList);
         // TODO 调用调度执行器，先按只发送一个结果

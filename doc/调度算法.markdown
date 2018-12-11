@@ -8,7 +8,7 @@
    
    | 参数 | 必选 | 类型 | 说明 |
    | :--- | :--- | :--- | :--- |
-   | podList | true | Json字符串 | 单个或多个pod |
+   | podList | true | Json数组 | 单个或多个pod |
        
    Pod：
    
@@ -140,7 +140,7 @@ scheduleOne()
     1. filteredNodes, failedPredicateMap, err := g.findNodesThatFit(pod, nodes)
         1. 16线程并发地对每个node，循环测试每个预选规则，如有不匹配则break，找到足够数量的node就停止继续找，fits, failedPredicates, err := podFitsOnNode(...) --> fit, reasons, err = predicate(pod, metaToUse, nodeInfoToUse)
     2. priorityList = PrioritizeNodes(pod, nodeNameToInfo, g.pods, g.prioritizers, algorithm.FakeNodeLister(filteredNodes), g.extenders)
-        1. 并发执行每个优选规则，并发对每个node打分
+        1. 并发执行每个优选规则，不同规则视情况循环或者并发
     3. return g.selectHost(priorityList)
         1. 从多个最高分node里随机选一个，随机是指round-robin.
 3. assumeVolumes(assumedPod, suggestedHost)
