@@ -8,9 +8,9 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import java.util.List;
 
 public interface GreedyAlgorithm {
+    Cache getCache();
     List<Pod> presort(List<Pod> pods);
     List<Node> predicates(Pod pod);
     List<HostPriority> priorities(Pod pod, List<Node> nodes);
-    Cache getCache();
     List<HostPriority> selectHost(List<HostPriority> hostPriorityList);
 }
