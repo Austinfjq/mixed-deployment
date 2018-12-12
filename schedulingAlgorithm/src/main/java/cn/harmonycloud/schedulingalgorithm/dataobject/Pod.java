@@ -2,9 +2,19 @@ package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 public class Pod {
     /**
-     * operation: 0增加，1减少
+     * for pod to be scheduled
+     * operation: 1增加，2减少
      */
     private Integer operation;
+    /**
+     * Pod所属服务
+     */
+    private String serviceName;
+    /**
+     * Pod所属Namespace
+     */
+    private String namespace;
+
     /**
      * unix时间
      */
@@ -21,14 +31,6 @@ public class Pod {
      * Pod所在节点名
      */
     private String nodeName;
-    /**
-     * Pod所属服务
-     */
-    private String serviceName;
-    /**
-     * Pod所属Namespace
-     */
-    private String namespace;
     /**
      * Pod所属resourceKind
      */
@@ -98,6 +100,22 @@ public class Pod {
         this.operation = operation;
     }
 
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
     public String getTime() {
         return time;
     }
@@ -128,22 +146,6 @@ public class Pod {
 
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
     }
 
     public String getResourceKind() {

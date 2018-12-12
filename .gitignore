@@ -5,6 +5,7 @@ target/
 bin/
 appLogs/
 *.log
+~$*.docx
 
 # Intellij project files
 *.iml

@@ -1,9 +1,14 @@
 # 调度算法模块接口
 1. 增加或减少pod的接口
+   
    接口功能：请求增加/减少某服务的pod，请求会被加进调度请求队列，等待下一轮调度时被读取. 
+   
    URL:http://hostname:port/schedulePod
+   
    支持格式:json
+   
    HTTP请求方式：POST
+   
    请求参数：
    
    | 参数 | 必选 | 类型 | 说明 |
@@ -14,7 +19,7 @@
    
    | key | 必选 | value类型 | 说明 |
    | :--- | :--- | :--- | :--- |
-   | operation | true | int | 0增加，1减少 |
+   | operation | true | int | 1增加，2减少 |
    | namespace | true | string | 服务所在的命名空间 |
    | serviceName | true | string | 服务名 |
    | number | true | string | 要增加/减少该类型的pod的数量 |
@@ -29,8 +34,7 @@
 1. 预处理策略
 2. 预选策略
     1. PodFitsResources  
-    2. PodFitsHostPorts  
-    3. HostName
+    2. PodFitsHostPorts, HostName
     4. MatchNodeSelector
     5. PodToleratesNodeTaints
     6. CheckNodeMemoryPressure, CheckNodeDiskPressure
@@ -45,11 +49,6 @@
     7. TaintTolerationPriority 
     8. ImageLocalityPriority optional
     9. NodeLoadForecastPriority 负载预测优选
-4. 并行优化
-    1. 预选node->rule，node并行
-    2. 优选rule->node，rule并行
-5. 短期缓存维护
-6. 消息队列维护
 
 # 需要的数据
 1. 要增/减的新pod和node上已经存在的旧pod，它们所属的服务，镜像名和镜像大小，需要或已经占用的端口，需要或已经占用资源cpu/mem/io，pod的nodeSelector,NodeAffinity,PodAffinity,toleration,tolerationList。已经存在的pod的PodController。
@@ -107,7 +106,7 @@
 4. 还可以额外定义规定某些应用倾向于放在一起、某些应用和某些node不倾向于放在一起等等软亲和约束。weight4 \* ( Σ 命中的规则对应的程度分数 )。可以包括NodeAffinity和PodAffinity中定义的软约束标签。 NodeAffinityPriority TaintTolerationPriority
 5. 另外从服务负载预测可以得知接下来的一段时间哪些节点上的负载会变高或低，因此调整该node的得分。weight5 \* ( ± 即将减少/增加的资源占机器资源的比例 )
 
-score = Σ weight~i~ \* score~i ~选择最大得分的机器增加这个pod，同时修改这个机器的信息上的资源信息，进行下个一个pod的处理。
+score = Σ weight i * score i 选择最大得分的机器增加这个pod，同时修改这个机器的信息上的资源信息，进行下个一个pod的处理。
 
 * 减少pod时，对预选阶段得到的可选节点逐个打分，打分策略考虑：
 1. 优先考虑繁忙的节点。weight1 \* 减少pod后节点占用资源与节点总容量的比值。
@@ -116,7 +115,7 @@ score = Σ weight~i~ \* score~i ~选择最大得分的机器增加这个pod，�
 4. 还可以额外定义规定某些应用倾向于放在一起，尽量不违反这个软约束。weight4 \* ( Σ 命中的规则对应的程度分数 )。可以包括NodeAffinity和PodAffinity中定义的软约束标签。
 5. 另外从服务负载预测可以得知接下来的一段时间哪些节点上的pod的负载会变高或低，从而影响node的负载，因此调整该node的得分。weight5 \* ( ± 即将减少/增加的资源占机器资源的比例 )
 
-score = Σ weight~i~ \* score~i ~选择最大得分的机器增加这个pod，同时修改这个机器的信息上的资源信息，进行下个一个pod的处理。
+score = Σ weight i * score i 选择最大得分的机器增加这个pod，同时修改这个机器的信息上的资源信息，进行下个一个pod的处理。
 
 # k8s v1.2 scheduler implementation
 scheduleOne()

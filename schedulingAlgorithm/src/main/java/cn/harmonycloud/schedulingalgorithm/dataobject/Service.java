@@ -2,6 +2,30 @@ package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 public class Service {
     /**
+     * for pods to be scheduled
+     */
+    private String cpuCosume;
+    /**
+     * for pods to be scheduled
+     */
+    private String memCosume;
+    /**
+     * for pods to be scheduled
+     */
+    private String DownNetIOCosume;
+    /**
+     * for pods to be scheduled
+     */
+    private String UPNetIOCosume;
+
+    /**
+     * for pods to be scheduled
+     * 资源密集类型
+     * 1.CPU密集型 2.mem密集型 3.磁盘密集型 4.网络密集型
+     */
+    private Integer intensiveType;
+
+    /**
      * unix时间
      */
     private String time;
@@ -58,19 +82,45 @@ public class Service {
      */
     private String responseTime;
 
-    /**
-     * 资源密集类型
-     * 1.CPU密集型 2.mem密集型 3.磁盘密集型 4.网络密集型
-     */
-    private String intensiveType;
+    public String getCpuCosume() {
+        return cpuCosume;
+    }
 
-    private Double podCpu;
+    public void setCpuCosume(String cpuCosume) {
+        this.cpuCosume = cpuCosume;
+    }
 
-    private Double podMemory;
+    public String getMemCosume() {
+        return memCosume;
+    }
 
-    private Double podDisk;
+    public void setMemCosume(String memCosume) {
+        this.memCosume = memCosume;
+    }
 
-    private Double podIo;
+    public String getDownNetIOCosume() {
+        return DownNetIOCosume;
+    }
+
+    public void setDownNetIOCosume(String downNetIOCosume) {
+        DownNetIOCosume = downNetIOCosume;
+    }
+
+    public String getUPNetIOCosume() {
+        return UPNetIOCosume;
+    }
+
+    public void setUPNetIOCosume(String UPNetIOCosume) {
+        this.UPNetIOCosume = UPNetIOCosume;
+    }
+
+    public Integer getIntensiveType() {
+        return intensiveType;
+    }
+
+    public void setIntensiveType(Integer intensiveType) {
+        this.intensiveType = intensiveType;
+    }
 
     public String getTime() {
         return time;
@@ -182,45 +232,5 @@ public class Service {
 
     public void setResponseTime(String responseTime) {
         this.responseTime = responseTime;
-    }
-
-    public String getIntensiveType() {
-        return intensiveType;
-    }
-
-    public void setIntensiveType(String intensiveType) {
-        this.intensiveType = intensiveType;
-    }
-
-    public Double getPodCpu() {
-        return podCpu;
-    }
-
-    public void setPodCpu(Double podCpu) {
-        this.podCpu = podCpu;
-    }
-
-    public Double getPodMemory() {
-        return podMemory;
-    }
-
-    public void setPodMemory(Double podMemory) {
-        this.podMemory = podMemory;
-    }
-
-    public Double getPodDisk() {
-        return podDisk;
-    }
-
-    public void setPodDisk(Double podDisk) {
-        this.podDisk = podDisk;
-    }
-
-    public Double getPodIo() {
-        return podIo;
-    }
-
-    public void setPodIo(Double podIo) {
-        this.podIo = podIo;
     }
 }

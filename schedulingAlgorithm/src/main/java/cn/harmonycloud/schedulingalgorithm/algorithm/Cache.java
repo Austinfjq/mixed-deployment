@@ -4,6 +4,7 @@ import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
+import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -48,11 +49,11 @@ public class Cache {
         List<Node> nodeList = (List<Node>)(Object) fetchOne(Constants.URI_GET_NODE, Node.class);
         serviceMap = new HashMap<>();
         if (serviceList != null) {
-            serviceList.forEach(s -> serviceMap.put(s.getNamespace()+"-"+s.getServiceName(), s));
+            serviceList.forEach(s -> serviceMap.put(DOUtils.getServiceFullName(s), s));
         }
         podMap = new HashMap<>();
         if (podList != null) {
-            podList.forEach(p -> podMap.put(p.getNamespace()+"-"+p.getServiceName(), p));
+            podList.forEach(p -> podMap.put(DOUtils.getServiceFullName(p), p));
         }
         nodeMap = new HashMap<>();
         if (nodeList != null) {
@@ -67,7 +68,7 @@ public class Cache {
         String jsonStr = HttpUtil.post(uri);
         try {
             JSONObject jsonObject = JSONObject.fromObject(jsonStr);
-            String timeSeries = jsonObject.optString("timeSeries", null);
+            String timeSeries = jsonObject.optString("timeSeries");
             if (timeSeries == null) {
                 return null;
             }
