@@ -1,6 +1,8 @@
 package cn.harmonycloud.schedulingalgorithm;
 
+import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import cn.harmonycloud.schedulingalgorithm.utils.CheckUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +34,12 @@ public class App {
      * 每次requestQueue被增加时，消费者会被触发开始一轮调度，用尽队列元素调用scheduler.schedule()
      */
     private static void startConsuming() {
-        List<Pod> podList = new ArrayList<>();
         while (true) {
             try {
                 semaphore.acquire();
                 // 此处一轮调度开始
                 // 每轮调度进行期间，新加入的pod请求必须等待当前这轮调度结束
+                List<Pod> podList = new ArrayList<>();
                 int size = requestQueue.size();
                 for (int i = 0; i < size; i++) {
                     Pod pod = requestQueue.poll();
@@ -47,7 +49,6 @@ public class App {
                 }
                 if (!podList.isEmpty()) {
                     scheduler.schedule(podList);
-                    podList.clear();
                 }
                 // 此处一轮调度结束
             } catch (Exception e) {
@@ -63,11 +64,25 @@ public class App {
      * @return 是否成功
      */
     public static boolean produce(List<Pod> podList) {
+        // check parameter
+        if (CheckUtil.nullOrEmpty(podList)) {
+            return false;
+        }
+        for (Pod pod : podList) {
+            if (pod == null || pod.getOperation() == null || pod.getNamespace() == null || pod.getServiceName() == null
+                    || CheckUtil.range(pod.getOperation(), Constants.OPERATION_ADD, Constants.OPERATION_DELETE)) {
+                return false;
+            }
+        }
+        // 放入队列
         try {
-            requestQueue.addAll(podList);
-            semaphore.release();
-            return true;
+            boolean result = requestQueue.addAll(podList);
+            if (result) {
+                semaphore.release();
+            }
+            return result;
         } catch (Exception e) {
+            // TODO
             return false;
         }
     }

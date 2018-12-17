@@ -12,54 +12,63 @@ import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
 import net.sf.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GreedyScheduler implements Scheduler {
     private GreedyAlgorithm greedyAlgorithm;
+    private Cache cache;
 
     GreedyScheduler() {
         super();
         greedyAlgorithm = new DefaultGreedyAlgorithm();
+        cache = new Cache();
     }
 
     /**
      * 每轮调度从待调度队列取出调度请求列表，在此执行调度
      *
-     * @param schedulingRequests pod调度请求列表
+     * @param schedulingRequests pod调度请求列表 必须非null非空没有null元素
      */
     @Override
     public void schedule(List<Pod> schedulingRequests) {
         // 1. 更新缓存监控数据
-        greedyAlgorithm.getCache().fetchCacheData();
-
+        cache.fetchCacheData();
         // 2. 获取应用画像信息
         getPortrait(schedulingRequests);
+        // TODO 检查数据完整性？
         // 3. 预排序
-        List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests);
-
+        List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
         // 4. 逐个处理待调度pod
-        for (Pod Pod : sortedPods) {
-            scheduleOne(Pod);
+        for (int i = 0; i < sortedPods.size(); i++) {
+            // 调度本轮最后一个pod后，不需再更新缓存
+            if (i == sortedPods.size() - 1) {
+                scheduleOne(sortedPods.get(i), false);
+            } else {
+                scheduleOne(sortedPods.get(i), true);
+            }
         }
     }
 
-    private void scheduleOne(Pod pod) {
+    private void scheduleOne(Pod pod, boolean ifUpdateCache) {
         // 预选
-        List<Node> predicatedNodes = greedyAlgorithm.predicates(pod);
+        List<Node> predicatedNodes = greedyAlgorithm.predicates(pod, cache);
         // 优选
-        List<HostPriority> hostPriorityList = greedyAlgorithm.priorities(pod, predicatedNodes);
+        List<HostPriority> hostPriorityList = greedyAlgorithm.priorities(pod, predicatedNodes, cache);
         // 挑选节点
-        List<HostPriority> hostPriority = greedyAlgorithm.selectHost(hostPriorityList);
-        // TODO 调用调度执行器，先按只发送一个结果
+        HostPriority selectedHost = greedyAlgorithm.selectHost(hostPriorityList, cache);
+        // 调用调度执行器，只发送一个host
+        scheduleExecute(pod, selectedHost.getHost());
+        // 修改缓存
+        if (ifUpdateCache) {
+            cache.updateCache(pod, selectedHost.getHost());
+        }
     }
 
     private void getPortrait(List<Pod> pods) {
         List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
-        Map<String, Service> serviceMap = greedyAlgorithm.getCache().getServiceMap();
+        Map<String, Service> serviceMap = cache.getServiceMap();
         for (String serviceFullName : serviceFullNames) {
             // 获取预计占用资源信息
             Map<String, String> parameters = new HashMap<>();
@@ -78,5 +87,14 @@ public class GreedyScheduler implements Scheduler {
             jsonObject = JSONObject.fromObject(result);
             service.setIntensiveType(jsonObject.optInt("serviceType"));
         }
+    }
+
+    private void scheduleExecute(Pod pod, String host) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("namespace", pod.getNamespace());
+        parameters.put("serviceName", pod.getServiceName());
+        parameters.put("nodeName", host);
+        String uri = pod.getOperation() == Constants.OPERATION_ADD ? Constants.URI_EXECUTE_ADD : Constants.URI_EXECUTE_REMOVE;
+        HttpUtil.post(uri, parameters);
     }
 }

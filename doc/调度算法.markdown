@@ -31,14 +31,15 @@
    | isSucceed | boolean | 是否成功加进调度请求队列 |
 
 # 开发任务
-1. 预处理策略
+1. 预处理策略 100%
 2. 预选策略
-    1. PodFitsResources  
-    2. PodFitsHostPorts, HostName
-    4. MatchNodeSelector
+    1. PodFitsResources 70%
+    2. PodFitsHostPorts 50%
+    4. PodMatchNodeSelector 50%
     5. PodToleratesNodeTaints
-    6. CheckNodeMemoryPressure, CheckNodeDiskPressure
-    7. MatchInterPodAffinity 
+    6. CheckNodeMemoryPressure 70%
+    7. CheckNodeDiskPressure 70%
+    8. MatchInterPodAffinity 
 3. 优选策略
     1. LeastRequestedPriority  
     2. BalancedResourceAllocation  
@@ -49,6 +50,18 @@
     7. TaintTolerationPriority 
     8. ImageLocalityPriority optional
     9. NodeLoadForecastPriority 负载预测优选
+
+## some issues
+0. 问已开启的策略
+1. 异常处理与日志
+2. 从es读取节点的预测结果
+3. 配置文件
+4. Spring config
+
+## 还没拿到的数据
+1. kube_node_status_allocatable下的指标，cpu core / memory byte / pods integer
+2. node上已占用的什么协议的哪些端口；pod要占用哪些hostIP下的什么协议的哪些端口，或者如果能拿到v1.Pod.Spec.Containers，读取container.Resources.Requests计算出pod要占用host的哪些端口
+3. pod.Spec.Affinity
 
 # 需要的数据
 1. 要增/减的新pod和node上已经存在的旧pod，它们所属的服务，镜像名和镜像大小，需要或已经占用的端口，需要或已经占用资源cpu/mem/io，pod的nodeSelector,NodeAffinity,PodAffinity,toleration,tolerationList。已经存在的pod的PodController。
@@ -86,7 +99,7 @@
 * 增加pod时的筛选依据(GeneralPredicates)有：
 1. 检查节点是否有足够资源 PodFitsResources （需要动态数据）
 2. HostPort冲突 PodFitsHostPorts （需要动态数据）
-3. PodSpec的NodeName字段中指定节点 PodSpec的NodeName （需要静态数据）
+3. ~~PodSpec的NodeName字段中指定节点 PodSpec的NodeName （需要静态数据）~~
 4. Pod的nodeSelector和NodeAffinity和PodAffinity定义的强约束标签 PodSelectorMatches MatchInterPodAffinity（需要静态数据）
 5. PodToleratesNodeTaints （需要静态数据）
 6. CheckNodeMemoryPressure, CheckNodeDiskPressure（需要动态数据）
@@ -94,6 +107,7 @@
 1. 机器上有此类型的pod（需要动态数据）
 2. 删除后不能违反应用应用强亲和关系，比如PodAffinity定义（需要静态数据）
 * 已经明确不考虑的预选策略：
+0. PodFitsHost：调度算法的调用者不会指定节点
 1. NoDiskConflict：pod所需的卷是否和节点已存在的卷冲突。如果节点已经挂载了某个卷，其它同样使用这个卷的pod不能再调度到这个主机上。我们没有这个限制
 2. NoVolumeZoneConflict：检查给定的zone限制前提下，检查如果在此主机上部署Pod是否存在卷冲突。我们没有设置zone-labels。
 3. MaxEBSVolumeCount, MaxGCEPDVolumeCount, MaxAzureDiskVolumeCount：我们没有存储卷数量上限的设置。
