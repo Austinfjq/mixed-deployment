@@ -5,6 +5,13 @@ import cn.harmonycloud.Forecaster;
 import cn.harmonycloud.ForecastingModel;
 import cn.harmonycloud.entry.DataPoint;
 import cn.harmonycloud.entry.DataSet;
+import cn.harmonycloud.entry.ForecastResultCell;
+import cn.harmonycloud.output.SaveDataToEs;
+import com.alibaba.fastjson.JSON;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Sample
 {
@@ -56,6 +63,8 @@ public class Sample
                 
                 requiredDataPoints.add( dp );
             }
+
+
         
         // Dump data set before forecast
         System.out.println("Required data set before forecast");
@@ -64,9 +73,26 @@ public class Sample
         // Use the given forecasting model to forecast values for
         //  the required (future) data points
         forecaster.forecast( requiredDataPoints );
-        
+
+        List<ForecastResultCell> list = new ArrayList<>();
+        Iterator<DataPoint> iterator = requiredDataPoints.iterator();
+
+        while(iterator.hasNext()) {
+            DataPoint dataPoint = iterator.next();
+            list.add(new ForecastResultCell("myservice","load",dataPoint.getTimeValue()+"",dataPoint.getValue()));
+        }
+
+        SaveDataToEs.saveDataToEs(forecastResultCellListToJson(list));
         // Output the results
         System.out.println("Output data, forecast values");
         System.out.println( requiredDataPoints );
+    }
+
+    public static String forecastResultCellToJson(ForecastResultCell forecastResultCell) {
+        return JSON.toJSONString(forecastResultCell);
+    }
+
+    public static String forecastResultCellListToJson(List<ForecastResultCell> forecastResultCellList) {
+        return JSON.toJSONString(forecastResultCellList);
     }
 }

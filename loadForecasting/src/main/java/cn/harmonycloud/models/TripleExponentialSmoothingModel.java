@@ -24,11 +24,11 @@ public class TripleExponentialSmoothingModel extends AbstractTimeBasedModel
 
     private double maxObservedTime;
 
-    private DataSet baseValues;
+    private DataSet baseValues;  //基础序列值
 
-    private DataSet trendValues;
+    private DataSet trendValues; //趋势序列值
 
-    private DataSet seasonalIndex;
+    private DataSet seasonalIndex; //季节序列值
 
     public static TripleExponentialSmoothingModel
         getBestFitModel( DataSet dataSet )
@@ -223,7 +223,6 @@ public class TripleExponentialSmoothingModel extends AbstractTimeBasedModel
 
     public void init( DataSet dataSet )
     {
-        String timeVariable = getTimeVariable();
 
         if ( dataSet.getPeriodsPerYear() <= 1 )
             throw new IllegalArgumentException("Data set passed to init in the triple exponential smoothing model does not contain seasonal data. Don't forget to call setPeriodsPerYear on the data set to set this.");
@@ -255,7 +254,6 @@ public class TripleExponentialSmoothingModel extends AbstractTimeBasedModel
 
     private void initBaseAndTrendValues( DataSet dataSet )
     {
-        String timeVariable = getTimeVariable();
         double trend = 0.0;
         Iterator<DataPoint> it = dataSet.iterator();
         for ( int p=0; p<periodsPerYear; p++ )
@@ -288,10 +286,11 @@ public class TripleExponentialSmoothingModel extends AbstractTimeBasedModel
                 // Initialize base values for second year only
                 if ( p >= periodsPerYear )
                     {
-                        dp.setValue(year2Average
+                        DataPoint baseDp = new DataPoint( trend , time );
+                        baseDp.setValue(year2Average
                                              + (p+1-periodsPerYear
                                                 -(periodsPerYear+1)/2.0)*trend);
-                        baseValues.add( dp );
+                        baseValues.add( baseDp );
                     }
             }
     }
@@ -382,7 +381,6 @@ public class TripleExponentialSmoothingModel extends AbstractTimeBasedModel
         throws IllegalArgumentException
     {
         // Search for previously calculated - and saved - base value
-        String timeVariable = getTimeVariable();
         Iterator<DataPoint> it = baseValues.iterator();
         while ( it.hasNext() )
             {
