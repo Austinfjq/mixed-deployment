@@ -7,9 +7,11 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.CheckNodeDiskPressurePredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.CheckNodeMemoryPressurePredicate;
+import cn.harmonycloud.schedulingalgorithm.predicate.impl.MatchInterPodAffinityPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.PodFitsHostPortsPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.PodFitsResourcesPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.PodMatchNodeSelectorPredicate;
+import cn.harmonycloud.schedulingalgorithm.predicate.impl.PodToleratesNodeTaintsPredicate;
 import cn.harmonycloud.schedulingalgorithm.presort.PresortRule;
 import cn.harmonycloud.schedulingalgorithm.presort.impl.DecreasingSortRule;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRuleConfig;
@@ -35,10 +37,10 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         predicateRules.add(new PodFitsResourcesPredicate());
         predicateRules.add(new PodFitsHostPortsPredicate());
         predicateRules.add(new PodMatchNodeSelectorPredicate());
-//        predicateRules.add(new PodToleratesNodeTaintsPredicate());
+        predicateRules.add(new PodToleratesNodeTaintsPredicate());
         predicateRules.add(new CheckNodeMemoryPressurePredicate());
         predicateRules.add(new CheckNodeDiskPressurePredicate());
-//        predicateRules.add(new MatchInterPodAffinityPredicate());
+        predicateRules.add(new MatchInterPodAffinityPredicate());
 
         priorityRuleConfigs = new ArrayList<>();
         priorityRuleConfigs.add(new PriorityRuleConfig(new LeastRequestedPriority(), 1.0));

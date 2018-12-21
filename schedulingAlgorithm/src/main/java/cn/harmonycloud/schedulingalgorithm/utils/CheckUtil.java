@@ -1,6 +1,5 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 public class CheckUtil {
@@ -26,6 +25,14 @@ public class CheckUtil {
                 }
             }
             return false;
+        }
+    }
+
+    public static boolean equal(Object s1, Object s2) {
+        if (s1 == null) {
+            return s2 == null;
+        } else {
+            return s1.equals(s2);
         }
     }
 }

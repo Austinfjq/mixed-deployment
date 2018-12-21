@@ -1,8 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm;
 
-import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.utils.CheckUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +10,19 @@ import java.util.concurrent.Semaphore;
 /**
  * 调度算法模块
  */
-public class App {
+public class SchedulingAlgorithmApp {
+    /**
+     * 并发队列，保存要调度的pods
+     */
+    static ConcurrentLinkedQueue<Pod> requestQueue = new ConcurrentLinkedQueue<>();
+    /**
+     * 信号量，用于requestQueue的生产者和消费者
+     */
+    static final Semaphore semaphore = new Semaphore(0);
     /**
      * 调度器，包含调度算法
      */
     private static Scheduler scheduler = new GreedyScheduler();
-    /**
-     * 并发队列，保存要调度的pods
-     */
-    private static ConcurrentLinkedQueue<Pod> requestQueue = new ConcurrentLinkedQueue<>();
-    /**
-     * 信号量，用于requestQueue的生产者和消费者
-     */
-    private static final Semaphore semaphore = new Semaphore(0);
 
     public static void main(String[] args) {
         startConsuming();
@@ -54,36 +52,6 @@ public class App {
             } catch (Exception e) {
                 return; //TODO
             }
-        }
-    }
-
-    /**
-     * TODO @RequestMapping("/schedulePod")
-     *
-     * @param podList 请求
-     * @return 是否成功
-     */
-    public static boolean produce(List<Pod> podList) {
-        // check parameter
-        if (CheckUtil.nullOrEmpty(podList)) {
-            return false;
-        }
-        for (Pod pod : podList) {
-            if (pod == null || pod.getOperation() == null || pod.getNamespace() == null || pod.getServiceName() == null
-                    || CheckUtil.range(pod.getOperation(), Constants.OPERATION_ADD, Constants.OPERATION_DELETE)) {
-                return false;
-            }
-        }
-        // 放入队列
-        try {
-            boolean result = requestQueue.addAll(podList);
-            if (result) {
-                semaphore.release();
-            }
-            return result;
-        } catch (Exception e) {
-            // TODO
-            return false;
         }
     }
 }

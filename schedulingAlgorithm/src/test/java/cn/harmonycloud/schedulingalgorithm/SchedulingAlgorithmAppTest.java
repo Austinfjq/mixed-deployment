@@ -1,9 +1,5 @@
 package cn.harmonycloud.schedulingalgorithm;
 
-import static org.junit.Assert.assertTrue;
-
-import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import net.sf.json.JSONObject;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -14,10 +10,12 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 
+import static org.junit.Assert.assertTrue;
+
 /**
- * Unit test for simple App.
+ * Unit test for simple SchedulingAlgorithmApp.
  */
-public class AppTest {
+public class SchedulingAlgorithmAppTest {
     /**
      * Rigorous Test :-)
      */

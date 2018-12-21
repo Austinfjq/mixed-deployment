@@ -35,13 +35,13 @@
 2. 预选策略
     1. PodFitsResources 70%
     2. PodFitsHostPorts 50%
-    4. PodMatchNodeSelector 50%
-    5. PodToleratesNodeTaints
+    4. PodMatchNodeSelector 40% ！
+    5. PodToleratesNodeTaints 70%
     6. CheckNodeMemoryPressure 70%
     7. CheckNodeDiskPressure 70%
-    8. MatchInterPodAffinity 
+    8. MatchInterPodAffinity 10% ！
 3. 优选策略
-    1. LeastRequestedPriority  
+    1. LeastRequestedPriority 
     2. BalancedResourceAllocation  
     3. InterPodAffinityPriority 
     4. SelectorSpreadPriority
@@ -52,7 +52,6 @@
     9. NodeLoadForecastPriority 负载预测优选
 
 ## some issues
-0. 问已开启的策略
 1. 异常处理与日志
 2. 从es读取节点的预测结果
 3. 配置文件
@@ -60,8 +59,8 @@
 
 ## 还没拿到的数据
 1. kube_node_status_allocatable下的指标，cpu core / memory byte / pods integer
-2. node上已占用的什么协议的哪些端口；pod要占用哪些hostIP下的什么协议的哪些端口，或者如果能拿到v1.Pod.Spec.Containers，读取container.Resources.Requests计算出pod要占用host的哪些端口
-3. pod.Spec.Affinity
+2. node上已占用的什么协议的哪些端口；pod要占用哪些hostIP下的什么协议的哪些端口，或者 如果能拿到v1.Pod.Spec.Containers，读取container.Resources.Requests计算出pod要占用host的哪些端口
+3. pod.Spec.Affinity, pod.Spec.Tolerations, NodeInfo.taints
 
 # 需要的数据
 1. 要增/减的新pod和node上已经存在的旧pod，它们所属的服务，镜像名和镜像大小，需要或已经占用的端口，需要或已经占用资源cpu/mem/io，pod的nodeSelector,NodeAffinity,PodAffinity,toleration,tolerationList。已经存在的pod的PodController。
