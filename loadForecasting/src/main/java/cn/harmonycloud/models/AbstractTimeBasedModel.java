@@ -20,9 +20,9 @@ public abstract class AbstractTimeBasedModel extends AbstractForecastingModel
 
     private DataSet forecastValues; //预测数据序列
 
-    private double minTimeValue;
+    private double minTimeValue;  //时间序列最早的那个点的时间
 
-    private double maxTimeValue;
+    private double maxTimeValue;  //时间序列最晚的那个点的时间
     
 
     public AbstractTimeBasedModel()
@@ -38,7 +38,8 @@ public abstract class AbstractTimeBasedModel extends AbstractForecastingModel
 
     public void init( DataSet dataSet )
     {
-        
+
+        System.out.println("超类!");
         if ( dataSet == null  || dataSet.size() == 0 )
             throw new IllegalArgumentException("Data set cannot be empty in call to init.");
         

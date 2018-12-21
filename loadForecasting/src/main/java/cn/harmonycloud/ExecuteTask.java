@@ -59,9 +59,6 @@ public class ExecuteTask {
 
         List<ForecastCell> forecastCells = executeTask.getServiceList();
 
-        System.out.println(forecastCells.get(0).getNamaspace());
-        System.out.println(forecastCells.get(1).getNamaspace());
-
         DataSet observedData = new DataSet();
         DataPoint dp;
 

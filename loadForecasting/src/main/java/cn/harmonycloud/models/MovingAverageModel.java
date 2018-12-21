@@ -40,6 +40,7 @@ public class MovingAverageModel extends WeightedMovingAverageModel
 
     public void init( DataSet dataSet )
     {
+        System.out.println("子类!");
         if ( getNumberOfPeriods() <= 0 )
             {
                 int period = getNumberOfPeriods();
