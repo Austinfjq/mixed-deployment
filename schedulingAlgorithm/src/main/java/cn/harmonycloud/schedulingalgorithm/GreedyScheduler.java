@@ -93,8 +93,15 @@ public class GreedyScheduler implements Scheduler {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("namespace", pod.getNamespace());
         parameters.put("serviceName", pod.getServiceName());
-        parameters.put("nodeName", host);
-        String uri = pod.getOperation() == Constants.OPERATION_ADD ? Constants.URI_EXECUTE_ADD : Constants.URI_EXECUTE_REMOVE;
+        String uri;
+        if (pod.getOperation() == Constants.OPERATION_ADD) {
+            parameters.put("nodeName", host);
+            uri = Constants.URI_EXECUTE_ADD;
+        } else {
+            //TODO
+//            parameters.put("podName", podName);
+            uri = Constants.URI_EXECUTE_REMOVE;
+        }
         HttpUtil.post(uri, parameters);
     }
 }

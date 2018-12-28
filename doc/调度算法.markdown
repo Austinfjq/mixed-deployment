@@ -57,6 +57,7 @@
 2. 从es读取节点的预测结果
 3. 配置文件
 4. 提供service,node下的pod列表，避免每次轮询所有pod。replace in path: "cache.getPodMap().values()"
+
 ## 还没拿到的数据
 1. kube_node_status_allocatable下的指标，cpu core / memory byte / pods integer
 2. node上已占用的什么协议的哪些端口；pod要占用哪些hostIP下的什么协议的哪些端口，或者 如果能拿到v1.Pod.Spec.Containers，读取container.Resources.Requests计算出pod要占用host的哪些端口
