@@ -7,11 +7,11 @@ import cn.harmonycloud.schedulingalgorithm.affinity.NodeAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorTerm;
 import cn.harmonycloud.schedulingalgorithm.affinity.Requirement;
-import cn.harmonycloud.schedulingalgorithm.affinity.SelectOperation;
 import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
+import cn.harmonycloud.schedulingalgorithm.utils.SelectorUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +61,7 @@ public class PodMatchNodeSelectorPredicate implements PredicateRule {
                 continue;
             }
             if (req.getMatchExpressions() != null && !req.getMatchExpressions().isEmpty()) {
-                Selector labelSelector = NodeSelectorRequirementsAsSelector(req.getMatchExpressions());
+                Selector labelSelector = SelectorUtil.nodeSelectorRequirementsAsSelector(req.getMatchExpressions());
                 if (labelSelector == null || !labelSelector.matches(nodeLabels)) {
                     continue;
                 }
@@ -204,84 +204,5 @@ public class PodMatchNodeSelectorPredicate implements PredicateRule {
         notHasItem.field = key;
         notHasItem.value = value;
         return notHasItem;
-    }
-
-    private Selector NodeSelectorRequirementsAsSelector(List<NodeSelectorRequirement> nsm) {
-        if (nsm == null || nsm.isEmpty()) {
-            return null;
-        }
-        Selector selector = new InternalSelector();
-        for (NodeSelectorRequirement expr : nsm) {
-            SelectOperation op;
-            switch (expr.getOperator()) {
-                case NodeSelectorOpIn:
-                    op = SelectOperation.In;
-                    break;
-                case NodeSelectorOpNotIn:
-                    op = SelectOperation.NotIn;
-                    break;
-                case NodeSelectorOpExists:
-                    op = SelectOperation.Exists;
-                    break;
-                case NodeSelectorOpDoesNotExist:
-                    op = SelectOperation.DoesNotExist;
-                    break;
-                case NodeSelectorOpGt:
-                    op = SelectOperation.GreaterThan;
-                    break;
-                case NodeSelectorOpLt:
-                    op = SelectOperation.LessThan;
-                    break;
-                default:
-                    return null;
-            }
-            Requirement r = newRequirement(expr.getKey(), op, expr.getValues());
-            selector.add(r);
-        }
-        return selector;
-    }
-
-    static Requirement newRequirement(String key, SelectOperation op, String[] values) {
-        switch (op) {
-            case In:
-            case NotIn:
-                if (values == null || values.length == 0) {
-                    return null;
-                }
-                break;
-            case Equals:
-            case DoubleEquals:
-            case NotEquals:
-                if (values == null || values.length != 1) {
-                    return null;
-                }
-                break;
-            case Exists:
-            case DoesNotExist:
-                if (values == null || values.length == 0) {
-                    return null;
-                }
-                break;
-            case GreaterThan:
-            case LessThan:
-                if (values == null || values.length != 1) {
-                    return null;
-                }
-                for (String s : values) {
-                    try {
-                        Integer.valueOf(s);
-                    } catch (Exception e) {
-                        return null;
-                    }
-                }
-                break;
-            default:
-                return null;
-        }
-        Requirement requirement = new Requirement();
-        requirement.setKey(key);
-        requirement.setOperator(op);
-        requirement.setStrValues(values);
-        return requirement;
     }
 }

@@ -46,9 +46,9 @@
     2. BalancedResourceAllocation 70%
     3. InterPodAffinityPriority ！
     4. SelectorSpreadPriority 70%
-    5. NodeAffinityPriority ！
-    6. NodePreferAvoidPodsPriority ！
-    7. TaintTolerationPriority ！
+    5. NodeAffinityPriority 70%
+    6. NodePreferAvoidPodsPriority 70%
+    7. TaintTolerationPriority 70%
     8. ImageLocalityPriority optional
     9. NodeLoadForecastPriority 负载预测优选
 

@@ -18,8 +18,11 @@ import cn.harmonycloud.schedulingalgorithm.presort.PresortRule;
 import cn.harmonycloud.schedulingalgorithm.presort.impl.DecreasingSortRule;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRuleConfig;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.BalancedResourceAllocationPriority;
+import cn.harmonycloud.schedulingalgorithm.priority.impl.NodeAffinityPriority;
+import cn.harmonycloud.schedulingalgorithm.priority.impl.NodePreferAvoidPodsPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.RequestedPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.SelectorSpreadPriority;
+import cn.harmonycloud.schedulingalgorithm.priority.impl.TaintTolerationPriority;
 import cn.harmonycloud.schedulingalgorithm.selecthost.SelectHostRule;
 import cn.harmonycloud.schedulingalgorithm.selecthost.impl.RoundRobinSelectHighest;
 
@@ -57,9 +60,9 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         priorityRuleConfigs = new ArrayList<>();
         priorityRuleConfigs.add(new PriorityRuleConfig(new RequestedPriority(Constants.OPERATION_ADD), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_ADD), 1));
-//        priorityRuleConfigs.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(), 10000));
-//        priorityRuleConfigs.add(new PriorityRuleConfig(new NodeAffinityPriority(), 1));
-//        priorityRuleConfigs.add(new PriorityRuleConfig(new TaintTolerationPriority(), 1));
+        priorityRuleConfigs.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_ADD), 10000));
+        priorityRuleConfigs.add(new PriorityRuleConfig(new NodeAffinityPriority(), 1));
+        priorityRuleConfigs.add(new PriorityRuleConfig(new TaintTolerationPriority(), 1));
 //        priorityRuleConfigs.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_ADD), 1));
 //        priorityRuleConfigs.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
@@ -68,9 +71,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         priorityRuleConfigsOnDelete = new ArrayList<>();
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new RequestedPriority(Constants.OPERATION_DELETE), 1));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_DELETE), 1));
-//        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(), 10000));
-//        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeAffinityPriority(), 1));
-//        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new TaintTolerationPriority(), 1));
+        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
 //        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_DELETE), 1));
 //        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));

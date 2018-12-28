@@ -14,4 +14,8 @@ public enum TaintEffect {
     public String toString() {
         return effect;
     }
+
+    public String getEffect() {
+        return effect;
+    }
 }

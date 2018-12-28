@@ -6,7 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
-import cn.harmonycloud.schedulingalgorithm.priority.PriorityUtil;
+import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +74,7 @@ public class SelectorSpreadPriority implements PriorityRule {
             if (count > maxCountByNodeName) {
                 maxCountByNodeName = count;
             }
-            String zoneID = PriorityUtil.getZoneKey(nodes.get(i));
+            String zoneID = RuleUtil.getZoneKey(nodes.get(i));
             if (zoneID == null) {
                 continue;
             }
@@ -98,7 +98,7 @@ public class SelectorSpreadPriority implements PriorityRule {
                 }
             }
             if (haveZones) {
-                String zoneID = PriorityUtil.getZoneKey(nodes.get(i));
+                String zoneID = RuleUtil.getZoneKey(nodes.get(i));
                 if (zoneID != null) {
                     double zoneScore = Constants.PRIORITY_MAX_SCORE;
                     if (maxCountByZone > 0) {

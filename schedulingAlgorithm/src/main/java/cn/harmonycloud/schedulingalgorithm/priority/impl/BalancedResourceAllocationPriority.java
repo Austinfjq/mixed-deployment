@@ -6,7 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
-import cn.harmonycloud.schedulingalgorithm.priority.PriorityUtil;
+import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
     private int operation;
@@ -22,7 +22,7 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
         }
         // TODO allocatable resource from node cache
         Resource allocatable = new Resource();
-        Resource requested = PriorityUtil.getRequestedAfterOp(pod, node, operation);
+        Resource requested = RuleUtil.getRequestedAfterOp(pod, node, operation);
         int score;
         // TODO Check if the pod has volumes and this could be added to scorer function for balanced resource allocation.
 //        if (len(pod.Spec.Volumes) >= 0 && utilfeature.DefaultFeatureGate.Enabled(features.BalanceAttachedNodeVolumes) && nodeInfo.TransientInfo != nil) {
