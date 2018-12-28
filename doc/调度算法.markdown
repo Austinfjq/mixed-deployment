@@ -34,20 +34,21 @@
 1. 预处理策略 100%
 2. 预选策略
     1. PodFitsResources 70%
-    2. PodFitsHostPorts 50%
-    4. PodMatchNodeSelector 40% ！
+    2. PodFitsHostPorts 70%
+    4. PodMatchNodeSelector 70%
     5. PodToleratesNodeTaints 70%
     6. CheckNodeMemoryPressure 70%
     7. CheckNodeDiskPressure 70%
-    8. MatchInterPodAffinity 10% ！
+    8. MatchInterPodAffinity 70%
+    9. PodExistingOnNode 70%
 3. 优选策略
-    1. LeastRequestedPriority 
-    2. BalancedResourceAllocation  
-    3. InterPodAffinityPriority 
-    4. SelectorSpreadPriority
-    5. NodeAffinityPriority
-    6. NodePreferAvoidPodsPriority
-    7. TaintTolerationPriority 
+    1. RequestedPriority(Least and Most) 70%
+    2. BalancedResourceAllocation 70%
+    3. InterPodAffinityPriority ！
+    4. SelectorSpreadPriority 70%
+    5. NodeAffinityPriority ！
+    6. NodePreferAvoidPodsPriority ！
+    7. TaintTolerationPriority ！
     8. ImageLocalityPriority optional
     9. NodeLoadForecastPriority 负载预测优选
 
@@ -55,8 +56,7 @@
 1. 异常处理与日志
 2. 从es读取节点的预测结果
 3. 配置文件
-4. Spring config
-
+4. 提供service,node下的pod列表，避免每次轮询所有pod。replace in path: "cache.getPodMap().values()"
 ## 还没拿到的数据
 1. kube_node_status_allocatable下的指标，cpu core / memory byte / pods integer
 2. node上已占用的什么协议的哪些端口；pod要占用哪些hostIP下的什么协议的哪些端口，或者 如果能拿到v1.Pod.Spec.Containers，读取container.Resources.Requests计算出pod要占用host的哪些端口
@@ -104,7 +104,6 @@
 6. CheckNodeMemoryPressure, CheckNodeDiskPressure（需要动态数据）
 * 减少pod时的筛选依据有：
 1. 机器上有此类型的pod（需要动态数据）
-2. 删除后不能违反应用应用强亲和关系，比如PodAffinity定义（需要静态数据）
 * 已经明确不考虑的预选策略：
 0. PodFitsHost：调度算法的调用者不会指定节点
 1. NoDiskConflict：pod所需的卷是否和节点已存在的卷冲突。如果节点已经挂载了某个卷，其它同样使用这个卷的pod不能再调度到这个主机上。我们没有这个限制
@@ -125,8 +124,7 @@ score = Σ weight i * score i 选择最大得分的机器增加这个pod，同�
 1. 优先考虑繁忙的节点。weight1 \* 减少pod后节点占用资源与节点总容量的比值。
 2. 尽量使CPU内存等利用率一致，避免出现类似CPU很高但内存很低这种情况。weight2 \* 减少pod后各个类型的资源占用最小与最大之比。
 3. 为了容灾考虑，尽量减少同一node下的相同服务的pod。 weight3 \* 此node部署此服务的pod数与此服务总pod数之比。
-4. 还可以额外定义规定某些应用倾向于放在一起，尽量不违反这个软约束。weight4 \* ( Σ 命中的规则对应的程度分数 )。可以包括NodeAffinity和PodAffinity中定义的软约束标签。
-5. 另外从服务负载预测可以得知接下来的一段时间哪些节点上的pod的负载会变高或低，从而影响node的负载，因此调整该node的得分。weight5 \* ( ± 即将减少/增加的资源占机器资源的比例 )
+4. 另外从服务负载预测可以得知接下来的一段时间哪些节点上的pod的负载会变高或低，从而影响node的负载，因此调整该node的得分。weight5 \* ( ± 即将减少/增加的资源占机器资源的比例 )
 
 score = Σ weight i * score i 选择最大得分的机器增加这个pod，同时修改这个机器的信息上的资源信息，进行下个一个pod的处理。
 

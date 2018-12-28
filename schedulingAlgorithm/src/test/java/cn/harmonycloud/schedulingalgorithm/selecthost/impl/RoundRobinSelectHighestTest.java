@@ -12,11 +12,11 @@ public class RoundRobinSelectHighestTest {
         RoundRobinSelectHighest rule = new RoundRobinSelectHighest();
         for (int i = 0; i < 100; i++) {
             List<HostPriority> list = new ArrayList<>();
-            list.add(new HostPriority("1", 0.5D));
-            list.add(new HostPriority("2", 0.9D));
-            list.add(new HostPriority("3", 1.0D));
-            list.add(new HostPriority("4", 1.0D));
-            list.add(new HostPriority("5", 1.0D));
+            list.add(new HostPriority("1", 1));
+            list.add(new HostPriority("2", 2));
+            list.add(new HostPriority("3", 3));
+            list.add(new HostPriority("4", 3));
+            list.add(new HostPriority("5", 3));
             System.out.println(rule.selectHost(list).getHost());
         }
     }

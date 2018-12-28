@@ -7,7 +7,6 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.presort.PresortRule;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +32,6 @@ public class DecreasingSortRule implements PresortRule {
                 Service rService = serviceMap.get(DOUtils.getServiceFullName(r));
                 double lPriority = getPodSortPriority(lService, l.getOperation(), resourceSum);
                 double rPriority = getPodSortPriority(rService, r.getOperation(), resourceSum);
-                System.out.println(DOUtils.getServiceFullName(lService) + "," + lPriority);
-                System.out.println(DOUtils.getServiceFullName(rService) + "," + rPriority);
                 return -Double.compare(lPriority, rPriority);
             }
         });

@@ -23,4 +23,6 @@ public class Constants {
     public static String PROTOCOL_TCP = "TCP";
     public static String PROTOCOL_UDP = "UDP";
     public static String PROTOCOL_SCTP = "SCTP";
+
+    public static int PRIORITY_MAX_SCORE = 10;
 }

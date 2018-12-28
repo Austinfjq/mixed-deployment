@@ -1,4 +1,4 @@
-package cn.harmonycloud.schedulingalgorithm.predicate.impl;
+package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
 import cn.harmonycloud.schedulingalgorithm.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
@@ -7,10 +7,10 @@ import cn.harmonycloud.schedulingalgorithm.affinity.Toleration;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
-import cn.harmonycloud.schedulingalgorithm.utils.CheckUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PodToleratesNodeTaintsPredicate implements PredicateRule {
     @Override
@@ -32,19 +32,19 @@ public class PodToleratesNodeTaintsPredicate implements PredicateRule {
     }
 
     private boolean ToleratesTaint(Toleration toleration, Taint taint) {
-        if (CheckUtil.equal(toleration.getEffect(), taint.getEffect())) {
+        if (Objects.equals(toleration.getEffect(), taint.getEffect())) {
             return false;
         }
-        if (CheckUtil.equal(toleration.getKey(), taint.getKey())) {
+        if (Objects.equals(toleration.getKey(), taint.getKey())) {
             return false;
         }
         if (toleration.getOperator() == null) {
             // operator == null 当作 operator == TolerationOperator.Equal
-            return CheckUtil.equal(toleration.getValue(), taint.getValue());
+            return Objects.equals(toleration.getValue(), taint.getValue());
         }
         switch (toleration.getOperator()) {
             case Equal:
-                return CheckUtil.equal(toleration.getValue(), taint.getValue());
+                return Objects.equals(toleration.getValue(), taint.getValue());
             case Exists:
                 return true;
             default:

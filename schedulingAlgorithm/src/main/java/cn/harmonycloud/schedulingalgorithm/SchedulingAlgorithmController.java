@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/schedulingalgorithm")
 public class SchedulingAlgorithmController {
     /**
      * @param podList 请求
      * @return 是否成功
      */
-    @RequestMapping("/schedulePod")
+    @RequestMapping("/schedulepod")
     public boolean schedulePod(List<Pod> podList) {
         // check parameter
         if (CheckUtil.nullOrEmpty(podList)) {

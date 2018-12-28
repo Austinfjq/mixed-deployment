@@ -2,9 +2,9 @@ package cn.harmonycloud.schedulingalgorithm.priority;
 
 public class PriorityRuleConfig {
     private PriorityRule priorityRule;
-    private Double weight;
+    private Integer weight;
 
-    public PriorityRuleConfig(PriorityRule priorityRule, Double weight) {
+    public PriorityRuleConfig(PriorityRule priorityRule, Integer weight) {
         this.priorityRule = priorityRule;
         this.weight = weight;
     }
@@ -17,11 +17,11 @@ public class PriorityRuleConfig {
         this.priorityRule = priorityRule;
     }
 
-    public Double getWeight() {
+    public Integer getWeight() {
         return weight;
     }
 
-    public void setWeight(Double weight) {
+    public void setWeight(Integer weight) {
         this.weight = weight;
     }
 }

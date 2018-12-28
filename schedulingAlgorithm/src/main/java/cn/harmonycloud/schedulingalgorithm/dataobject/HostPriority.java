@@ -2,9 +2,9 @@ package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 public class HostPriority {
     private String host;
-    private Double weightedScore;
+    private Integer weightedScore;
 
-    public HostPriority(String host, Double weightedScore) {
+    public HostPriority(String host, Integer weightedScore) {
         this.host = host;
         this.weightedScore = weightedScore;
     }
@@ -17,11 +17,11 @@ public class HostPriority {
         this.host = host;
     }
 
-    public Double getWeightedScore() {
+    public Integer getWeightedScore() {
         return weightedScore;
     }
 
-    public void setWeightedScore(Double weightedScore) {
+    public void setWeightedScore(Integer weightedScore) {
         this.weightedScore = weightedScore;
     }
 }

@@ -22,10 +22,10 @@ public class RoundRobinSelectHighest implements SelectHostRule {
     }
 
     private List<Integer> findMaxScores(List<HostPriority> hostPriorityList) {
-        double maxScore = Double.MIN_VALUE;
+        int maxScore = Integer.MIN_VALUE;
         List<Integer> indices = new ArrayList<>();
         for (int i = 0; i < hostPriorityList.size(); i++) {
-            Double score = hostPriorityList.get(i).getWeightedScore();
+            Integer score = hostPriorityList.get(i).getWeightedScore();
             if (score != null) {
                 if (score > maxScore) {
                     maxScore = score;

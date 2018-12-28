@@ -1,4 +1,4 @@
-package cn.harmonycloud.schedulingalgorithm.predicate.impl;
+package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
 import cn.harmonycloud.schedulingalgorithm.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;

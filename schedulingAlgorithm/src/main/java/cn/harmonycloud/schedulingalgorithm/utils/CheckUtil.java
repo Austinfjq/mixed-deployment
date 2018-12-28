@@ -27,12 +27,4 @@ public class CheckUtil {
             return false;
         }
     }
-
-    public static boolean equal(Object s1, Object s2) {
-        if (s1 == null) {
-            return s2 == null;
-        } else {
-            return s1.equals(s2);
-        }
-    }
 }
