@@ -1,5 +1,7 @@
 package cn.harmonycloud.implementation;
 
+import cn.harmonycloud.bean.Rule;
+
 import java.util.concurrent.Callable;
 
 public class CreatePodCallable implements Callable<Boolean> {
@@ -10,9 +12,9 @@ public class CreatePodCallable implements Callable<Boolean> {
     @Override
     public Boolean call() {
         //创建ruler
-
+        Rule rule = new Rule(json);
         //创建pod
-        PodsImplementation.createPod(json);
+        PodsImplementation.createPod(rule);
         return null;
     }
 }
