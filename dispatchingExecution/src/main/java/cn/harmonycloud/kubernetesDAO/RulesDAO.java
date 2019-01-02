@@ -1,10 +1,14 @@
 package cn.harmonycloud.kubernetesDAO;
 
+import cn.harmonycloud.bean.DoneableRule;
 import cn.harmonycloud.bean.Rule;
+import cn.harmonycloud.bean.RuleList;
+import cn.harmonycloud.utils.Constants;
 import cn.harmonycloud.utils.K8sClient;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionBuilder;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionList;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 
 import java.util.List;
 
@@ -14,14 +18,16 @@ import java.util.List;
 public class RulesDAO {
     //createRule func
     public static boolean createRule(Rule rule){
-            CustomResourceDefinition ruleTemp = new CustomResourceDefinitionBuilder()
-                    .withApiVersion("apiextensions.k8s.io/v1beta1")
-                    .withNewMetadata().withName("rule1").endMetadata()
-                    .withNewSpec().withGroup("crd.k8s.io").withVersion("v1").withScope("Namespaced")
-                    .withNewNames().withKind("Rule").withPlural("rules").endNames()
-                    .endSpec()
-                    .build();
-            K8sClient.getInstance().customResourceDefinitions().create(ruleTemp);
-            return false;
+        CustomResourceDefinitionList ruleDefinitionList = K8sClient.getInstance().customResourceDefinitions().list();
+        CustomResourceDefinition ruleDefinition = new CustomResourceDefinition();
+        for (CustomResourceDefinition e: ruleDefinitionList.getItems()){
+            if (e.getApiVersion().equals(Constants.RULE_API_VERSION) && e.getKind().equals(Constants.RULE_KIND) && e.getMetadata().getName().equals(Constants.RULE_NAME)){
+                ruleDefinition = e;
+                break;
+            }
+        }
+        NonNamespaceOperation<Rule, RuleList, DoneableRule, Resource<Rule, DoneableRule>> ruleClient = K8sClient.getInstance().customResources(ruleDefinition, Rule.class, RuleList.class, DoneableRule.class);
+        ruleClient.create(rule);
+        return true;
     }
 }

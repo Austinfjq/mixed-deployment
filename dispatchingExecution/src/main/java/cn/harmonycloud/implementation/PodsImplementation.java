@@ -1,28 +1,28 @@
 package cn.harmonycloud.implementation;
 
 import cn.harmonycloud.bean.Rule;
+import cn.harmonycloud.bean.RuleSpec;
 import cn.harmonycloud.kubernetesDAO.PodsDAO;
 import cn.harmonycloud.utils.K8sClient;
 
 public class PodsImplementation {
 
     public static boolean createPod(Rule rule){
-        //创建rule
-
+        RuleSpec ruleSpec = rule.getSpec();
         //创建pod
         boolean flag = false;
-        switch (rule.getOwnType()){
-            case  DAEMONSET:
-                flag = PodsDAO.createDaemonsetPod(rule.getNamespace(),rule.getOwnName(),rule.getReplicas());
-                break;
+        switch (ruleSpec.getOwnType()){
+//            case  DAEMONSET:
+//                flag = PodsDAO.createDaemonsetPod(ruleSpec.getNamespace(),ruleSpec.getOwnName(),ruleSpec.getReplicas());
+//                break;
             case REPLICASET:
-                flag = PodsDAO.createReplicasetPod(rule.getNamespace(),rule.getOwnName(),rule.getReplicas());
+                flag = PodsDAO.createReplicasetPod(ruleSpec.getNamespace(),ruleSpec.getOwnName(),ruleSpec.getReplicas());
                 break;
             case DEPLOYMENT:
-                flag = PodsDAO.createDeploymentPod(rule.getNamespace(),rule.getOwnName(),rule.getReplicas());
+                flag = PodsDAO.createDeploymentPod(ruleSpec.getNamespace(),ruleSpec.getOwnName(),ruleSpec.getReplicas());
                 break;
             case STATEFULSET:
-                flag = PodsDAO.createStatefulsetPod(rule.getNamespace(),rule.getOwnName(),rule.getReplicas());
+                flag = PodsDAO.createStatefulsetPod(ruleSpec.getNamespace(),ruleSpec.getOwnName(),ruleSpec.getReplicas());
                 break;
                 default:
                     System.out.println("OwnType is unknown!");
