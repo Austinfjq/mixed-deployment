@@ -1,4 +1,4 @@
-git地址：http://10.10.102.101:8000/gitlab/
+git地址：http://10.10.102.104:8000/mixed-deployment/mixed-deployment
 项目名称：mixed-deployment
 
 模块名称：
