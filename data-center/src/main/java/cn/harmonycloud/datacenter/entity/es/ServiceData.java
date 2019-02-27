@@ -26,6 +26,7 @@ public class ServiceData {
     private String id;
     @Field(type = FieldType.Date,format = DateFormat.custom,pattern = "yyyy-MM-dd HH:mm:ss")
     private String time;
+
     @Field(type = FieldType.Text,fielddata = true,analyzer = "whitespace",searchAnalyzer = "whitespace")
     private String namespace;
     @Field(type = FieldType.Text,fielddata = true,analyzer = "whitespace",searchAnalyzer = "whitespace")
@@ -272,6 +273,7 @@ public class ServiceData {
     public ArrayList<String> getKey() {
         ArrayList<String> key = new ArrayList<>();
         key.add(this.serviceName);
+        key.add(this.namespace);
         return key;
     }
 
@@ -289,5 +291,4 @@ public class ServiceData {
     public int hashCode() {
         return Objects.hash(getNamespace(), getServiceName());
     }
-
 }

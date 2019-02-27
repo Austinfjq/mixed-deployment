@@ -23,6 +23,7 @@ public class NodeData {
     private String id;
     @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
     private String time;
+
     private String nodeName;
     @Field(type = FieldType.Text,fielddata = true,analyzer = "whitespace",searchAnalyzer = "whitespace")
     private String nodeIP;
