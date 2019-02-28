@@ -23,6 +23,8 @@ public class ServiceData {
     private Long netErrors;
     private Double responseTime;
     private Double application;
+    private String volumeType;
+    private Double volumeUsage;
 
     private String resourceKind;
     private String resourceName;
@@ -34,6 +36,8 @@ public class ServiceData {
         this.requestBytes = 0.0;
         this.responseBytes = 0.0;
         this.requestConnections = 0l;
+        this.volumeType = "";
+        this.volumeUsage = 0.0;
     }
 
     public ServiceData(String serviceNamespace, String serviceName, String clusterIP) {
@@ -118,6 +122,14 @@ public class ServiceData {
         return resourceName;
     }
 
+    public String getVolumeType() {
+        return volumeType;
+    }
+
+    public Double getVolumeUsage() {
+        return volumeUsage;
+    }
+
     public void setServiceNamespace(String serviceNamespace) {
         this.namespace = serviceNamespace;
     }
@@ -196,6 +208,14 @@ public class ServiceData {
 
     public void setResourceName(String resourceName) {
         this.resourceName = resourceName;
+    }
+
+    public void setVolumeType(String volumeType) {
+        this.volumeType = volumeType;
+    }
+
+    public void setVolumeUsage(Double volumeUsage) {
+        this.volumeUsage = volumeUsage;
     }
 
     public ArrayList<String> getKey() {

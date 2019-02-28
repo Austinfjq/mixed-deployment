@@ -9,8 +9,6 @@ class Config:
         self.cpuLimit = 'cpuLimit'
         self.memRequest = 'memReuqest'
         self.memLimit = 'memLimit'
-        self.ownerName = 'ownerName'
-        self.ownerType = 'ownerType'
         self.period = 'period'
         self.Type = 'Type'
         self.serviceLoad = 'serviceLoad'
@@ -20,6 +18,8 @@ class Config:
         self.podIntances = 'podIntances'
         self.numNetRequest = 'numNetRequest'
         self.responseTime = 'responseTime'
+        self.ownerType = 'ownerType'
+        self.ownerName = 'ownerName'
 
         self.hostPortURL="http://localhost:8088"
         #针对接口文档1部分

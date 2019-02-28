@@ -14,16 +14,16 @@ public class PodFitsResourcesPredicate implements PredicateRule {
     public boolean predicate(Pod pod, Node node, Cache cache) {
         // in prometheus: kube_node_status_allocatable{node="pc"}
 
-        if (1 + cache.getNodeMapPodList().get(node.getNodeName()).size() > Long.valueOf(node.getAllocatablePods())) {
+        if (1 + cache.getNodeMapPodList().get(node.getNodeName()).size() > node.getAllocatablePods().longValue()) {
             return false;
         }
-        if (Long.valueOf(pod.getCpuRequest()).equals(0L) && Long.valueOf(pod.getMemRequest()).equals(0L)) {
+        if (pod.getCpuRequest().equals(0D) && pod.getMemRequest().equals(0D)) {
             return true;
         }
-        if (Long.valueOf(node.getAllocatableCpuCores()) < Long.valueOf(pod.getCpuRequest()) + Long.valueOf(node.getCpuUsage())) {
+        if (node.getAllocatableCpuCores() < pod.getCpuRequest() + node.getCpuUsage()) {
             return false;
         }
-        if (Long.valueOf(node.getAllocatableMem()) < Long.valueOf(pod.getMemRequest()) + Long.valueOf(node.getMemUsage())) {
+        if (node.getAllocatableMem() < pod.getMemRequest() + node.getMemUsage()) {
             return false;
         }
 

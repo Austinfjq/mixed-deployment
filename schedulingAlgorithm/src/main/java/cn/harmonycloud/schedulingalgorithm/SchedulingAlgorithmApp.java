@@ -1,6 +1,10 @@
 package cn.harmonycloud.schedulingalgorithm;
 
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +14,13 @@ import java.util.concurrent.Semaphore;
 /**
  * 调度算法模块
  */
+@SpringBootApplication
 public class SchedulingAlgorithmApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SchedulingAlgorithmApp.class, args);
+    }
+
     /**
      * 并发队列，保存要调度的pods
      */
@@ -24,14 +34,11 @@ public class SchedulingAlgorithmApp {
      */
     private static Scheduler scheduler = new GreedyScheduler();
 
-    public static void main(String[] args) {
-        startConsuming();
-    }
-
     /**
      * 每次requestQueue被增加时，消费者会被触发开始一轮调度，用尽队列元素调用scheduler.schedule()
      */
-    private static void startConsuming() {
+    @EventListener(ApplicationReadyEvent.class)
+    public void startConsuming() {
         while (true) {
             try {
                 semaphore.acquire();

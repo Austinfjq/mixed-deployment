@@ -6,6 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.affinity.Requirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.SelectOperation;
 import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class SelectorUtil {

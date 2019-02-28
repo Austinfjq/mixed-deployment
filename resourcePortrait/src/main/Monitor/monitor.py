@@ -5,6 +5,7 @@ from flask import jsonify
 from config import error_config
 from config.config import Config
 from DataUtils.alterServiceData import updateService
+from DataUtils.utils import adjustValidParameter
 
 #app = Flask(__name__)
 from DAO.ServiceDAO import app
@@ -92,11 +93,10 @@ def getservicePeriod():
     data = request.get_data()
     dicttest = json.loads(data)
     if request.method =='POST':
-        if config.namespace and config.serviceName and config.clusterIP in dicttest:#包含有必须参数
+        if config.namespace and config.serviceName and config.clusterIP in dicttest and adjustValidParameter(dicttest):#包含有必须参数
             if dicttest[config.namespace] =="" or dicttest[config.serviceName] =="" or dicttest[config.clusterIP] =="":
                 raise error_config.CustomFlaskErr(error_config.PARAMETERS_INVALID,status_code=400)
             else:
-                print(dicttest[config.namespace],dicttest[config.serviceName],dicttest[config.clusterIP])
                 try:
                     tempCpuRequest = dicttest[config.cpuRequest]
                 except KeyError:
@@ -125,11 +125,20 @@ def getservicePeriod():
                     tempResponseTime = dicttest[config.period]
                 except KeyError:
                     tempResponseTime = None
+                try:
+                    tempOwnerType = dicttest[config.ownerType]
+                except KeyError:
+                    tempOwnerType = None
+                try:
+                    tempOwnerName = dicttest[config.ownerName]
+                except KeyError:
+                    tempOwnerName = None
                 #捕捉数据库异常
                 try:
 
                     ret = updateService(namespace=dicttest[config.namespace],serviceName=dicttest[config.serviceName],clusterIP=dicttest[config.clusterIP],
-                              cpuRequest=tempCpuRequest,cpuLimit=tempCpuLimit,memRequest=tempMemRequest,memLimit=tempMemLimit,period=tempPeriod,Type=tempType,responseTime=tempResponseTime)
+                              cpuRequest=tempCpuRequest,cpuLimit=tempCpuLimit,memRequest=tempMemRequest,ownerName=tempOwnerName,ownerType=tempOwnerType,
+                              memLimit=tempMemLimit,period=tempPeriod,Type=tempType,responseTime=tempResponseTime)
                     if ret != 1:
                         value =  0
                         dicTepm ={

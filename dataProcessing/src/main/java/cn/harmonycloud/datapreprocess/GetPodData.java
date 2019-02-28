@@ -41,7 +41,6 @@ public class GetPodData {
             pod.setDeletionStamp(d.getMetadata().getDeletionTimestamp());
             pod.setLabels(d.getMetadata().getLabels());
 
-
 //            for (OwnerReference item : d.getMetadata().getOwnerReferences()) {
 //                pod.setResourceKind(item.getKind());
 //                pod.setResourceName(item.getName());
@@ -114,17 +113,55 @@ public class GetPodData {
 
             //get affinity
             if (d.getSpec().getAffinity() != null) {
-                pod.setAffinity(d.getSpec().getAffinity().toString());
-            } else {
-                pod.setAffinity("null");
+                Map<String, String> temp = new HashMap<>();
+
+                if (d.getSpec().getAffinity().getAdditionalProperties() != null) {
+                    temp.put("AdditionalProperties", d.getSpec().getAffinity().getAdditionalProperties().toString());
+                }
+
+                //get podAffinity
+                if (d.getSpec().getAffinity().getPodAffinity() != null) {
+                    temp.put("podAffinity", d.getSpec().getAffinity().getPodAffinity().toString());
+                }
+
+                //get podAntiAffinity
+                if (d.getSpec().getAffinity().getPodAntiAffinity() != null) {
+                    temp.put("podAntiAffinity", d.getSpec().getAffinity().getPodAntiAffinity().toString());
+                }
+
+                //get nodeAffinity
+                if (d.getSpec().getAffinity().getNodeAffinity() != null) {
+                    temp.put("nodeAffinity", d.getSpec().getAffinity().getNodeAffinity().toString());
+                }
+
+                pod.setAffinity(temp);
             }
 
+
             //get toleration
-            ArrayList<String> toleration = new ArrayList<>();
+            ArrayList<Map<String, String>> toleration = new ArrayList<>();
             for (Toleration t : d.getSpec().getTolerations()) {
-                toleration.add(t.toString());
+                Map<String, String> temp = new HashMap<>();
+                temp.clear();
+                if (t.getValue() != null)
+                    temp.put("value", t.getValue());
+
+                if (t.getEffect() != null)
+                    temp.put("effect", t.getEffect());
+
+                if (t.getKey() != null)
+                    temp.put("key", t.getKey());
+
+                if (t.getOperator() != null)
+                    temp.put("operator", t.getOperator());
+
+                if (t.getAdditionalProperties() != null)
+                    temp.put("additionalProperties", t.getAdditionalProperties().toString());
+
+                if (t.getTolerationSeconds() != null)
+                    temp.put("tolerationSeconds", t.getTolerationSeconds().toString());
+                toleration.add(temp);
             }
-            //TODO
             pod.setToleration(toleration);
 
             for (OwnerReference item : d.getMetadata().getOwnerReferences()) {
