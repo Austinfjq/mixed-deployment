@@ -204,4 +204,4 @@ def getResponseTime(namespace,serviceName,clusterIP,notEnoughURL=config.hostPort
 
 
 #获得服务的周期
-print(getResponseTime(namespace='wordpress',serviceName='wordpress-wp',clusterIP='10.101.3.215',startTime = '2019-02-28 16:07:14',endTime = '2019-02-28 16:37:14',notEnoughURL="http://10.10.101.115:8080"))
+print(getResourceCosume(namespace='wordpress',serviceName='wordpress-wp',clusterIP='10.101.3.215',startTime = '2019-02-28 13:07:14',endTime = '2019-02-28 19:06:14',notEnoughURL="http://10.10.101.115:8080"))
