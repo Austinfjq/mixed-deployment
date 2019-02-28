@@ -1,5 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.dataobject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Service {
@@ -54,35 +55,57 @@ public class Service {
     /**
      * 服务cpu使用量
      */
-    private String cpuUsage;
+    private Double cpuUsage;
     /**
      * 服务内存使用量
      */
-    private String memUsage;
+    private Double memUsage;
     /**
      * 服务存储使用量
      */
-    private String diskUsage;
+    private Double diskUsage;
     /**
      * 服务请求流量
      */
-    private String requestBytes;
+    private Double requestBytes;
     /**
      * 服务响应流量
      */
-    private String responseBytes;
+    private Double responseBytes;
     /**
      * 服务请求连接数
      */
-    private String requestConnections;
+    private Long requestConnections;
     /**
      * 服务网络错误数
      */
-    private String netErrors;
+    private Long netErrors;
     /**
      * 服务网络响应时间
      */
     private String responseTime;
+
+    /**
+     * 不需要的数据
+     */
+    private String[] key;
+    private String nodePort;
+
+    public String[] getKey() {
+        return key;
+    }
+
+    public void setKey(String[] key) {
+        this.key = key;
+    }
+
+    public String getNodePort() {
+        return nodePort;
+    }
+
+    public void setNodePort(String nodePort) {
+        this.nodePort = nodePort;
+    }
 
     public String getCpuCosume() {
         return cpuCosume;
@@ -172,59 +195,59 @@ public class Service {
         this.podList = podList;
     }
 
-    public String getCpuUsage() {
+    public Double getCpuUsage() {
         return cpuUsage;
     }
 
-    public void setCpuUsage(String cpuUsage) {
+    public void setCpuUsage(Double cpuUsage) {
         this.cpuUsage = cpuUsage;
     }
 
-    public String getMemUsage() {
+    public Double getMemUsage() {
         return memUsage;
     }
 
-    public void setMemUsage(String memUsage) {
+    public void setMemUsage(Double memUsage) {
         this.memUsage = memUsage;
     }
 
-    public String getDiskUsage() {
+    public Double getDiskUsage() {
         return diskUsage;
     }
 
-    public void setDiskUsage(String diskUsage) {
+    public void setDiskUsage(Double diskUsage) {
         this.diskUsage = diskUsage;
     }
 
-    public String getRequestBytes() {
+    public Double getRequestBytes() {
         return requestBytes;
     }
 
-    public void setRequestBytes(String requestBytes) {
+    public void setRequestBytes(Double requestBytes) {
         this.requestBytes = requestBytes;
     }
 
-    public String getResponseBytes() {
+    public Double getResponseBytes() {
         return responseBytes;
     }
 
-    public void setResponseBytes(String responseBytes) {
+    public void setResponseBytes(Double responseBytes) {
         this.responseBytes = responseBytes;
     }
 
-    public String getRequestConnections() {
+    public Long getRequestConnections() {
         return requestConnections;
     }
 
-    public void setRequestConnections(String requestConnections) {
+    public void setRequestConnections(Long requestConnections) {
         this.requestConnections = requestConnections;
     }
 
-    public String getNetErrors() {
+    public Long getNetErrors() {
         return netErrors;
     }
 
-    public void setNetErrors(String netErrors) {
+    public void setNetErrors(Long netErrors) {
         this.netErrors = netErrors;
     }
 

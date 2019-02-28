@@ -9,6 +9,7 @@ import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 public class CheckNodeMemoryPressurePredicate implements PredicateRule {
     @Override
@@ -28,23 +29,33 @@ public class CheckNodeMemoryPressurePredicate implements PredicateRule {
     }
 
     private boolean isPodBestEffort(Pod pod) {
-        for (Container container : pod.getContainers()) {
-            for (Map.Entry<String, Quantity> entry : container.getRequests().entrySet()) {
-                if (!isSupportedQoSComputeResource(entry.getKey())) {
-                    continue;
-                }
-                if (entry.getValue().isZero()){
-                    continue;
-                }
-                return false;
-            }
-            for (Map.Entry<String, Quantity> entry : container.getLimits().entrySet()) {
-                if (!isSupportedQoSComputeResource(entry.getKey())) {
-                    continue;
-                }
-                if (entry.getValue().isZero()){
-                    continue;
-                }
+        return allZero(pod.getCpuRequest(), pod.getMemRequest(), pod.getCpuLimit(), pod.getMemLimit());
+//        for (Container container : pod.getContainers()) {
+//            for (Map.Entry<String, Quantity> entry : container.getRequests().entrySet()) {
+//                if (!isSupportedQoSComputeResource(entry.getKey())) {
+//                    continue;
+//                }
+//                if (entry.getValue().isZero()){
+//                    continue;
+//                }
+//                return false;
+//            }
+//            for (Map.Entry<String, Quantity> entry : container.getLimits().entrySet()) {
+//                if (!isSupportedQoSComputeResource(entry.getKey())) {
+//                    continue;
+//                }
+//                if (entry.getValue().isZero()){
+//                    continue;
+//                }
+//                return false;
+//            }
+//        }
+//        return true;
+    }
+
+    private boolean allZero(Double ... ds) {
+        for (Double d : ds) {
+            if (!Objects.equals(d, 0D)) {
                 return false;
             }
         }

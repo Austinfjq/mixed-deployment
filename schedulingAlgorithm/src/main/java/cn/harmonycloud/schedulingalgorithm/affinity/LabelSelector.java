@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class LabelSelector {
     private Map<String, String> matchLabels;
-    private List<LabelSelectorRequirement> MatchExpressions;
+    private LabelSelectorRequirement[] MatchExpressions;
 
     public Map<String, String> getMatchLabels() {
         return matchLabels;
@@ -15,11 +15,24 @@ public class LabelSelector {
         this.matchLabels = matchLabels;
     }
 
-    public List<LabelSelectorRequirement> getMatchExpressions() {
+    public LabelSelectorRequirement[] getMatchExpressions() {
         return MatchExpressions;
     }
 
-    public void setMatchExpressions(List<LabelSelectorRequirement> matchExpressions) {
+    public void setMatchExpressions(LabelSelectorRequirement[] matchExpressions) {
         MatchExpressions = matchExpressions;
+    }
+
+    /**
+     * unused properpy
+     */
+    private Object additionalProperties;
+
+    public Object getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Object additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 }

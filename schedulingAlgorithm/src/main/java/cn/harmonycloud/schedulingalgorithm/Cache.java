@@ -1,6 +1,9 @@
 package cn.harmonycloud.schedulingalgorithm;
 
 import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.NodeAffinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
 import cn.harmonycloud.schedulingalgorithm.affinity.Toleration;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
@@ -88,11 +91,14 @@ public class Cache {
                     li.add(p);
                     nodeMapPodList.put(p.getNodeName(), li);
                 }
-                Service service = serviceMap.get(DOUtils.getServiceFullName(p));
-                if (service.getPodList() == null) {
-                    service.setPodList(new ArrayList<>());
-                }
-                service.getPodList().add(DOUtils.getPodFullName(p));
+                // 转换Affinity格式
+                readAffinity(p);
+                // 监控数据已提供
+//                Service service = serviceMap.get(DOUtils.getServiceFullName(p));
+//                if (service.getPodList() == null) {
+//                    service.setPodList(new ArrayList<>());
+//                }
+//                service.getPodList().add(DOUtils.getPodFullName(p));
             });
         }
         nodeMap = new HashMap<>();
@@ -102,6 +108,20 @@ public class Cache {
             nodeForecastMap = fetchNodeForecast(nodeList);
         }
         this.nodeList = nodeList;
+    }
+
+    private void readAffinity(Pod pod) {
+        String nodeAffinityStr = pod.getAffinity().getNodeAffinity();
+        String podAffinityStr = pod.getAffinity().getPodAffinity();
+        String podAntiAffinityStr = pod.getAffinity().getPodAntiAffinity();
+        NodeAffinity nodeAffinity = (NodeAffinity) JSONObject.toBean(JSONObject.fromObject(nodeAffinityStr), NodeAffinity.class);
+        PodAffinity podAffinity = (PodAffinity) JSONObject.toBean(JSONObject.fromObject(podAffinityStr), PodAffinity.class);
+        PodAntiAffinity podAntiAffinity = (PodAntiAffinity) JSONObject.toBean(JSONObject.fromObject(podAntiAffinityStr), PodAntiAffinity.class);
+        Affinity affinity = new Affinity();
+        affinity.setNodeAffinity(nodeAffinity);
+        affinity.setPodAffinity(podAffinity);
+        affinity.setPodAntiAffinity(podAntiAffinity);
+        pod.setAffinityObject(affinity);
     }
 
     private Map<String, Resource> fetchNodeForecast(List<Node> nodeList) {
@@ -122,7 +142,7 @@ public class Cache {
             paras.put("id", node.getNodeName() + "&" + node.getNodeIP());
 
             paras.put("index", "cpu");
-            String res = HttpUtil.post(Constants.URI_GET_NODE_FORECAST, paras);
+            String res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
             JSONArray jsonArray = JSONArray.fromObject(res);
             if (!jsonArray.isEmpty()) {
                 try {
@@ -135,7 +155,7 @@ public class Cache {
             }
 
             paras.put("index", "memory");
-            res = HttpUtil.post(Constants.URI_GET_NODE_FORECAST, paras);
+            res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
             jsonArray = JSONArray.fromObject(res);
             if (!jsonArray.isEmpty()) {
                 try {
@@ -153,14 +173,9 @@ public class Cache {
 
     private List<Object> fetchOne(String uri, Class clazz) {
         List<Object> result = new ArrayList<>();
-        String jsonStr = HttpUtil.post(uri);
+        String jsonStr = HttpUtil.get(uri);
         try {
-            JSONObject jsonObject = JSONObject.fromObject(jsonStr);
-            String timeSeries = jsonObject.optString("timeSeries");
-            if (timeSeries == null || timeSeries.isEmpty()) {
-                return result;
-            }
-            JSONArray jsonArray = JSONArray.fromObject(timeSeries);
+            JSONArray jsonArray = JSONArray.fromObject(jsonStr);
             if (jsonArray == null) {
                 return null;
             }
@@ -208,8 +223,8 @@ public class Cache {
 //        service.setMemUsage(String.valueOf(Double.valueOf(service.getMemUsage()) + (isAdd ? 1 : -1) * Double.valueOf(service.getMemCosume())));
         // 更新 node占用的资源
         Node node = nodeMap.get(host);
-        node.setCpuUsage(String.valueOf(Double.valueOf(node.getCpuUsage()) + (isAdd ? 1 : -1) * Double.valueOf(pod.getCpuRequest())));
-        node.setMemUsage(String.valueOf(Double.valueOf(node.getMemUsage()) + (isAdd ? 1 : -1) * Double.valueOf(pod.getMemRequest())));
+        node.setCpuUsage(node.getCpuUsage() + (isAdd ? 1 : -1) * pod.getCpuRequest());
+        node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest());
         // 更新node下pod列表，nodeMapPodList
         if (isAdd) {
             nodeMapPodList.get(host).add(pod);

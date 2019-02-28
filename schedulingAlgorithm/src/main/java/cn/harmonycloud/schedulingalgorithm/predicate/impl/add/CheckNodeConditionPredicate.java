@@ -15,16 +15,16 @@ public class CheckNodeConditionPredicate implements PredicateRule {
         if (node == null) {
             return false;
         }
-        NodeCondition[] nodeConditions = node.getConditions();
-        if (nodeConditions != null) {
-            for (NodeCondition cond : nodeConditions) {
-                if (NodeReady.equals(cond.getType()) && !ConditionTrue.equals(cond.getStatus())) {
-                    return false;
-                }
-                if (NodeNetworkUnavailable.equals(cond.getType()) && !ConditionFalse.equals(cond.getStatus())) {
-                    return false;
-                }
+        NodeCondition cond = node.getNodeConditions();
+        if (cond != null) {
+//            for (NodeCondition cond : nodeConditions) {
+            if (NodeReady.equals(cond.getType()) && !ConditionTrue.equals(cond.getStatus())) {
+                return false;
             }
+            if (NodeNetworkUnavailable.equals(cond.getType()) && !ConditionFalse.equals(cond.getStatus())) {
+                return false;
+            }
+//            }
         }
         if (node.getUnschedulable() != null && node.getUnschedulable()) {
             return false;

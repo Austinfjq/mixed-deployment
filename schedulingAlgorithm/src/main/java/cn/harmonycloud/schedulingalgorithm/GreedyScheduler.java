@@ -97,16 +97,16 @@ public class GreedyScheduler implements Scheduler {
             p.setAffinity(sp.getAffinity());
             p.setContainers(sp.getContainers());
             p.setWantPorts(sp.getWantPorts());
-            p.setTolerations(sp.getTolerations());
+            p.setToleration(sp.getToleration());
         });
     }
 
     private void scheduleExecute(Pod pod, String host, Cache cache) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("namespace", pod.getNamespace());
-        parameters.put("serviceName", pod.getServiceName());
         String uri;
         if (pod.getOperation() == Constants.OPERATION_ADD) {
+            parameters.put("serviceName", pod.getServiceName());
             parameters.put("nodeName", host);
             uri = Constants.URI_EXECUTE_ADD;
         } else {

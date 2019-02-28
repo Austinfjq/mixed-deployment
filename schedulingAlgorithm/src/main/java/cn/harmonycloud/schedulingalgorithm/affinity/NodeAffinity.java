@@ -4,7 +4,7 @@ import java.util.List;
 
 public class NodeAffinity {
     private NodeSelector requiredDuringSchedulingIgnoredDuringExecution;
-    private List<PreferredSchedulingTerm> preferredDuringSchedulingIgnoredDuringExecution;
+    private PreferredSchedulingTerm[] preferredDuringSchedulingIgnoredDuringExecution;
 
     public NodeSelector getRequiredDuringSchedulingIgnoredDuringExecution() {
         return requiredDuringSchedulingIgnoredDuringExecution;
@@ -14,11 +14,24 @@ public class NodeAffinity {
         this.requiredDuringSchedulingIgnoredDuringExecution = requiredDuringSchedulingIgnoredDuringExecution;
     }
 
-    public List<PreferredSchedulingTerm> getPreferredDuringSchedulingIgnoredDuringExecution() {
+    public PreferredSchedulingTerm[] getPreferredDuringSchedulingIgnoredDuringExecution() {
         return preferredDuringSchedulingIgnoredDuringExecution;
     }
 
-    public void setPreferredDuringSchedulingIgnoredDuringExecution(List<PreferredSchedulingTerm> preferredDuringSchedulingIgnoredDuringExecution) {
+    public void setPreferredDuringSchedulingIgnoredDuringExecution(PreferredSchedulingTerm[] preferredDuringSchedulingIgnoredDuringExecution) {
         this.preferredDuringSchedulingIgnoredDuringExecution = preferredDuringSchedulingIgnoredDuringExecution;
+    }
+
+    /**
+     * unused properpy
+     */
+    private Object additionalProperties;
+
+    public Object getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Object additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 }

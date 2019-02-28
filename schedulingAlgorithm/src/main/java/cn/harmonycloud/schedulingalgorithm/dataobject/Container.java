@@ -3,22 +3,22 @@ package cn.harmonycloud.schedulingalgorithm.dataobject;
 import java.util.Map;
 
 public class Container {
-    private Map<String, Quantity> requests;
-    private Map<String, Quantity> limits;
+    private String image;
+    private String ports;
 
-    public Map<String, Quantity> getRequests() {
-        return requests;
+    public String getImage() {
+        return image;
     }
 
-    public void setRequests(Map<String, Quantity> requests) {
-        this.requests = requests;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public Map<String, Quantity> getLimits() {
-        return limits;
+    public String getPorts() {
+        return ports;
     }
 
-    public void setLimits(Map<String, Quantity> limits) {
-        this.limits = limits;
+    public void setPorts(String ports) {
+        this.ports = ports;
     }
 }

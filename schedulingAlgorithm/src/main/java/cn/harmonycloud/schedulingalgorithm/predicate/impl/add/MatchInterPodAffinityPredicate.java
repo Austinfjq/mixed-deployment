@@ -15,6 +15,7 @@ import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
         }
         // 2. satisfiesPodsAffinityAntiAffinity
         // Now check if <pod> requirements will be satisfied on this node.
-        Affinity affinity = pod.getAffinity();
+        Affinity affinity = pod.getAffinityObject();
         if (!satisfiesPodsAffinityAntiAffinity(pod, node, affinity, cache)) {
             return false;
         }
@@ -138,7 +139,7 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
     }
 
     private boolean targetPodMatchesAffinityOfPod(Pod pod, Pod targetPod) {
-        Affinity affinity = pod.getAffinity();
+        Affinity affinity = pod.getAffinityObject();
         if (affinity == null || affinity.getPodAffinity() == null) {
             return false;
         }
@@ -148,8 +149,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
 
     private List<PodAffinityTerm> getPodAffinityTerms(PodAffinity podAffinity) {
         if (podAffinity != null) {
-            List<PodAffinityTerm> terms = podAffinity.getRequiredDuringSchedulingIgnoredDuringExecution();
-            if (terms != null && !terms.isEmpty()) {
+            List<PodAffinityTerm> terms = Arrays.asList(podAffinity.getRequiredDuringSchedulingIgnoredDuringExecution());
+            if (!terms.isEmpty()) {
                 return terms;
             }
         }
@@ -158,8 +159,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
 
     private List<PodAffinityTerm> getPodAntiAffinityTerms(PodAntiAffinity podAntiAffinity) {
         if (podAntiAffinity != null) {
-            List<PodAffinityTerm> terms = podAntiAffinity.getRequiredDuringSchedulingIgnoredDuringExecution();
-            if (terms != null && !terms.isEmpty()) {
+            List<PodAffinityTerm> terms = Arrays.asList(podAntiAffinity.getRequiredDuringSchedulingIgnoredDuringExecution());
+            if (!terms.isEmpty()) {
                 return terms;
             }
         }
@@ -194,11 +195,11 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
 
     private TopologyPairsMaps getMatchingAntiAffinityTopologyPairsOfPod(Pod newPod, Pod existingPod, Node node, Cache cache) {
         TopologyPairsMaps topologyMaps = new TopologyPairsMaps();
-        Affinity affinity = existingPod.getAffinity();
+        Affinity affinity = existingPod.getAffinityObject();
         if (affinity == null || affinity.getPodAffinity() == null) {
             return null;
         }
-        List<PodAffinityTerm> terms = affinity.getPodAffinity().getRequiredDuringSchedulingIgnoredDuringExecution();
+        List<PodAffinityTerm> terms = Arrays.asList(affinity.getPodAffinity().getRequiredDuringSchedulingIgnoredDuringExecution());
         if (terms != null && !terms.isEmpty()) {
             for (PodAffinityTerm term : terms) {
                 Set<String> namespaces = RuleUtil.getNamespacesFromPodAffinityTerm(existingPod, term);

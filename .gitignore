@@ -1,0 +1,12 @@
+.settings/
+.project
+.classpath
+target/
+bin/
+appLogs/
+*.log
+~$*.docx
+
+# Intellij project files
+*.iml
+.idea/

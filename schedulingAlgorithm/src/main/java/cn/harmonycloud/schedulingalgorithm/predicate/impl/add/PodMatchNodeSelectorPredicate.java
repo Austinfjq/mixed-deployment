@@ -11,6 +11,7 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +32,13 @@ public class PodMatchNodeSelectorPredicate implements PredicateRule {
             }
         }
         // 2. affinity terms
-        Affinity affinity = pod.getAffinity();
+        Affinity affinity = pod.getAffinityObject();
         if (affinity != null && affinity.getNodeAffinity() != null) {
             NodeAffinity nodeAffinity = affinity.getNodeAffinity();
             if (nodeAffinity.getRequiredDuringSchedulingIgnoredDuringExecution() == null) {
                 return true;
             } else {
-                List<NodeSelectorTerm> nodeSelectorTerms = nodeAffinity.getRequiredDuringSchedulingIgnoredDuringExecution().getNodeSelectorTerms();
+                List<NodeSelectorTerm> nodeSelectorTerms = Arrays.asList(nodeAffinity.getRequiredDuringSchedulingIgnoredDuringExecution().getNodeSelectorTerms());
                 return nodeMatchesNodeSelectorTerms(node, nodeSelectorTerms);
             }
         }

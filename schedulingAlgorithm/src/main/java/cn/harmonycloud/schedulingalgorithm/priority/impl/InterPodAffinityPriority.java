@@ -12,6 +12,7 @@ import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class InterPodAffinityPriority implements PriorityRule {
     }
 
     private List<Integer> calculateInterPodAffinityPriority(Pod pod, List<Node> nodes, Cache cache) {
-        Affinity affinity = pod.getAffinity();
+        Affinity affinity = pod.getAffinityObject();
         boolean hasAffinityConstraints = affinity != null && affinity.getPodAffinity() != null;
         boolean hasAntiAffinityConstraints = affinity != null && affinity.getPodAntiAffinity() != null;
 
@@ -92,30 +93,30 @@ public class InterPodAffinityPriority implements PriorityRule {
 
     private void processPod(Context context, Pod existingPod) {
         Node existingPodNode = context.cache.getNodeMap().get(existingPod.getNodeName());
-        Affinity existingPodAffinity = existingPod.getAffinity();
+        Affinity existingPodAffinity = existingPod.getAffinityObject();
         boolean existingHasAffinityConstraints = existingPodAffinity != null && existingPodAffinity.getPodAffinity() != null;
         boolean existingHasAntiAffinityConstraints = existingPodAffinity != null && existingPodAffinity.getPodAntiAffinity() != null;
         if (context.hasAffinityConstraints) {
-            List<WeightedPodAffinityTerm> terms = context.affinity.getPodAffinity().getPreferredDuringSchedulingIgnoredDuringExecution();
+            List<WeightedPodAffinityTerm> terms = Arrays.asList(context.affinity.getPodAffinity().getPreferredDuringSchedulingIgnoredDuringExecution());
             processTerms(context, terms, context.pod, existingPod, existingPodNode, 1);
         }
         if (context.hasAntiAffinityConstraints) {
-            List<WeightedPodAffinityTerm> terms = context.affinity.getPodAntiAffinity().getPreferredDuringSchedulingIgnoredDuringExecution();
+            List<WeightedPodAffinityTerm> terms = Arrays.asList(context.affinity.getPodAntiAffinity().getPreferredDuringSchedulingIgnoredDuringExecution());
             processTerms(context, terms, context.pod, existingPod, existingPodNode, -1);
         }
         if (existingHasAffinityConstraints) {
             int hardPodAffinityWeight = 1; // DefaultHardPodAffinitySymmetricWeight = 1, but no idea about where to find modified value
             if (hardPodAffinityWeight > 0) {
-                List<PodAffinityTerm> terms = existingPodAffinity.getPodAffinity().getRequiredDuringSchedulingIgnoredDuringExecution();
+                PodAffinityTerm[] terms = existingPodAffinity.getPodAffinity().getRequiredDuringSchedulingIgnoredDuringExecution();
                 for (PodAffinityTerm term : terms) {
                     processTerm(context, term, existingPod, context.pod, existingPodNode, (double) hardPodAffinityWeight);
                 }
             }
-            List<WeightedPodAffinityTerm> terms = existingPodAffinity.getPodAffinity().getPreferredDuringSchedulingIgnoredDuringExecution();
+            List<WeightedPodAffinityTerm> terms = Arrays.asList(existingPodAffinity.getPodAffinity().getPreferredDuringSchedulingIgnoredDuringExecution());
             processTerms(context, terms, existingPod, context.pod, existingPodNode, 1);
         }
         if (existingHasAntiAffinityConstraints) {
-            List<WeightedPodAffinityTerm> terms = existingPodAffinity.getPodAntiAffinity().getPreferredDuringSchedulingIgnoredDuringExecution();
+            List<WeightedPodAffinityTerm> terms = Arrays.asList(existingPodAffinity.getPodAntiAffinity().getPreferredDuringSchedulingIgnoredDuringExecution());
             processTerms(context, terms, existingPod, context.pod, existingPodNode, -1);
         }
     }

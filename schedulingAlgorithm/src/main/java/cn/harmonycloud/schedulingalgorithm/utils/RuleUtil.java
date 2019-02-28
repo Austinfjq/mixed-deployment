@@ -3,6 +3,7 @@ package cn.harmonycloud.schedulingalgorithm.utils;
 import cn.harmonycloud.schedulingalgorithm.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelector;
+import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorOperator;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorTerm;
@@ -27,16 +28,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorOperator.LabelSelectorOpIn;
+
 public class RuleUtil {
     public static Resource getRequestedAfterOp(Pod pod, Node node, int op) {
         Resource requested = new Resource();
 
         if (op == Constants.OPERATION_ADD) {
-            requested.setMilliCPU(Long.valueOf(node.getCpuUsage()) + Long.valueOf(pod.getCpuRequest()));
-            requested.setMemory(Long.valueOf(node.getMemUsage()) + Long.valueOf(pod.getMemRequest()));
+            requested.setMilliCPU(node.getCpuUsage().longValue() + pod.getCpuRequest().longValue());
+            requested.setMemory(node.getMemUsage().longValue() + pod.getMemRequest().longValue());
         } else {
-            requested.setMilliCPU(Long.valueOf(node.getCpuUsage()) - Long.valueOf(pod.getCpuRequest()));
-            requested.setMemory(Long.valueOf(node.getMemUsage()) - Long.valueOf(pod.getMemRequest()));
+            requested.setMilliCPU(node.getCpuUsage().longValue() - pod.getCpuRequest().longValue());
+            requested.setMemory(node.getMemUsage().longValue() - pod.getMemRequest().longValue());
         }
         return requested;
     }
@@ -151,7 +154,7 @@ public class RuleUtil {
         if (ps == null) {
             return new NothingSelector();
         }
-        if (ps.getMatchLabels().isEmpty() && ps.getMatchExpressions().isEmpty()) {
+        if (ps.getMatchLabels().isEmpty() && ps.getMatchExpressions().length == 0) {
             return new InternalSelector();
         }
         Selector selector = new InternalSelector();
@@ -164,7 +167,7 @@ public class RuleUtil {
         }
         for (LabelSelectorRequirement expr : ps.getMatchExpressions()) {
             SelectOperation op;
-            switch (expr.getOperator()) {
+            switch (LabelSelectorOperator.valueOf(expr.getOperator())) {
                 case LabelSelectorOpIn:
                     op = SelectOperation.In;
                     break;
@@ -213,18 +216,18 @@ public class RuleUtil {
 
     public static boolean matchNodeSelectorTerms(List<NodeSelectorTerm> nodeSelectorTerms, Map<String, String> nodeLabels, Map<String, String> nodeFields) {
         for (NodeSelectorTerm req : nodeSelectorTerms) {
-            if ((req.getMatchExpressions() == null || req.getMatchExpressions().isEmpty())
-                    && (req.getMatchFields() == null || req.getMatchFields().isEmpty())) {
+            if ((req.getMatchExpressions() == null || req.getMatchExpressions().length == 0)
+                    && (req.getMatchFields() == null || req.getMatchFields().length == 0)) {
                 continue;
             }
-            if (req.getMatchExpressions() != null && !req.getMatchExpressions().isEmpty()) {
-                Selector labelSelector = SelectorUtil.nodeSelectorRequirementsAsSelector(req.getMatchExpressions());
+            if (req.getMatchExpressions() != null && !(req.getMatchExpressions().length == 0)) {
+                Selector labelSelector = SelectorUtil.nodeSelectorRequirementsAsSelector(Arrays.asList(req.getMatchExpressions()));
                 if (labelSelector == null || !labelSelector.matches(nodeLabels)) {
                     continue;
                 }
             }
-            if (req.getMatchFields() != null && !req.getMatchFields().isEmpty()) {
-                Selector fieldSelector = nodeSelectorRequirementsAsFieldSelector(req.getMatchFields());
+            if (req.getMatchFields() != null && !(req.getMatchFields().length == 0)) {
+                Selector fieldSelector = nodeSelectorRequirementsAsFieldSelector(Arrays.asList(req.getMatchFields()));
                 if (fieldSelector == null || !fieldSelector.matches(nodeFields)) {
                     continue;
                 }
@@ -365,8 +368,8 @@ public class RuleUtil {
 
     public static Resource getNodeAllocatableResource(Node node) {
         Resource allocatable = new Resource();
-        allocatable.setMilliCPU(Long.valueOf(node.getAllocatableCpuCores()));
-        allocatable.setMemory(Long.valueOf(node.getAllocatableMem()));
+        allocatable.setMilliCPU(node.getAllocatableCpuCores().longValue());
+        allocatable.setMemory(node.getAllocatableMem().longValue());
         return allocatable;
     }
 }

@@ -28,4 +28,17 @@ public class PodAffinityTerm {
     public void setTopologyKey(String topologyKey) {
         this.topologyKey = topologyKey;
     }
+
+    /**
+     * unused properpy
+     */
+    private Object additionalProperties;
+
+    public Object getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Object additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
 }
