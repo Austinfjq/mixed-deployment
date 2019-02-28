@@ -14,7 +14,9 @@ class Utils:
         self.url=url
     #解析返回一个URL json的数据
     def getResponse(self,requestParam,header={}):
-        r = requests.get(url=self.url,data=requestParam,headers=header)
+        r = requests.get(url=self.url,params = requestParam,headers=header)
+        print(requestParam)
+        print(r.url)
         return r.json()
     def putResponse(self,requestParam,header={}):
         r = requests.put(url=self.url,data=requestParam,headers=header)
