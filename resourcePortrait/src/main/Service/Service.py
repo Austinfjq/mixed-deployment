@@ -46,6 +46,10 @@ def updateServiceInfo(newValue):
         Result.ServiceType = newValue.ServiceType
     if newValue.responseTime is not None:
         Result.responseTime = newValue.responseTime
+    if newValue.ownerName is not None:
+        Result.ownerName = newValue.ownerName
+    if newValue.ownerType is not None:
+        Result.ownerType = newValue.ownerType
     db.session.commit()
     return 1
 #查找

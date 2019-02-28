@@ -23,6 +23,7 @@ public class PodData {
     private String id;
     @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
     private String time;
+
     private String podName;
     private String podIp;
     private String nodeName;
@@ -62,10 +63,12 @@ public class PodData {
     private Map<String, String> labels;
     private ArrayList<String> persistentVolumeClaimNames;
     private Map<String, String> containers;
-    private String affinity;
+    private Map<String, String> affinity;
     private String deletionStamp;
     private String ownerReferencesUid;
-    private ArrayList<String> toleration;
+    private ArrayList<Map<String, String>> toleration;
+    @Field(type = FieldType.Long)
+    private Long netErrors;
 
     public PodData() {
         this.podName = "";
@@ -91,6 +94,7 @@ public class PodData {
         this.writesBytes = 0.0;
         this.receiveBytes = 0.0;
         this.responseBytes = 0.0;
+        this.netErrors = 0l;
         this.locateNodeIP = "";
     }
 
@@ -223,11 +227,11 @@ public class PodData {
         return persistentVolumeClaimNames;
     }
 
-    public String getAffinity() {
+    public Map<String, String> getAffinity() {
         return affinity;
     }
 
-    public ArrayList<String> getToleration() {
+    public ArrayList<Map<String, String>> getToleration() {
         return toleration;
     }
 
@@ -242,6 +246,11 @@ public class PodData {
     public Map<String, String> getContainers() {
         return containers;
     }
+
+    public Long getNetErrors() {
+        return netErrors;
+    }
+
 
     public void setNamespace(String namespace) {
         this.namespace = namespace;
@@ -348,14 +357,14 @@ public class PodData {
     }
 
     public void setPersistentVolumeClaimNames(ArrayList<String> persistentVolumeClaimNames) {
-        persistentVolumeClaimNames = persistentVolumeClaimNames;
+        this.persistentVolumeClaimNames = persistentVolumeClaimNames;
     }
 
-    public void setAffinity(String affinity) {
+    public void setAffinity(Map<String, String> affinity) {
         this.affinity = affinity;
     }
 
-    public void setToleration(ArrayList<String> toleration) {
+    public void setToleration(ArrayList<Map<String, String>> toleration) {
         this.toleration = toleration;
     }
 
@@ -370,6 +379,11 @@ public class PodData {
     public void setContainers(Map<String, String> containers) {
         this.containers = containers;
     }
+
+    public void setNetErrors(Long netErrors) {
+        this.netErrors = netErrors;
+    }
+
 
     public ArrayList<String> getKey() {
         ArrayList<String> key = new ArrayList<>();

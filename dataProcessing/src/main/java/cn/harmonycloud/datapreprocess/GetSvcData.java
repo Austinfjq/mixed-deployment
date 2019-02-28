@@ -89,6 +89,8 @@ public class GetSvcData {
             Double requestBytes = 0.0;
             Double responseBytes = 0.0;
             Long netErrors = 0l;
+            String volumeType = "";
+            Double volumeUsage = 0.0;
 
             if (svc.getPodList().size() != 0) {
                 for (String podName : svc.getPodList()) {
@@ -100,6 +102,8 @@ public class GetSvcData {
                             requestBytes += pod.getReceiveBytes();
                             responseBytes += pod.getResponseBytes();
                             netErrors += pod.getNetErrors();
+                            volumeType = pod.getVolumeType();
+                            volumeUsage += pod.getVolumeUsage();
                         }
                     }
                 }
@@ -110,6 +114,8 @@ public class GetSvcData {
             svc.setRequestBytes(requestBytes);
             svc.setResponseBytes(responseBytes);
             svc.setNetErrors(netErrors);
+            svc.setVolumeType(volumeType);
+            svc.setVolumeUsage(volumeUsage);
         }
 
 
