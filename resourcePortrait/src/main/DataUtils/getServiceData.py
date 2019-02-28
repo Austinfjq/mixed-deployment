@@ -6,7 +6,7 @@ import requests
 #定义一个全局配置类
 config = Config()
 
-#获取Pod实例数
+#获取指定service的系统Pod实例数
 #傳遞值：
 #1.notEnoughURL ：http://主機:端口
 #2.namespace: 服務所在namespace
@@ -22,8 +22,8 @@ def getPodIntances(namespace,serviceName,clusterIP,notEnoughURL=config.hostPortU
                  config.serviceName:serviceName,
                  config.clusterIP:clusterIP}
     #data = {"namespace" : "foo", "serviceName" : "22","clusterIP" : "22"}
-    in_json = json.dumps(paramater)
-    return temp.getResponse(requestParam=in_json)
+    in_json = paramater#json.dumps(paramater)
+    return temp.getResponse(requestParam = paramater)
 
 
 #获取指定service的cpu_request,mem_request
@@ -70,7 +70,7 @@ def getNetVolumn(namespace,serviceName,clusterIP,notEnoughURL=config.hostPortURL
     paramater = {config.namespace:namespace,
                  config.serviceName:serviceName,
                  config.clusterIP:clusterIP}
-    in_json = json.dumps(paramater)
+    in_json = paramater#json.dumps(paramater)
     return temp.getResponse(requestParam = in_json)
 
 #获得服务所属类型
@@ -139,16 +139,16 @@ def getMappingRecords(namespace,serviceName,clusterIP,numNetRequest):
 #6.timeTo：記錄時間下界（時間戳格式）
 #返回值
 #1.
-def getResourceCosume(namespace,serviceName,clusterIP,timeFrom,timeTo,notEnoughURL=config.hostPortURL):
+def getResourceCosume(namespace,serviceName,clusterIP,startTime,endTime,notEnoughURL=config.hostPortURL):
     newUrl = notEnoughURL + config.url_service_getResourceCosume
     temp = Utils(newUrl)
     #将请求参数封装成parameter
     paramater = {config.namespace:namespace,
                  config.serviceName:serviceName,
                  config.clusterIP:clusterIP,
-                 config.timeFrom:timeFrom,
-                 config.timeTo:timeTo}
-    in_json = json.dumps(paramater)
+                 config.timeFrom:startTime,
+                 config.timeTo:endTime}
+    in_json = paramater#json.dumps(paramater)
     return temp.getResponse(requestParam=in_json)
 
 
@@ -166,7 +166,7 @@ def getResourceCosume(namespace,serviceName,clusterIP,timeFrom,timeTo,notEnoughU
 #2.numInstances：相应服务的Pod实例数
 #3.numNetRequest：服务单位时间请求数
 #TODO
-def getLoadMappingIntances(namespace,serviceName,clusterIP,timeFrom,timeTo,notEnoughURL=config.hostPortURL):
+def getLoadMappingIntances(namespace,serviceName,clusterIP,startTime,endTime,notEnoughURL=config.hostPortURL):
     newUrl = notEnoughURL + config.url_service_getLoadMappingIntances
     temp = Utils(newUrl)
     #将请求参数封装成parameter
@@ -174,9 +174,10 @@ def getLoadMappingIntances(namespace,serviceName,clusterIP,timeFrom,timeTo,notEn
     paramater = {config.namespace:namespace,
                  config.serviceName:serviceName,
                  config.clusterIP:clusterIP,
-                 config.timeFrom:timeFrom,
-                 config.timeTo:timeTo}
-    in_json = json.dumps(paramater)
+                 config.timeFrom:startTime,
+                 config.timeTo:endTime}
+    in_json = paramater#json.dumps(paramater)
+
 
     return temp.getResponse(requestParam=in_json)
 
@@ -197,10 +198,10 @@ def getResponseTime(namespace,serviceName,clusterIP,notEnoughURL=config.hostPort
     paramater = {config.namespace:namespace,
                  config.serviceName:serviceName,
                  config.clusterIP:clusterIP}
-    in_json = json.dumps(paramater)
+    in_json = paramater#json.dumps(paramater)
     return temp.getResponse(requestParam=in_json)
 
 
 
 #获得服务的周期
-#print(getResponseTime(namespace="default",serviceName="wordpress",clusterIP="192.168.122.133"))
+print(getResponseTime(namespace='wordpress',serviceName='wordpress-wp',clusterIP='10.101.3.215',startTime = '2019-02-28 16:07:14',endTime = '2019-02-28 16:37:14',notEnoughURL="http://10.10.101.115:8080"))

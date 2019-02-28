@@ -24,7 +24,7 @@ def handle_flask_error(error):
 
     return response
 #以下为模拟内部数据接口测试
-@app.route('/inside/service/PodInstances', methods=['GET','POST'])
+@app.route('/service/podNums', methods=['GET','POST'])
 def getPodPeriod():
     dictTemp = {
         "podInstancesNum" : "2"

@@ -43,8 +43,8 @@ def getPodCosume():
                 #获取网络返回一个字典
                 retJsonNet = getNetVolumn(namespace=dicttest[config.namespace],serviceName=dicttest[config.serviceName],clusterIP=dicttest[config.clusterIP])
                 retDictNet = retJsonNet
-                downNetIOCosume = float(retDictNet["DownNetIOCosume"])
-                upNetIOCosume = float(retDictNet["UPNetIOCosume"])
+                downNetIOCosume = float(retDictNet["requestBytes"])
+                upNetIOCosume = float(retDictNet["responseBytes"])
 
                 #获取当前Pod实例数   返回json
                 retJsonInstances = getPodIntances(namespace=dicttest[config.namespace],serviceName=dicttest[config.serviceName],clusterIP=dicttest[config.clusterIP])
