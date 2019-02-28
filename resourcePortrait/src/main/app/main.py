@@ -6,6 +6,7 @@ from config import error_config
 from config.config import Config
 from DataUtils.getServiceData import getServiceTypeImpl,getMappingRecords,getPodRequest,getPodIntances,getNetVolumn
 from DAO.ServiceDAO import app#!!!!!!!!!!!!!!!!!!!!!!!!!!
+from DataUtils.utils import adjustValidParameter
 
 #获取相关配置信息
 config = Config()
@@ -29,7 +30,7 @@ def getPodCosume():
     data = request.get_data()
     dicttest = json.loads(data)
     if request.method =='POST':
-        if config.namespace and config.serviceName and config.clusterIP in dicttest:#包含有必须参数
+        if config.namespace and config.serviceName and config.clusterIP in dicttest and adjustValidParameter(dicttest):#包含有必须参数
             if dicttest[config.namespace] =="" or dicttest[config.serviceName] =="" or dicttest[config.clusterIP] =="":
                 raise error_config.CustomFlaskErr(error_config.PARAMETERS_INVALID,status_code=400)
             else:
@@ -74,7 +75,7 @@ def getServiceType():
     data = request.get_data()
     dicttest = json.loads(data)
     if request.method =='POST':
-        if config.namespace and config.serviceName and config.clusterIP in dicttest:#包含有必须参数
+        if config.namespace and config.serviceName and config.clusterIP in dicttest and adjustValidParameter(dicttest):#包含有必须参数
             if dicttest[config.namespace] =="" or dicttest[config.serviceName] =="" or dicttest[config.clusterIP] =="":
                 raise error_config.CustomFlaskErr(error_config.PARAMETERS_INVALID,status_code=400)
             else:
@@ -101,7 +102,7 @@ def getServiceInstances():
     data = request.get_data()
     dicttest = json.loads(data)
     if request.method =='POST':
-        if config.namespace and config.serviceName and config.clusterIP and config.numNetRequest in dicttest:#包含有必须参数
+        if config.namespace and config.serviceName and config.clusterIP and config.numNetRequest in dicttest and adjustValidParameter(dicttest):#包含有必须参数
             if dicttest[config.namespace] =="" or dicttest[config.serviceName] =="" or dicttest[config.clusterIP] ==""or dicttest[config.numNetRequest]==0:
                 raise error_config.CustomFlaskErr(error_config.PARAMETERS_INVALID,status_code=400)
             else:
@@ -126,7 +127,7 @@ def getservicePeriod():
     data = request.get_data()
     dicttest = json.loads(data)
     if request.method =='POST':
-        if config.namespace and config.serviceName and config.clusterIP in dicttest:#包含有必须参数
+        if config.namespace and config.serviceName and config.clusterIP in dicttest and adjustValidParameter(dicttest):#包含有必须参数
             if dicttest[config.namespace] =="" or dicttest[config.serviceName] =="" or dicttest[config.clusterIP] =="":
                 raise error_config.CustomFlaskErr(error_config.PARAMETERS_INVALID,status_code=400)
             else:
@@ -156,8 +157,6 @@ def getservicePeriod():
             raise error_config.CustomFlaskErr(error_config.PARAMETERS_NOTENOUGH,status_code=400)
     else:
         raise error_config.CustomFlaskErr(error_config.REQUEST_METHOD_ERROR,status_code=400)
-
-
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0', port=8089)

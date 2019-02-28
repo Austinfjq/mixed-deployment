@@ -9,6 +9,8 @@ from Service.Service import delete
 #定义一个全局配置类
 config = Config()
 
+
+
 #删除指定服务的所有负载实例数映射记录
 #1.notEnoughURL ：http://主機:端口
 #2.namespace: 服務所在namespace
@@ -84,10 +86,11 @@ def insertServiceStorge(namespace,serviceName,clusterIP,storgeType,storgeValue):
 #10.Type:1.CPU密集型/2.mem密集型/3.网络上传密集型/4.网络下载密集型
 #返回值
 #1.isSucceed
-
-def updateService(namespace,serviceName,clusterIP,cpuRequest=None,responseTime=None,cpuLimit=None,memRequest=None,memLimit=None,period=None,Type=None):
+def updateService(namespace,serviceName,clusterIP,cpuRequest=None,responseTime=None,
+                  cpuLimit=None,memRequest=None,memLimit=None,period=None,Type=None,
+                  ownerName = None,ownerType=None):
     service = Service(namespace=namespace,serviceName=serviceName,clusterIP=clusterIP,cpuRequest=cpuRequest,
-                      cpuLimit=cpuLimit,memRequest=memRequest,
+                      cpuLimit=cpuLimit,memRequest=memRequest,ownerName=ownerName,ownerType=ownerType,
                       memLimit=memLimit,period=period,ServiceType=Type,responseTime=responseTime)
     return updateServiceInfo(service)
 
@@ -122,3 +125,4 @@ def insertServiceInfo(namespace,serviceName,clusterIP,cpuRequest=None,cpuLimit=N
 #print(service.serviceID)
 #addMappingRecords(namespace="default",serviceName="wordess",clusterIP="192.168.122.133",serviceLoad=3000,podIntances=25)
 #insertServiceStorge(namespace='default',serviceName='wordpress',clusterIP='192.168.122.133',storgeType="emptyDIR",storgeValue=200)
+

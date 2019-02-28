@@ -20,13 +20,17 @@ class Service(db.Model):
     serviceName = db.Column(db.String(50),nullable=False)
     clusterIP = db.Column(db.String(50),nullable=False)
     responseTime = db.Column(db.String(10),nullable=True)
+    ownerName = db.Column(db.String(30),nullable=True)
+    ownerType = db.Column(db.String(30),nullable=True)
     cpuRequest = db.Column(db.SMALLINT)
     cpuLimit = db.Column(db.SMALLINT)
     memRequest = db.Column(db.SMALLINT)
     memLimit = db.Column(db.SMALLINT)
     period =  db.Column(db.Integer)# 以分钟为单位
     ServiceType = db.Column(db.SMALLINT)#1.CPU密集型2.mem密集型3.网络上传密集型4.网络下载密集型
-    def __init__(self,namespace=None,serviceName=None,clusterIP=None,cpuRequest=None,cpuLimit=None,memRequest=None,memLimit=None,period=None,ServiceType=None,responseTime=None):
+    def __init__(self,namespace=None,serviceName=None,clusterIP=None,cpuRequest=None,
+                 cpuLimit=None,memRequest=None,memLimit=None,period=None,
+                 ServiceType=None,responseTime=None,ownerName=None,ownerType=None):
         self.serviceID = str(uuid.uuid1())
 
         self.namespace = namespace
@@ -39,6 +43,8 @@ class Service(db.Model):
         self.period = period
         self.ServiceType = ServiceType
         self.responseTime = responseTime
+        self.ownerType = ownerType
+        self.ownerName = ownerName
 
     def to_json(self):
         dict = self.__dict__
