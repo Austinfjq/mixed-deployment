@@ -41,4 +41,6 @@ public interface IServiceDataService {
     public List<Map<String,Object>> getLoadMappingInstances(String namespace,String serviceName,String clusterIP,String startTime,String endTime);
     //实时获得指定服务的单位时间请求数响应时间平均值（衡量Qos）
     public Double getAvgResponseTime(String namespace,String serviceName,String clusterIP);
+    //获取当前service数据
+    public List<Map<String,Object>> getNowServices(String now);
 }

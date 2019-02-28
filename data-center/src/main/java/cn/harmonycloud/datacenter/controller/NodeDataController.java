@@ -82,4 +82,16 @@ public class NodeDataController {
                                                 @RequestParam("nodeIP") String nodeIP){
         return nodeDataService.getNodeConditions(nodeName,nodeIP);
     }
+
+    /**
+     * 获取当前node数据
+     *
+     * @return
+     */
+    @GetMapping("/nowNode")
+    public List<Map<String,Object>> getNowNodes(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return nodeDataService.getNowNodes(df.format(new Date()));
+    }
 }

@@ -1,6 +1,7 @@
 package cn.harmonycloud.datacenter.dao;
 
 import cn.harmonycloud.datacenter.entity.DataPoint;
+import cn.harmonycloud.datacenter.entity.es.NodeData;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface INodeDataDao {
     public List<DataPoint> getIndexDatas(String nodeName, String nodeIP, String indexName, String startTime, String endTime);
     //获得Node的Conditions
     public Map<String,Object> getNodeConditions(String nodeName, String nodeIP);
+    //获得当前时间的Node
+    public List<Map<String,Object>> getNowNodes(String now);
 }

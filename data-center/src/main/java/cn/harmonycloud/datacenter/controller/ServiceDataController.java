@@ -239,4 +239,16 @@ public class ServiceDataController {
         responseMap.put("responseTime",avgResponseTime);
         return responseMap;
     }
+
+    /**
+     * 获取当前service数据
+     *
+     * @return
+     */
+    @GetMapping("/nowService")
+    public List<Map<String,Object>> getNowServices(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return serviceDataService.getNowServices(df.format(new Date()));
+    }
 }

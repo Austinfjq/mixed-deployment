@@ -528,4 +528,52 @@ public class ServiceDataDao implements IServiceDataDao {
             return null;
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getNowServices(String now) {
+        //GET /service/servicedata/_search
+        //{
+        //    "query":{
+        //        "bool":{
+        //            "must":[
+        //                {"match_phrase":{"time":"2019-01-01 00:00:00"}}
+        //            ]
+        //        }
+        //    },
+        //	"_source":["namespace","serviceName","podNums","cpuUsage","memUsage","onlineType"]
+        //}
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",now));
+        String[] includes = {"namespace","serviceName","podNums","cpuUsage","memUsage","onlineType"};
+        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(SERVICE_INDEX)
+                .withTypes(SERVICE_TYPE)
+                .withSourceFilter(fetchSourceFilter)
+                .withSearchType(SearchType.DEFAULT)
+                .build();
+        SearchResponse searchResponse = elasticsearchTemplate.query(searchQuery, response -> response);
+        SearchHits searchHits = searchResponse.getHits();
+        if(searchHits.getTotalHits()>0){
+            for(SearchHit searchHit : searchHits){
+                Map map = searchHit.getSourceAsMap();
+                Map<String, Object> result = new HashMap<>();
+                result.put("namespace", map.get("namespace"));
+                result.put("serviceName", map.get("serviceName"));
+                result.put("podNums", map.get("podNums"));
+                result.put("cpuUsage", map.get("cpuUsage"));
+                result.put("memUsage", map.get("memUsage"));
+                String onlineType = (String) map.get("onlineType");
+                if(onlineType.equals("1")){
+                    result.put("isOffline",true);
+                }else{
+                    result.put("isOffline",false);
+                }
+                resultList.add(result);
+            }
+        }
+        return resultList;
+    }
 }

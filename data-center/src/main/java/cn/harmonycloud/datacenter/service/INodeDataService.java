@@ -26,4 +26,6 @@ public interface INodeDataService {
     public List<DataPoint> getIndexDatas(String id, String indexName, String startTime, String endTime);
     //获得Node的Conditions
     public Map<String,Object> getNodeConditions(String nodeName, String nodeIP);
+    //获得当前时间的Node
+    public List<Map<String,Object>> getNowNodes(String now);
 }

@@ -68,7 +68,7 @@ public class ForecastDataController {
      * @param endTime
      * @return
      */
-    @GetMapping("/forecast/forecastValue")
+    @GetMapping("/forecast/forecastValues")
     public List<Object> getAllForecastValue(@RequestParam("startTime") String startTime,
                                             @RequestParam("endTime") String endTime){
         return forecastDataService.getAllForecastValue(startTime,endTime);

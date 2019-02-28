@@ -59,4 +59,9 @@ public class NodeDataService implements INodeDataService {
     public Map<String, Object> getNodeConditions(String nodeName, String nodeIP) {
         return nodeDataDao.getNodeConditions(nodeName,nodeIP);
     }
+
+    @Override
+    public List<Map<String, Object>> getNowNodes(String now) {
+        return nodeDataDao.getNowNodes(now);
+    }
 }

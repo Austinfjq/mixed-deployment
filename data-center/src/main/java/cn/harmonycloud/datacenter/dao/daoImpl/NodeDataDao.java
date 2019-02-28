@@ -2,9 +2,11 @@ package cn.harmonycloud.datacenter.dao.daoImpl;
 
 import cn.harmonycloud.datacenter.dao.INodeDataDao;
 import cn.harmonycloud.datacenter.entity.DataPoint;
+import cn.harmonycloud.datacenter.entity.es.NodeData;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -128,5 +130,47 @@ public class NodeDataDao implements INodeDataDao {
             }
         }
         return new HashMap<>();
+    }
+
+    @Override
+    public List<Map<String, Object>> getNowNodes(String now) {
+        //GET /node/nodedata/_search
+        //{
+        //    "query":{
+        //        "bool":{
+        //            "must":[
+        //                {"match_phrase":{"time":"2019-01-01 00:00:00"}}
+        //            ]
+        //        }
+        //    },
+        //	"_source":["nodeName","nodeIP","podNums","cpuUsage","memUsage"]
+        //}
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",now));
+        String[] includes = {"nodeName","nodeIP","podNums","cpuUsage","memUsage"};
+        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(NODE_INDEX)
+                .withTypes(NODE_TYPE)
+                .withSourceFilter(fetchSourceFilter)
+                .withSearchType(SearchType.DEFAULT)
+                .build();
+        SearchResponse searchResponse = elasticsearchTemplate.query(searchQuery, response -> response);
+        SearchHits searchHits = searchResponse.getHits();
+        if(searchHits.getTotalHits()>0){
+            for(SearchHit searchHit : searchHits){
+                Map map = searchHit.getSourceAsMap();
+                Map<String, Object> result = new HashMap<>();
+                result.put("hostName", map.get("nodeName"));
+                result.put("hostIP", map.get("nodeIP"));
+                result.put("podNums", map.get("podNums"));
+                result.put("cpuUsage", map.get("cpuUsage"));
+                result.put("memUsage", map.get("memUsage"));
+                resultList.add(result);
+            }
+        }
+        return resultList;
     }
 }

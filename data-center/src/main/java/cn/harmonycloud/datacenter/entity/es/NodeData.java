@@ -50,6 +50,8 @@ public class NodeData {
     @Field(type = FieldType.Double)
     private Double podMaxCapacity;
     private String condition;
+    @Field(type = FieldType.Long)
+    private Long podNums;
     private Map<String, String> labels;
     @Field(type = FieldType.Boolean)
     private boolean unschedulable;
@@ -82,11 +84,20 @@ public class NodeData {
         this.requestedVolumes = 0.0;
         this.allocatableVolumesCount = 0.0;
         this.preferAvoidPodsAnnotationKey = "";
+        this.podNums = 0l;
     }
 
     public NodeData(String hostName, String ip) {
         this.nodeName = hostName;
         this.nodeIP = ip;
+    }
+
+    public Long getPodNums() {
+        return podNums;
+    }
+
+    public void setPodNums(Long podNums) {
+        this.podNums = podNums;
     }
 
     public String getId() {
