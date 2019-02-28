@@ -38,6 +38,7 @@ public class ServiceData {
         this.requestConnections = 0l;
         this.volumeType = "";
         this.volumeUsage = 0.0;
+        this.podNums = 0l;
     }
 
     public ServiceData(String serviceNamespace, String serviceName, String clusterIP) {

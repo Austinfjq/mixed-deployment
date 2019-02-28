@@ -7,6 +7,7 @@ import cn.harmonycloud.tools.K8sClient;
 import cn.harmonycloud.tools.ReadUrl;
 import cn.harmonycloud.tools.SetValue;
 import cn.harmonycloud.tools.Write2ES;
+import com.alibaba.fastjson.JSON;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,6 +17,9 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.alibaba.fastjson.serializer.SerializerFeature.*;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 
 public class GetSvcData {
@@ -56,7 +60,12 @@ public class GetSvcData {
 
             }
             svc.setPodList(podNameList);
-            svc.setPodNums((long) podNameList.size());
+
+            if (podNameList.size() != 0) {
+                svc.setPodNums((long) podNameList.size());
+            } else {
+                svc.setPodNums(1l);
+            }
 
             //get svc ownername kind
             if (podNameList.size() != 0) {
@@ -69,7 +78,6 @@ public class GetSvcData {
                     }
                 }
             }
-
 
             s.add(svc);
         }
@@ -180,7 +188,9 @@ public class GetSvcData {
     }
 
     public static void main(String[] args) {
-        System.out.println(Write2ES.run(run(), "services"));
+        String returnValue = JSON.toJSONString(run(), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        System.out.println(returnValue);
     }
 
 }
