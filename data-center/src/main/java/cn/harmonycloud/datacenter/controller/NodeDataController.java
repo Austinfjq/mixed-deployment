@@ -66,7 +66,7 @@ public class NodeDataController {
 
     @GetMapping("/nodes")
     public List<NodeData> findAllNodes(){
-        List<NodeData> nodes = Lists.newArrayList(nodeDataService.findAllNodeDatas());
+        List<NodeData> nodes = nodeDataService.findAllNodeDatas();
         return nodes;
     }
 
@@ -89,9 +89,7 @@ public class NodeDataController {
      * @return
      */
     @GetMapping("/nowNode")
-    public List<Map<String,Object>> getNowNodes(){
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        return nodeDataService.getNowNodes(df.format(new Date()));
+    public List<Map> getNowNodes(){
+        return nodeDataService.getNowNodes();
     }
 }

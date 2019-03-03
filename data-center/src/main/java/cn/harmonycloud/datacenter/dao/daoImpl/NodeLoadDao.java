@@ -2,7 +2,6 @@ package cn.harmonycloud.datacenter.dao.daoImpl;
 
 import cn.harmonycloud.datacenter.dao.INodeLoadDao;
 import cn.harmonycloud.datacenter.entity.NodeLoad;
-import cn.harmonycloud.datacenter.entity.ServiceLoad;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -73,7 +72,7 @@ public class NodeLoadDao implements INodeLoadDao {
                 .dateRange("group_by_time")
                 .field("time")
                 .addRange(startTime,endTime);
-        TermsAggregationBuilder nodeIPTerms = AggregationBuilders.terms("group_by_nodeIP").field("nodeIP");
+        TermsAggregationBuilder nodeIPTerms = AggregationBuilders.terms("group_by_nodeIP").field("nodeIP").size(Integer.MAX_VALUE);
         AvgAggregationBuilder avgCpuUsage = AggregationBuilders.avg("avg_cpuUsage").field("cpuUsage");
         AvgAggregationBuilder avgMemUsage = AggregationBuilders.avg("avg_memUsage").field("memUsage");
         AvgAggregationBuilder avgDiskUsage = AggregationBuilders.avg("avg_diskUsage").field("diskUsage");

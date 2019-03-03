@@ -45,8 +45,8 @@ public class ServiceDataService implements IServiceDataService {
     }
 
     @Override
-    public Iterable<ServiceData> findAllServiceDatas() {
-        return serviceDataRepository.findAll();
+    public List<ServiceData> findAllServiceDatas() {
+        return serviceDataDao.findAllServiceDatas();
     }
 
     @Override
@@ -88,12 +88,12 @@ public class ServiceDataService implements IServiceDataService {
     }
 
     @Override
-    public List<Map<String,Object>> getResourceConsume(String namespace, String serviceName, String clusterIP, String startTime, String endTime) {
+    public List<Map> getResourceConsume(String namespace, String serviceName, String clusterIP, String startTime, String endTime) {
         return serviceDataDao.getResourceConsume(namespace,serviceName,clusterIP,startTime,endTime);
     }
 
     @Override
-    public List<Map<String, Object>> getLoadMappingInstances(String namespace, String serviceName, String clusterIP, String startTime, String endTime) {
+    public List<Map> getLoadMappingInstances(String namespace, String serviceName, String clusterIP, String startTime, String endTime) {
         return serviceDataDao.getLoadMappingInstances(namespace,serviceName,clusterIP,startTime,endTime);
     }
 
@@ -106,5 +106,10 @@ public class ServiceDataService implements IServiceDataService {
         calendar.add(Calendar.SECOND,-TIME_INTERVAL);
         Date startTime = calendar.getTime();
         return serviceDataDao.getAvgResponseTime(namespace,serviceName,clusterIP,simpleDateFormat.format(startTime),simpleDateFormat.format(endTime));
+    }
+
+    @Override
+    public List<Map> getNowServices() {
+        return serviceDataDao.getNowServices();
     }
 }
