@@ -6,6 +6,7 @@ import cn.harmonycloud.tools.K8sClient;
 import cn.harmonycloud.tools.ReadUrl;
 import cn.harmonycloud.tools.SetValue;
 import cn.harmonycloud.tools.Write2ES;
+import com.alibaba.fastjson.JSON;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,6 +15,9 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 
 import java.util.*;
+
+import static com.alibaba.fastjson.serializer.SerializerFeature.*;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 public class GetNodeData {
 
@@ -45,10 +49,15 @@ public class GetNodeData {
             }
             node.setNodeConditions(nodeConditions);
 
-            //get used ports
+            //get used ports and podnums
             Map<String, String> portTemp = new HashMap<>();
+            long podNums = 0l;
+
             for (Pod pod : podList.getItems()) {
                 if (pod.getSpec().getNodeName().equals(d.getMetadata().getName())) {
+
+                    podNums++;
+                    //get ports
                     for (Container c : pod.getSpec().getContainers()) {
                         if (c.getPorts() != null) {
                             for (ContainerPort cp : c.getPorts()) {
@@ -58,6 +67,8 @@ public class GetNodeData {
                     }
                 }
             }
+
+            node.setPodNums(podNums);
             node.setUsedPorts(portTemp);
 
             n.add(node);
@@ -177,6 +188,8 @@ public class GetNodeData {
     }
 
     public static void main(String[] args) {
-        System.out.println(Write2ES.run(run(), "nodes"));
+        String returnValue = JSON.toJSONString(run(), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        System.out.println(returnValue);
     }
 }

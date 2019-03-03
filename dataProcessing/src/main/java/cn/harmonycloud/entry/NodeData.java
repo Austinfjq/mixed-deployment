@@ -17,7 +17,7 @@ public class NodeData {
     private Double allocatablePods;
     private Double podMaxCapacity;
     private String condition;
-
+    private Long podNums;
 
     private Map<String, String> labels;
     private boolean unschedulable;
@@ -48,6 +48,7 @@ public class NodeData {
         this.requestedVolumes = 0.0;
         this.allocatableVolumesCount = 0.0;
         this.preferAvoidPodsAnnotationKey = "";
+        this.podNums = 0l;
     }
 
     public NodeData(String hostName, String ip) {
@@ -147,6 +148,10 @@ public class NodeData {
         return preferAvoidPodsAnnotationKey;
     }
 
+    public Long getPodNums() {
+        return podNums;
+    }
+
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
     }
@@ -231,6 +236,9 @@ public class NodeData {
         this.imageStates = imageStates;
     }
 
+    public void setPodNums(Long podNums) {
+        this.podNums = podNums;
+    }
 
     public void setNodeConditions(Map<String, String> nodeConditions) {
         this.nodeConditions = nodeConditions;
