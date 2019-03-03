@@ -19,17 +19,4 @@ public class PreferredSchedulingTerm {
     public void setPreference(NodeSelectorTerm preference) {
         this.preference = preference;
     }
-
-    /**
-     * unused properpy
-     */
-    private Object additionalProperties;
-
-    public Object getAdditionalProperties() {
-        return additionalProperties;
-    }
-
-    public void setAdditionalProperties(Object additionalProperties) {
-        this.additionalProperties = additionalProperties;
-    }
 }

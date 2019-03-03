@@ -16,6 +16,7 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
+import com.google.gson.Gson;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -63,6 +64,8 @@ public class Cache {
         return nodeForecastMap;
     }
 
+    private static Gson gson = new Gson();
+
     /**
      * 每轮调度开始时调用，获取数据，覆盖上一轮的旧数据
      */
@@ -104,24 +107,34 @@ public class Cache {
         nodeMap = new HashMap<>();
         nodeForecastMap = new HashMap<>();
         if (nodeList != null) {
-            nodeList.forEach(n -> nodeMap.put(n.getNodeName(), n));
+            nodeList.forEach(n -> {
+                nodeMap.put(n.getNodeName(), n);
+                // 转换taints格式
+                readTaints(n);
+            });
             nodeForecastMap = fetchNodeForecast(nodeList);
         }
         this.nodeList = nodeList;
     }
 
     private void readAffinity(Pod pod) {
-        String nodeAffinityStr = pod.getAffinity().getNodeAffinity();
-        String podAffinityStr = pod.getAffinity().getPodAffinity();
-        String podAntiAffinityStr = pod.getAffinity().getPodAntiAffinity();
-        NodeAffinity nodeAffinity = (NodeAffinity) JSONObject.toBean(JSONObject.fromObject(nodeAffinityStr), NodeAffinity.class);
-        PodAffinity podAffinity = (PodAffinity) JSONObject.toBean(JSONObject.fromObject(podAffinityStr), PodAffinity.class);
-        PodAntiAffinity podAntiAffinity = (PodAntiAffinity) JSONObject.toBean(JSONObject.fromObject(podAntiAffinityStr), PodAntiAffinity.class);
+        String nodeAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getNodeAffinity());
+        String podAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAffinity());
+        String podAntiAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAntiAffinity());
+        NodeAffinity nodeAffinity = gson.fromJson(nodeAffinityStr, NodeAffinity.class);
+        PodAffinity podAffinity = gson.fromJson(podAffinityStr, PodAffinity.class);
+        PodAntiAffinity podAntiAffinity = gson.fromJson(podAntiAffinityStr, PodAntiAffinity.class);
         Affinity affinity = new Affinity();
         affinity.setNodeAffinity(nodeAffinity);
         affinity.setPodAffinity(podAffinity);
         affinity.setPodAntiAffinity(podAntiAffinity);
         pod.setAffinityObject(affinity);
+    }
+
+    private void readTaints(Node node) {
+        String taintsStr = node.getTaints();
+        Taint[] taints = gson.fromJson(taintsStr, Taint[].class);
+        node.setTaintsArray(taints);
     }
 
     private Map<String, Resource> fetchNodeForecast(List<Node> nodeList) {

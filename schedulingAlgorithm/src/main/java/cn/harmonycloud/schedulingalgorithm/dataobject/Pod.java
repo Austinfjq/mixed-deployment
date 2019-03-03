@@ -121,7 +121,7 @@ public class Pod {
     /**
      * 容器
      */
-    private Container[] containers;
+    private Container containers;
     /**
      * 需要的端口
      */
@@ -369,11 +369,11 @@ public class Pod {
         this.deletionStamp = deletionStamp;
     }
 
-    public Container[] getContainers() {
+    public Container getContainers() {
         return containers;
     }
 
-    public void setContainers(Container[] containers) {
+    public void setContainers(Container containers) {
         this.containers = containers;
     }
 

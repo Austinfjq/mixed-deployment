@@ -32,7 +32,7 @@ public class TaintTolerationPriority implements PriorityRule {
         }
         List<Toleration> tolerations = Arrays.asList(pod.getToleration());
         List<Toleration> tolerationsPreferNoSchedule = getAllTolerationPreferNoSchedule(tolerations);
-        List<Taint> taints = Arrays.asList(node.getTaints());
+        List<Taint> taints = Arrays.asList(node.getTaintsArray());
         return countIntolerableTaintsPreferNoSchedule(taints, tolerationsPreferNoSchedule);
     }
 
