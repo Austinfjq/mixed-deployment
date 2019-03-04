@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 
 public class LabelSelectorRequirement {
     private String key;
+
     private String operator;//LabelSelectorOperator
     private String[] values;
 
@@ -27,18 +28,5 @@ public class LabelSelectorRequirement {
 
     public void setValues(String[] values) {
         this.values = values;
-    }
-
-    /**
-     * unused properpy
-     */
-    private Object additionalProperties;
-
-    public Object getAdditionalProperties() {
-        return additionalProperties;
-    }
-
-    public void setAdditionalProperties(Object additionalProperties) {
-        this.additionalProperties = additionalProperties;
     }
 }

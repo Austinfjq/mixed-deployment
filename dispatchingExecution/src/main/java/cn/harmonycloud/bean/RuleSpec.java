@@ -10,56 +10,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RuleSpec implements KubernetesResource {
-    private OwnTypes ownType;
-    private String ownName;
+    private OwnTypes ownerType;
+    private String ownerName;
     private String namespace;
     private int replicas;
-    private String timestamp;
     private List<NodeInfo> nodeList = new ArrayList<>();
-
 //    public RuleSpec(){}
-
-    public RuleSpec(String json){
-        JSONObject data = JSON.parseObject(json);
-        switch (data.get("ownType").toString()){
-            case "deployment":ownType = OwnTypes.DEPLOYMENT;break;
-            case "replicaset":ownType = OwnTypes.REPLICASET;break;
-            case "statefulset":ownType = OwnTypes.STATEFULSET;break;
-            case "daemonset":ownType = OwnTypes.DAEMONSET;break;
+    public RuleSpec(String namespace,JSONObject owner,JSONArray nodeList){
+        switch (owner.get("ownerType").toString()){
+            case "deployment":ownerType = OwnTypes.DEPLOYMENT;break;
+            case "replicaset":ownerType = OwnTypes.REPLICASET;break;
+            case "statefulset":ownerType = OwnTypes.STATEFULSET;break;
+            case "daemonset":ownerType = OwnTypes.DAEMONSET;break;
             default:
-                System.out.println("ownType is unknown!");
+                System.out.println("ownerType["+owner.get("ownerType").toString()+"] is unknown!");
                 break;
         }
-        ownName = data.getString("ownName");
-        namespace = data.getString("namespace");
-        replicas = data.getInteger("replicas");
-        timestamp = data.getString("timestamp");
+        ownerName = owner.getString("ownerName");
+        this.namespace = namespace;
+        this.replicas = 1;
 
-        JSONArray nodeArray = data.getJSONArray("nodelist");
-        for(Object node : nodeArray){
+        for(Object node : nodeList){
             JSONObject n = JSON.parseObject(node.toString());
             NodeInfo nodeInfo = new NodeInfo();
             nodeInfo.setIp(n.getString("ip"));
             nodeInfo.setHostname(n.getString("hostname"));
             nodeInfo.setScore(n.getInteger("score"));
-            nodeList.add(nodeInfo);
+            this.nodeList.add(nodeInfo);
         }
     }
 
-    public OwnTypes getOwnType() {
-        return ownType;
+    public int getReplicas() {
+        return replicas;
     }
 
-    public void setOwnType(OwnTypes ownType) {
-        this.ownType = ownType;
+    public OwnTypes getOwnerType() {
+        return ownerType;
     }
 
-    public String getOwnName() {
-        return ownName;
+    public void setOwnerType(OwnTypes ownerType) {
+        this.ownerType = ownerType;
     }
 
-    public void setOwnName(String ownName) {
-        this.ownName = ownName;
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public List<NodeInfo> getNodeList() {
+        return nodeList;
+    }
+
+    public void setNodeList(List<NodeInfo> nodeList) {
+        this.nodeList = nodeList;
     }
 
     public String getNamespace() {
@@ -70,11 +76,4 @@ public class RuleSpec implements KubernetesResource {
         this.namespace = namespace;
     }
 
-    public int getReplicas() {
-        return replicas;
-    }
-
-    public void setReplicas(int replicas) {
-        this.replicas = replicas;
-    }
 }

@@ -4,6 +4,7 @@ import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
+import com.google.gson.Gson;
 import net.sf.json.JSONObject;
 
 public class DOUtils {
@@ -25,7 +26,7 @@ public class DOUtils {
         // 测试k8sObjectToJson()
         String s = "Affinity(nodeAffinity=null, podAffinity=null, podAntiAffinity=PodAntiAffinity(preferredDuringSchedulingIgnoredDuringExecution=[WeightedPodAffinityTerm(podAffinityTerm=PodAffinityTerm(labelSelector=LabelSelector(matchExpressions=[LabelSelectorRequirement(key=app, operator=In, values=[group-schedule], additionalProperties={})], matchLabels=null, additionalProperties={}), namespaces=[cbl], topologyKey=kubernetes.io/hostname, additionalProperties={}), weight=50, additionalProperties={}), WeightedPodAffinityTerm(podAffinityTerm=PodAffinityTerm(labelSelector=LabelSelector(matchExpressions=[LabelSelectorRequirement(key=app, operator=In, values=[group-schedule], additionalProperties={})], matchLabels=null, additionalProperties={}), namespaces=[cbl], topologyKey=harmonycloud.cn/group, additionalProperties={}), weight=50, additionalProperties={})], requiredDuringSchedulingIgnoredDuringExecution=[], additionalProperties={}), additionalProperties={})";
         s = DOUtils.k8sObjectToJson(s);
-        Affinity affinity = (Affinity) JSONObject.toBean(JSONObject.fromObject(s), Affinity.class);
+        Affinity affinity = new Gson().fromJson(s, Affinity.class);
     }
 
     /**
@@ -38,6 +39,9 @@ public class DOUtils {
         // Type(***) --> {***}
         // abc --> "abc"
         // = --> :
+        if (src == null) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder(src);
         for (int i = 0; i < sb.length(); i++) {
             if (sb.charAt(i) == '(') {
