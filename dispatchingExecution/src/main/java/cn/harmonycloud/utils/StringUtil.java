@@ -15,10 +15,17 @@ public class StringUtil {
         }
         return result;
     }
+<<<<<<< HEAD
+
+
+    public static String combineUrl(String server){
+        return "https://"+server;
+=======
     public static void main(String[] args){
         int n = 5;
         for (int i = 0; i < 100;i++){
             System.out.println(StringUtil.randomStringGenerator(5));
         }
+>>>>>>> 3136146d1eeb88331b20a0ab8a05b5127c68b61d
     }
 }

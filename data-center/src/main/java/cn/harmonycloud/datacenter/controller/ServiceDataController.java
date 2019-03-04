@@ -70,7 +70,7 @@ public class ServiceDataController {
 
     @GetMapping("/services")
     public List<ServiceData> findAllServices(){
-        List<ServiceData> services = Lists.newArrayList(serviceDataService.findAllServiceDatas());
+        List<ServiceData> services = serviceDataService.findAllServiceDatas();
         return services;
     }
 
@@ -196,7 +196,7 @@ public class ServiceDataController {
      * @return
      */
     @GetMapping("/service/resourceConsume")
-    public List<Map<String,Object>> getResourceConsume(@RequestParam("namespace") String namespace,
+    public List<Map> getResourceConsume(@RequestParam("namespace") String namespace,
                                                  @RequestParam("serviceName") String serviceName,
                                                  @RequestParam("clusterIP") String clusterIP,
                                                  @RequestParam("startTime") String startTime,
@@ -214,7 +214,7 @@ public class ServiceDataController {
      * @return
      */
     @GetMapping("/service/loadMappingInstances")
-    public List<Map<String,Object>> getLoadMappingInstances(@RequestParam("namespace") String namespace,
+    public List<Map> getLoadMappingInstances(@RequestParam("namespace") String namespace,
                                                               @RequestParam("serviceName") String serviceName,
                                                               @RequestParam("clusterIP") String clusterIP,
                                                               @RequestParam("startTime") String startTime,
@@ -238,5 +238,17 @@ public class ServiceDataController {
         Map<String,Object> responseMap = new HashMap<>();
         responseMap.put("responseTime",avgResponseTime);
         return responseMap;
+    }
+
+    /**
+     * 获取当前service数据
+     *
+     * @return
+     */
+    @GetMapping("/nowService")
+    public List<Map> getNowServices(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return serviceDataService.getNowServices();
     }
 }

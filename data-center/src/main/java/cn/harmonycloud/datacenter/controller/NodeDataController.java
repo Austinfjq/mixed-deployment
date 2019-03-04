@@ -66,7 +66,7 @@ public class NodeDataController {
 
     @GetMapping("/nodes")
     public List<NodeData> findAllNodes(){
-        List<NodeData> nodes = Lists.newArrayList(nodeDataService.findAllNodeDatas());
+        List<NodeData> nodes = nodeDataService.findAllNodeDatas();
         return nodes;
     }
 
@@ -81,5 +81,15 @@ public class NodeDataController {
     public Map<String,Object> getNodeConditions(@RequestParam("nodeName") String nodeName,
                                                 @RequestParam("nodeIP") String nodeIP){
         return nodeDataService.getNodeConditions(nodeName,nodeIP);
+    }
+
+    /**
+     * 获取当前node数据
+     *
+     * @return
+     */
+    @GetMapping("/nowNode")
+    public List<Map> getNowNodes(){
+        return nodeDataService.getNowNodes();
     }
 }

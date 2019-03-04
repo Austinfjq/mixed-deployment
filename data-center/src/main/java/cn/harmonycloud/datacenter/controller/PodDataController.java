@@ -68,7 +68,7 @@ public class PodDataController {
 
     @GetMapping("/pods")
     public List<PodData> findAllPods(){
-        List<PodData> pods = Lists.newArrayList(podDataService.findAllPodDatas());
+        List<PodData> pods = podDataService.findAllPodDatas();
         return pods;
     }
 }

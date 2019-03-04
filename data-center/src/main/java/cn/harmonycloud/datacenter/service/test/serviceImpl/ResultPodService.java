@@ -5,6 +5,7 @@ import cn.harmonycloud.datacenter.repository.test.ResultPodRepository;
 import cn.harmonycloud.datacenter.service.test.IResultPodService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,6 @@ public class ResultPodService implements IResultPodService {
 
     @Override
     public List<ResultPod> getAllResultPods() {
-        return Lists.newArrayList(resultPodRepository.findAll());
+        return Lists.newArrayList(resultPodRepository.findAll(PageRequest.of(0,Integer.MAX_VALUE)));
     }
 }

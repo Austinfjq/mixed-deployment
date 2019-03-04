@@ -5,6 +5,7 @@ import cn.harmonycloud.datacenter.repository.test.ResultNodeRepository;
 import cn.harmonycloud.datacenter.service.test.IResultNodeService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,6 @@ public class ResultNodeService implements IResultNodeService {
 
     @Override
     public List<ResultNode> getAllResultNodes() {
-        return Lists.newArrayList(resultNodeRepository.findAll());
+        return Lists.newArrayList(resultNodeRepository.findAll(PageRequest.of(0,Integer.MAX_VALUE)));
     }
 }

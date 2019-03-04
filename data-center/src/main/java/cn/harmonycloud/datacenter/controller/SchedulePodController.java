@@ -39,7 +39,7 @@ public class SchedulePodController {
 
     @GetMapping("/schedulePods")
     public List<SchedulePod> getAllSchedulePods(){
-        List<SchedulePod> schedulePods = Lists.newArrayList(schedulePodService.getAllSchedulePods());
+        List<SchedulePod> schedulePods = schedulePodService.getAllSchedulePods();
         return schedulePods;
     }
 }

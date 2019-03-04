@@ -4,7 +4,6 @@ public class Taint {
     private String key;
     private String value;
     private TaintEffect effect;
-
     public String getKey() {
         return key;
     }

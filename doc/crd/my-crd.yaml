@@ -1,0 +1,10 @@
+apiVersion: "stable.example.com/v1"
+kind: mypolicy
+metadata:
+    name: my-new-regulation-object
+spec:
+    ownType: deployment
+    ownName: my-policy-deployment
+  	nodeIp: 1.1.1.1
+    Replicas: 2
+    timestamp: XXXXXXXXXX

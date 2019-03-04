@@ -42,8 +42,8 @@ public class NodeDataService implements INodeDataService {
     }
 
     @Override
-    public Iterable<NodeData> findAllNodeDatas() {
-        return nodeDataRepository.findAll();
+    public List<NodeData> findAllNodeDatas() {
+        return nodeDataDao.findAllNodeDatas();
     }
 
     @Override
@@ -58,5 +58,10 @@ public class NodeDataService implements INodeDataService {
     @Override
     public Map<String, Object> getNodeConditions(String nodeName, String nodeIP) {
         return nodeDataDao.getNodeConditions(nodeName,nodeIP);
+    }
+
+    @Override
+    public List<Map> getNowNodes() {
+        return nodeDataDao.getNowNodes();
     }
 }

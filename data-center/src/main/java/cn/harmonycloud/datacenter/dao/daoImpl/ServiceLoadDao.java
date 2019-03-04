@@ -85,8 +85,8 @@ public class ServiceLoadDao implements IServiceLoadDao {
                 .dateRange("group_by_time")
                 .field("time")
                 .addRange(startTime,endTime);
-        TermsAggregationBuilder namespaceTerms = AggregationBuilders.terms("group_by_name").field("namespace");
-        TermsAggregationBuilder serviceNameTerms = AggregationBuilders.terms("group_by_service").field("serviceName");
+        TermsAggregationBuilder namespaceTerms = AggregationBuilders.terms("group_by_name").field("namespace").size(Integer.MAX_VALUE);
+        TermsAggregationBuilder serviceNameTerms = AggregationBuilders.terms("group_by_service").field("serviceName").size(Integer.MAX_VALUE);
         AvgAggregationBuilder avgRequestConnections = AggregationBuilders.avg("avg_reqConns").field("requestConnections");
         AvgAggregationBuilder avgNetErrors = AggregationBuilders.avg("avg_netErrors").field("netErrors");
         AvgAggregationBuilder avgTimeResp = AggregationBuilders.avg("avg_timeResp").field("responseTime");
