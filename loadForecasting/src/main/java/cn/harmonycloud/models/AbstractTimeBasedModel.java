@@ -39,7 +39,6 @@ public abstract class AbstractTimeBasedModel extends AbstractForecastingModel
     public void init( DataSet dataSet )
     {
 
-        System.out.println("超类!");
         if ( dataSet == null  || dataSet.size() == 0 )
             throw new IllegalArgumentException("Data set cannot be empty in call to init.");
         

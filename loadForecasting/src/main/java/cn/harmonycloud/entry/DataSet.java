@@ -13,22 +13,34 @@ public class DataSet extends AbstractCollection<DataPoint> {
 
     private int periodsPerYear;
 
+    private int timeInterval;
+
+    private double minTime;
+
+    private double maxTime;
+
+
     public DataSet()
     {
-        periodsPerYear = 0;
+        periodsPerYear = 1;
+        timeInterval = 1;
+
     }
 
 
     public DataSet( DataSet dataSet )
     {
         this( dataSet.getPeriodsPerYear(),
+                dataSet.getTimeInterval(),
                 dataSet.dataPoints );
     }
 
 
-    public DataSet( int periodsPerYear, Collection<DataPoint> c )
+    public DataSet( int periodsPerYear, int timeInterval,Collection<DataPoint> c )
     {
         this.periodsPerYear = periodsPerYear;
+
+        this.timeInterval = timeInterval;
 
         addAll( c );
     }
@@ -158,6 +170,19 @@ public class DataSet extends AbstractCollection<DataPoint> {
         return periodsPerYear;
     }
 
+    public void setTimeInterval( int timeInterval )
+    {
+        if ( timeInterval < 1 )
+            throw new IllegalArgumentException( "timeInterval parameter must be at least 1" );
+
+        this.timeInterval = timeInterval;
+    }
+
+    public int getTimeInterval()
+    {
+        return timeInterval;
+    }
+
     public boolean removeAll( Collection<?> c )
             throws UnsupportedOperationException
     {
@@ -220,6 +245,28 @@ public class DataSet extends AbstractCollection<DataPoint> {
         }
 
         return result + ")";
+    }
+
+    public double getMinTime(){
+        Iterator<DataPoint> iterator = this.iterator();
+        return iterator.next().getTimeValue();
+    }
+
+    public double getMaxTime(){
+        Iterator<DataPoint> iterator = this.iterator();
+
+        DataPoint dp = null;
+
+        while(iterator.hasNext()) {
+            dp = iterator.next();
+        }
+
+        return dp.getTimeValue();
+    }
+
+    public void init(){
+        this.minTime = getMinTime();
+        this.maxTime = getMaxTime();
     }
 }
 

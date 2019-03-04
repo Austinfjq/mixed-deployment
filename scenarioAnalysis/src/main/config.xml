@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<rules>
+
+    <times>
+
+        <index>
+
+            <time>01:00:00</time>
+            <onlineService>
+                <add>false</add>
+                <num>5</num>
+            </onlineService>
+
+            <offlineService>
+                <add>true</add>
+                <num>5</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>06:00:00</time>
+            <onlineService>
+                <add>true</add>
+                <num>3</num>
+            </onlineService>
+
+            <offlineService>
+                <add>false</add>
+                <num>0</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>08:00:00</time>
+            <onlineService>
+                <add>true</add>
+                <num>5</num>
+            </onlineService>
+
+            <offlineService>
+                <add>false</add>
+                <num>5</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>10:00:00</time>
+
+            <onlineService>
+                <add>true</add>
+                <num>5</num>
+            </onlineService>
+
+            <offlineService>
+                <add>false</add>
+                <num>5</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+
+            <time>18:00:00</time>
+            <onlineService>
+                <add>true</add>
+                <num>3</num>
+            </onlineService>
+
+            <offlineService>
+                <add>false</add>
+                <num>3</num>
+            </offlineService>
+
+        </index>
+
+
+    </times>
+
+    <offlineService>
+
+    </offlineService>
+
+    <onlineService>
+
+    </onlineService>
+
+    <temp>
+
+    </temp>
+
+</rules>

@@ -7,19 +7,25 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 
+import java.util.Objects;
+
 public class PodFitsResourcesPredicate implements PredicateRule {
     @Override
     public boolean predicate(Pod pod, Node node, Cache cache) {
-        Service service = cache.getServiceMap().get(DOUtils.getServiceFullName(pod));
-        // TODO search in prometheus: kube_node_status_allocatable{node="pc"}
+        // in prometheus: kube_node_status_allocatable{node="pc"}
 
-        // if len(nodeInfo.Pods())+1 > allowedPodNumber return false;
-
-        // if podRequest.MilliCPU == 0 && podRequest.Memory == 0 return true;
-
-        // if allocatable.MilliCPU < podRequest.MilliCPU+nodeInfo.RequestedResource().MilliCPU return false;
-
-        // if allocatable.Memory < podRequest.Memory+nodeInfo.RequestedResource().Memory return false;
+        if (1 + cache.getNodeMapPodList().get(node.getNodeName()).size() > node.getAllocatablePods().longValue()) {
+            return false;
+        }
+        if (pod.getCpuRequest().equals(0D) && pod.getMemRequest().equals(0D)) {
+            return true;
+        }
+        if (node.getAllocatableCpuCores() < pod.getCpuRequest() + node.getCpuUsage()) {
+            return false;
+        }
+        if (node.getAllocatableMem() < pod.getMemRequest() + node.getMemUsage()) {
+            return false;
+        }
 
         return true;
     }

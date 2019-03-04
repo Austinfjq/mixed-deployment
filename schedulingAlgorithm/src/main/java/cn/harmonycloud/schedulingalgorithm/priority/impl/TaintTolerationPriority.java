@@ -11,6 +11,7 @@ import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +30,9 @@ public class TaintTolerationPriority implements PriorityRule {
         if (node == null) {
             return 0;
         }
-        List<Toleration> tolerations = new ArrayList<>();// TODO get pod.Spec.Tolerations from pod
+        List<Toleration> tolerations = Arrays.asList(pod.getToleration());
         List<Toleration> tolerationsPreferNoSchedule = getAllTolerationPreferNoSchedule(tolerations);
-        List<Taint> taints = new ArrayList<>(); // TODO get node.Spec.Taints from node
+        List<Taint> taints = Arrays.asList(node.getTaints());
         return countIntolerableTaintsPreferNoSchedule(taints, tolerationsPreferNoSchedule);
     }
 

@@ -1,13 +1,9 @@
 package cn.harmonycloud.schedulingalgorithm.affinity;
 
-import java.util.Date;
-
 public class Taint {
     private String key;
     private String value;
     private TaintEffect effect;
-    private Date timeAdded;
-
     public String getKey() {
         return key;
     }
@@ -30,13 +26,5 @@ public class Taint {
 
     public void setEffect(TaintEffect effect) {
         this.effect = effect;
-    }
-
-    public Date getTimeAdded() {
-        return timeAdded;
-    }
-
-    public void setTimeAdded(Date timeAdded) {
-        this.timeAdded = timeAdded;
     }
 }

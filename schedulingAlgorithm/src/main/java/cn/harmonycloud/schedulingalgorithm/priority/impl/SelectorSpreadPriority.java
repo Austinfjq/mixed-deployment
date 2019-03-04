@@ -6,6 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
+import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
@@ -37,32 +38,36 @@ public class SelectorSpreadPriority implements PriorityRule {
         if (node == null) {
             return 0;
         }
-        // TODO get serviceLister controllerLister replicaSetLister statefulSetLister
-        List<Selector> selectors = new ArrayList<>();
-        // instead: pod所属的services, Controllers, replicaSets, StatefulSets，对每一个都：xxx -> selectors.add(new InternalSelector(xxx.Spec.Selector));
-        // k8s source code: selectors = getSelectors(pod, s.serviceLister, s.controllerLister, s.replicaSetLister, s.statefulSetLister)
-        if (selectors.isEmpty()) {
-            return 0;
-        }
-        int count = 0;
-        List<Pod> nodePods = cache.getPodMap().values().stream().filter(p -> Objects.equals(p.getPodName(), node.getNodeName())).collect(Collectors.toList());
-        for (Pod nodePod : nodePods) {
-            if (Objects.equals(nodePod.getNamespace(), pod.getNamespace())) {
-                continue;
-            }
-            // TODO : pod.getDeletionTimestamp
-//            if (nodePod.getDeletionTimestamp() != null) {
+        // 直接匹配服务名，不用service.Spec.Selector
+        List<Pod> nodePods = cache.getNodeMapPodList().get(node.getNodeName());
+        return (int) nodePods.stream().filter(p -> p.getServiceName() != null && DOUtils.getServiceFullName(p).equals(DOUtils.getServiceFullName(pod))).count();
+//        // TO-DO data: selectors of all services
+//        List<Selector> selectors = new ArrayList<>();
+//        // instead: pod所属的services, Controllers, replicaSets, StatefulSets，对每一个都：xxx -> selectors.add(new InternalSelector(xxx.Spec.Selector));
+//        // k8s source code: selectors = getSelectors(pod, s.serviceLister, s.controllerLister, s.replicaSetLister, s.statefulSetLister)
+//        if (selectors.isEmpty()) {
+//            return 0;
+//        }
+//        int count = 0;
+//        List<Pod> nodePods = cache.getNodeMapPodList().get(node.getNodeName());
+//        for (Pod nodePod : nodePods) {
+//            if (Objects.equals(nodePod.getNamespace(), pod.getNamespace())) {
 //                continue;
 //            }
-            for (Selector selector : selectors) {
-                Map<String, String> labels = new HashMap<>(); // TODO get labels from pod
-                if (selector.matches(labels)) {
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count;
+//            // TO DO : existingPod.getDeletionTimestamp
+////            if (nodePod.getDeletionTimestamp() != null) {
+////                continue;
+////            }
+//            for (Selector selector : selectors) {
+//                // TO DO existingPod.Labels
+//                Map<String, String> labels = new HashMap<>();
+//                if (selector.matches(labels)) {
+//                    count++;
+//                    break;
+//                }
+//            }
+//        }
+//        return count;
     }
 
     private List<Integer> calculateSpreadPriorityReduce(Pod pod, List<Node> nodes, Cache cache, List<Integer> mapResult) {

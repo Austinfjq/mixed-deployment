@@ -6,7 +6,6 @@ public class ContainerPort {
      * hostPort 需要用到
      */
     private int hostPort;
-    private int containerPort;
     /**
      * protocol 需要用到
      */
@@ -30,14 +29,6 @@ public class ContainerPort {
 
     public void setHostPort(int hostPort) {
         this.hostPort = hostPort;
-    }
-
-    public int getContainerPort() {
-        return containerPort;
-    }
-
-    public void setContainerPort(int containerPort) {
-        this.containerPort = containerPort;
     }
 
     public String getProtocol() {

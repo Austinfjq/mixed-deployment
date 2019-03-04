@@ -26,8 +26,8 @@ def train_predict():
 	# Load command line arguments 
 	# train_file = sys.argv[1]
 	# parameter_file = sys.argv[2]
-	train_file = "../daily-minimum-temperatures-in-me.csv"
-	parameter_file = "./training_config.json"
+	# train_file = "../daily-minimum-temperatures-in-me.csv"
+	# parameter_file = "./training_config.json"
 
 	# Load training parameters
 	params = json.loads(open(parameter_file).read())
@@ -63,9 +63,6 @@ def train_predict():
 	return last_window,last_window_raw
 
 
-
-
-
-
+train_predict()
 print "start forecast!"
 print('The next time stamp forecasting is: {}'.format(test()))

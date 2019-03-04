@@ -11,6 +11,7 @@ import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 import cn.harmonycloud.schedulingalgorithm.utils.SelectorUtil;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,25 +32,25 @@ public class NodeAffinityPriority implements PriorityRule {
         if (node == null) {
             return 0;
         }
-        Affinity affinity = new Affinity(); //TODO get affinity of pod
+        Affinity affinity = pod.getAffinityObject();
         int count = 0;
         // A nil element of PreferredDuringSchedulingIgnoredDuringExecution matches no objects.
         // An element of PreferredDuringSchedulingIgnoredDuringExecution that refers to an
         // empty PreferredSchedulingTerm matches all objects.
         if (affinity != null && affinity.getNodeAffinity() != null && affinity.getNodeAffinity().getPreferredDuringSchedulingIgnoredDuringExecution() != null) {
             // Match PreferredDuringSchedulingIgnoredDuringExecution term by term.
-            List<PreferredSchedulingTerm> terms = affinity.getNodeAffinity().getPreferredDuringSchedulingIgnoredDuringExecution();
+            List<PreferredSchedulingTerm> terms = Arrays.asList(affinity.getNodeAffinity().getPreferredDuringSchedulingIgnoredDuringExecution());
             for (int i = 0; i < terms.size(); i++) {
                 PreferredSchedulingTerm preferredSchedulingTerm = terms.get(i);
                 if (preferredSchedulingTerm.getWeight() == 0) {
                     continue;
                 }
 
-                Selector nodeSelector = SelectorUtil.nodeSelectorRequirementsAsSelector(preferredSchedulingTerm.getPreference().getMatchExpressions());
+                Selector nodeSelector = SelectorUtil.nodeSelectorRequirementsAsSelector(Arrays.asList(preferredSchedulingTerm.getPreference().getMatchExpressions()));
                 if (nodeSelector == null) {
                     return 0;
                 }
-                Map<String, String> nodeLabels = new HashMap<>(); // TODO get labels of node
+                Map<String, String> nodeLabels = node.getLabels();
                 if (nodeSelector.matches(nodeLabels)) {
                     count += preferredSchedulingTerm.getWeight();
                 }

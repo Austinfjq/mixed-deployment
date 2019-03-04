@@ -6,8 +6,11 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
+import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodeConditionPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodeDiskPressurePredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodeMemoryPressurePredicate;
+import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodePIDPressurePredicate;
+import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckVolumeBindingPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.MatchInterPodAffinityPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.PodFitsHostPortsPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.PodFitsResourcesPredicate;
@@ -18,7 +21,10 @@ import cn.harmonycloud.schedulingalgorithm.presort.PresortRule;
 import cn.harmonycloud.schedulingalgorithm.presort.impl.DecreasingSortRule;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRuleConfig;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.BalancedResourceAllocationPriority;
+import cn.harmonycloud.schedulingalgorithm.priority.impl.ImageLocalityPriority;
+import cn.harmonycloud.schedulingalgorithm.priority.impl.InterPodAffinityPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.NodeAffinityPriority;
+import cn.harmonycloud.schedulingalgorithm.priority.impl.NodeLoadForecastPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.NodePreferAvoidPodsPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.RequestedPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.SelectorSpreadPriority;
@@ -43,40 +49,54 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     private SelectHostRule selectHostRule;
 
     public DefaultGreedyAlgorithm() {
+        /*
+        预处理策略
+         */
         presortRule = new DecreasingSortRule();
 
+        /*
+        预选策略 推荐顺序
+        The order is based on the restrictiveness & complexity of predicates.
+        */
         predicateRules = new ArrayList<>();
+        predicateRules.add(new CheckNodeConditionPredicate());
         predicateRules.add(new PodFitsResourcesPredicate());
         predicateRules.add(new PodFitsHostPortsPredicate());
         predicateRules.add(new PodMatchNodeSelectorPredicate());
         predicateRules.add(new PodToleratesNodeTaintsPredicate());
+//        弃用predicateRules.add(new CheckVolumeBindingPredicate());
         predicateRules.add(new CheckNodeMemoryPressurePredicate());
+        predicateRules.add(new CheckNodePIDPressurePredicate());
         predicateRules.add(new CheckNodeDiskPressurePredicate());
         predicateRules.add(new MatchInterPodAffinityPredicate());
 
         predicateRulesOnDelete = new ArrayList<>();
         predicateRulesOnDelete.add(new PodExistingOnNodePredicate());
 
+        /*
+        优选策略 没有顺序
+        */
         priorityRuleConfigs = new ArrayList<>();
         priorityRuleConfigs.add(new PriorityRuleConfig(new RequestedPriority(Constants.OPERATION_ADD), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_ADD), 1));
-        priorityRuleConfigs.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_ADD), 10000));
+//        弃用priorityRuleConfigs.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_ADD), 10000));
         priorityRuleConfigs.add(new PriorityRuleConfig(new NodeAffinityPriority(), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new TaintTolerationPriority(), 1));
-//        priorityRuleConfigs.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
+//        弃用priorityRuleConfigs.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_ADD), 1));
-//        priorityRuleConfigs.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
-//        priorityRuleConfigs.add(new PriorityRuleConfig(new NodeLoadForecastPriority(), 1));
+        priorityRuleConfigs.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
+        priorityRuleConfigs.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_ADD), 1));
 
         priorityRuleConfigsOnDelete = new ArrayList<>();
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new RequestedPriority(Constants.OPERATION_DELETE), 1));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_DELETE), 1));
-        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
-//        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
+//        弃用priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_DELETE), 1));
-//        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
-//        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(), 1));
+        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_DELETE), 1));
 
+        /*
+        host选择策略
+        */
         selectHostRule = new RoundRobinSelectHighest();
     }
 
@@ -101,7 +121,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
 
     @Override
     public List<Node> predicates(Pod pod, Cache cache) {
-        // 分别处理各个节点 TODO: parallelStream or ExecutorCompletionService
+        // 分别处理各个节点
         long enough = Long.MAX_VALUE;
         return cache.getNodeList().stream()
                 .filter(node -> runAllPredicates(pod, node, cache))
@@ -112,7 +132,18 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     private boolean runAllPredicates(Pod pod, Node node, Cache cache) {
         // 分别处理各个预选规则，预选规则大概只有10个，规则判断不会很耗时
         List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
-        return rules.stream().allMatch(rule -> rule.predicate(pod, node, cache));
+        try {
+            return rules.stream().allMatch(rule -> {
+                try {
+                    return rule.predicate(pod, node, cache);
+                } catch (Exception e) {
+                    // TODO log
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -133,11 +164,19 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     }
 
     private List<Integer> markAllNodes(Pod pod, PriorityRuleConfig config, Cache cache) {
-        // 优选规则内部处理各个node，可以自己决定是否对各个node的评分并发处理
-        List<Integer> list = config.getPriorityRule().priority(pod, cache.getNodeList(), cache);
-        // 计算权重后的得分
-        int weight = config.getWeight();
-        return list.stream().map(score -> weight * score).collect(Collectors.toList());
+        try {
+            // 优选规则内部处理各个node，可以自己决定是否对各个node的评分并发处理
+            List<Integer> list = config.getPriorityRule().priority(pod, cache.getNodeList(), cache);
+            // 计算权重后的得分
+            int weight = config.getWeight();
+            return list.stream().map(score -> weight * score).collect(Collectors.toList());
+        } catch (Exception e) {
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < cache.getNodeList().size(); i++) {
+                list.add(0);
+            }
+            return list;
+        }
     }
 
     private List<Integer> mergeScoreList(List<Integer> list1, List<Integer> list2) {

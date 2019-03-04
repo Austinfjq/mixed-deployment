@@ -298,8 +298,6 @@ public class TripleExponentialSmoothingModel extends AbstractTimeBasedModel
 
     private void initSeasonalIndices( DataSet dataSet )
     {
-        String timeVariable = getTimeVariable();
-
         double yearlyAverage[] = new double[NUMBER_OF_YEARS];
         Iterator<DataPoint> it = dataSet.iterator();
         for ( int year=0; year<NUMBER_OF_YEARS; year++ )

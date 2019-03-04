@@ -1,1 +1,1 @@
-from getData.utils import Utils
+from DataUtils.utils import Utils

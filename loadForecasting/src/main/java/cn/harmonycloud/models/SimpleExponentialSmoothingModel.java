@@ -116,13 +116,6 @@ public class SimpleExponentialSmoothingModel extends AbstractTimeBasedModel
     }
     
 
-    public SimpleExponentialSmoothingModel(String independentVariable,
-                                           double alpha )
-    {
-        this(independentVariable,alpha,HUNTER);
-    }
-    
-
     public SimpleExponentialSmoothingModel(double alpha,
                                            int approach )
     {
@@ -132,20 +125,6 @@ public class SimpleExponentialSmoothingModel extends AbstractTimeBasedModel
         this.alpha = alpha;
         this.approach = approach;
     }
-
-    public SimpleExponentialSmoothingModel(String independentVariable,
-                                           double alpha,
-                                           int approach )
-    {
-        super(independentVariable);
-        
-        if ( alpha < 0.0 || alpha > 1.0 )
-            throw new IllegalArgumentException("SimpleExponentialSmoothingModel: Invalid smoothing constant, " + alpha + " - must be in the range 0.0-1.0.");
-        
-        this.alpha = alpha;
-        this.approach = approach;
-    }
-    
 
     protected double forecast( double timeValue )
         throws IllegalArgumentException

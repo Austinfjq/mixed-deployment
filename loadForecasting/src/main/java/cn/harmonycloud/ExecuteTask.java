@@ -1,10 +1,9 @@
 package cn.harmonycloud;
 
-import cn.harmonycloud.entry.DataPoint;
-import cn.harmonycloud.entry.DataSet;
 import cn.harmonycloud.entry.ForecastCell;
+import cn.harmonycloud.entry.HttpClientResult;
 import cn.harmonycloud.exception.ServiceGotException;
-import cn.harmonycloud.tools.HttpSend;
+import cn.harmonycloud.tools.HttpClientUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 
@@ -20,7 +19,7 @@ public class ExecuteTask {
 
     public void process() {
 
-        List<ForecastCell> forecastCells = getServiceList();
+        List<ForecastCell> forecastCells = getForecastCellList();
 
         if (forecastCells == null) {
             throw new ServiceGotException("Get service list failed!");
@@ -32,14 +31,20 @@ public class ExecuteTask {
 
         for (int i = 0; i< forecastCells.size(); i++) {
             ForecastCell forecastCell = forecastCells.get(i);
-            ServiceTaskThreadExecutor taskThreadExecutor = new ServiceTaskThreadExecutor(forecastCell);
+            TaskThreadExecutor taskThreadExecutor = new TaskThreadExecutor(forecastCell);
             Thread thread = new Thread(taskThreadExecutor);
             TaskThreadPoolExecutor.getExecutor().execute(thread);
         }
     }
 
-    public List<ForecastCell> getServiceList() {
-        String ServiceListStr = getServiceListStr();
+    public List<ForecastCell> getForecastCellList() {
+        HttpClientResult httpClientResult = getForecastCellListStr();
+
+        if (null == httpClientResult || httpClientResult.getCode() != 200) {
+            System.out.println("get service list failed!");
+            return null;
+        }
+        String ServiceListStr = httpClientResult.getContent();
 
         Type type = new TypeReference<List<ForecastCell>>() {}.getType();
         List<ForecastCell> list = JSON.parseObject(ServiceListStr, type);
@@ -47,45 +52,21 @@ public class ExecuteTask {
         return list;
     }
 
-    public String getServiceListStr() {
-        String params = "dsd";
-        String url = "http://localhost:8080/service/testSpring";
-        return HttpSend.sendPost(url,params);
+    public HttpClientResult getForecastCellListStr() {
+        String url = "http://localhost:8080/forecast/forecastCellList";
+        HttpClientResult httpClientResult = null;
+        try {
+            httpClientResult = HttpClientUtils.doGet(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return httpClientResult;
     }
 
     public static void main(String[] args) {
 
         ExecuteTask executeTask = new ExecuteTask();
-
-        List<ForecastCell> forecastCells = executeTask.getServiceList();
-
-        DataSet observedData = new DataSet();
-        DataPoint dp;
-
-        dp = new DataPoint( 2.1 , 0);
-        observedData.add( dp );
-
-        dp = new DataPoint( 7.7 ,1);
-        observedData.add( dp );
-
-        dp = new DataPoint( 13.6 ,2);
-        observedData.add( dp );
-
-        dp = new DataPoint( 27.2 ,3);
-        observedData.add( dp );
-
-        dp = new DataPoint( 40.9 ,4);
-        observedData.add( dp );
-
-        dp = new DataPoint( 61.1 ,5);
-        observedData.add( dp );
-
-        dp = new DataPoint( 59.2 ,6);
-        observedData.add( dp );
-
-        String str = JSON.toJSONString(observedData);
-
-        System.out.println(str);
+        executeTask.process();
 
     }
 

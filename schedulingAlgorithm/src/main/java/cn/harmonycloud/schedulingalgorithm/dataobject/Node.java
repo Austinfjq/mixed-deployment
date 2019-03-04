@@ -1,5 +1,10 @@
 package cn.harmonycloud.schedulingalgorithm.dataobject;
 
+import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
+
+import java.util.List;
+import java.util.Map;
+
 public class Node {
     /**
      * unix时间
@@ -16,35 +21,83 @@ public class Node {
     /**
      * 节点cpu核数
      */
-    private String cpuCores;
+    private Double cpuCores;
     /**
      * 节点cpu使用率
      */
-    private String cpuUsage;
+    private Double cpuUsage;
     /**
      * 节点内存使用量
      */
-    private String memUsage;
+    private Double memUsage;
     /**
      * 节点内存总容量
      */
-    private String memMaxCapacity;
+    private Double memMaxCapacity;
     /**
      * 节点磁盘使用量
      */
-    private String diskUsage;
+    private Double diskUsage;
     /**
      * 节点磁盘总容量
      */
-    private String diskMaxCapacity;
+    private Double diskMaxCapacity;
     /**
      * 节点网络带宽
      */
-    private String netBandwidth;
+    private Double netBandwidth;
     /**
      * 节点pressure状态
      */
     private String condition;
+    /**
+     * 节点标签
+     */
+    private Map<String, String> labels;
+    /**
+     * 节点是否是不可调度的
+     */
+    private Boolean unschedulable;
+    /**
+     * 节点已使用的端口和对应的协议
+     */
+    private Map<String, String> usedPorts;
+    /**
+     * 节点污点
+     */
+    private Taint[] taints;
+    /**
+     * 节点Condition
+     */
+    private NodeCondition nodeConditions;
+    /**
+     * 节点可用pod数量
+     */
+    private Double allocatablePods;
+    /**
+     * 节点可用cpu核数
+     */
+    private Double allocatableCpuCores;
+    /**
+     * 节点可用内存字节数
+     */
+    private Double allocatableMem;
+    /**
+     * 节点避免Pod的注释
+     */
+    private String preferAvoidPodsAnnotationKey;
+    /**
+     * 节点镜像状态
+     */
+    private Map<String, String> imageStates;
+    /**
+     * 在节点上需要的卷数量
+     */
+    private Double requestedVolumes;
+    /**
+     * 节点上可分配卷数量
+     */
+    private Double allocatableVolumesCount;
 
     public String getTime() {
         return time;
@@ -70,59 +123,59 @@ public class Node {
         this.nodeIP = nodeIP;
     }
 
-    public String getCpuCores() {
+    public Double getCpuCores() {
         return cpuCores;
     }
 
-    public void setCpuCores(String cpuCores) {
+    public void setCpuCores(Double cpuCores) {
         this.cpuCores = cpuCores;
     }
 
-    public String getCpuUsage() {
+    public Double getCpuUsage() {
         return cpuUsage;
     }
 
-    public void setCpuUsage(String cpuUsage) {
+    public void setCpuUsage(Double cpuUsage) {
         this.cpuUsage = cpuUsage;
     }
 
-    public String getMemUsage() {
+    public Double getMemUsage() {
         return memUsage;
     }
 
-    public void setMemUsage(String memUsage) {
+    public void setMemUsage(Double memUsage) {
         this.memUsage = memUsage;
     }
 
-    public String getMemMaxCapacity() {
+    public Double getMemMaxCapacity() {
         return memMaxCapacity;
     }
 
-    public void setMemMaxCapacity(String memMaxCapacity) {
+    public void setMemMaxCapacity(Double memMaxCapacity) {
         this.memMaxCapacity = memMaxCapacity;
     }
 
-    public String getDiskUsage() {
+    public Double getDiskUsage() {
         return diskUsage;
     }
 
-    public void setDiskUsage(String diskUsage) {
+    public void setDiskUsage(Double diskUsage) {
         this.diskUsage = diskUsage;
     }
 
-    public String getDiskMaxCapacity() {
+    public Double getDiskMaxCapacity() {
         return diskMaxCapacity;
     }
 
-    public void setDiskMaxCapacity(String diskMaxCapacity) {
+    public void setDiskMaxCapacity(Double diskMaxCapacity) {
         this.diskMaxCapacity = diskMaxCapacity;
     }
 
-    public String getNetBandwidth() {
+    public Double getNetBandwidth() {
         return netBandwidth;
     }
 
-    public void setNetBandwidth(String netBandwidth) {
+    public void setNetBandwidth(Double netBandwidth) {
         this.netBandwidth = netBandwidth;
     }
 
@@ -132,5 +185,101 @@ public class Node {
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Map<String, String> labels) {
+        this.labels = labels;
+    }
+
+    public Boolean getUnschedulable() {
+        return unschedulable;
+    }
+
+    public void setUnschedulable(Boolean unschedulable) {
+        this.unschedulable = unschedulable;
+    }
+
+    public Map<String, String> getUsedPorts() {
+        return usedPorts;
+    }
+
+    public void setUsedPorts(Map<String, String> usedPorts) {
+        this.usedPorts = usedPorts;
+    }
+
+    public Taint[] getTaints() {
+        return taints;
+    }
+
+    public void setTaints(Taint[] taints) {
+        this.taints = taints;
+    }
+
+    public NodeCondition getNodeConditions() {
+        return nodeConditions;
+    }
+
+    public void setNodeConditions(NodeCondition nodeConditions) {
+        this.nodeConditions = nodeConditions;
+    }
+
+    public Double getAllocatablePods() {
+        return allocatablePods;
+    }
+
+    public void setAllocatablePods(Double allocatablePods) {
+        this.allocatablePods = allocatablePods;
+    }
+
+    public Double getAllocatableCpuCores() {
+        return allocatableCpuCores;
+    }
+
+    public void setAllocatableCpuCores(Double allocatableCpuCores) {
+        this.allocatableCpuCores = allocatableCpuCores;
+    }
+
+    public Double getAllocatableMem() {
+        return allocatableMem;
+    }
+
+    public void setAllocatableMem(Double allocatableMem) {
+        this.allocatableMem = allocatableMem;
+    }
+
+    public String getPreferAvoidPodsAnnotationKey() {
+        return preferAvoidPodsAnnotationKey;
+    }
+
+    public void setPreferAvoidPodsAnnotationKey(String preferAvoidPodsAnnotationKey) {
+        this.preferAvoidPodsAnnotationKey = preferAvoidPodsAnnotationKey;
+    }
+
+    public Map<String, String> getImageStates() {
+        return imageStates;
+    }
+
+    public void setImageStates(Map<String, String> imageStates) {
+        this.imageStates = imageStates;
+    }
+
+    public Double getRequestedVolumes() {
+        return requestedVolumes;
+    }
+
+    public void setRequestedVolumes(Double requestedVolumes) {
+        this.requestedVolumes = requestedVolumes;
+    }
+
+    public Double getAllocatableVolumesCount() {
+        return allocatableVolumesCount;
+    }
+
+    public void setAllocatableVolumesCount(Double allocatableVolumesCount) {
+        this.allocatableVolumesCount = allocatableVolumesCount;
     }
 }

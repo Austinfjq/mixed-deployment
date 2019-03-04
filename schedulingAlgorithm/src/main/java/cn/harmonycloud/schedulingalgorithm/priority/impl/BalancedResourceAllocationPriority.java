@@ -20,11 +20,11 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
         if (node == null) {
             return 0;
         }
-        // TODO allocatable resource from node cache
-        Resource allocatable = new Resource();
+        Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
         Resource requested = RuleUtil.getRequestedAfterOp(pod, node, operation);
         int score;
-        // TODO Check if the pod has volumes and this could be added to scorer function for balanced resource allocation.
+        // do not check any more
+        // TO - DO Check if the pod has volumes and this could be added to scorer function for balanced resource allocation.
 //        if (len(pod.Spec.Volumes) >= 0 && utilfeature.DefaultFeatureGate.Enabled(features.BalanceAttachedNodeVolumes) && nodeInfo.TransientInfo != nil) {
 //            score = balancedResourceScorer(requested, allocatable, true, nodeInfo.TransientInfo.TransNodeInfo.RequestedVolumes, nodeInfo.TransientInfo.TransNodeInfo.AllocatableVolumesCount);
 //        } else {
@@ -33,27 +33,21 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
         return score;
     }
 
-    private Resource getNonZeroRequests(Pod pod) {
-        Resource requested = new Resource();
-        // TODO 合计pod下各个container需要的cpu mem，或者直接拿到
-        return requested;
-    }
-
     private int balancedResourceScorer(Resource requested, Resource allocatable, boolean includeVolumes, int requestedVolumes, int allocatableVolumes) {
         double cpuFraction = fractionOfCapacity(requested.getMilliCPU(), allocatable.getMilliCPU());
         double memoryFraction = fractionOfCapacity(requested.getMemory(), allocatable.getMemory());
         // This to find a node which has most balanced CPU, memory and volume usage.
-        if (includeVolumes /*&& utilfeature.DefaultFeatureGate.Enabled(features.BalanceAttachedNodeVolumes)*/ && allocatableVolumes > 0) {
-            double volumeFraction = (double) requestedVolumes / (double) allocatableVolumes;
-            if (cpuFraction >= 1 || memoryFraction >= 1 || volumeFraction >= 1) {
-                // if requested >= capacity, the corresponding host should never be preferred when adding and should be preferred when deleting.
-                return operation == Constants.OPERATION_ADD ? 0 : Constants.PRIORITY_MAX_SCORE;
-            }
-            // Compute variance for all the three fractions.
-            double mean = (cpuFraction + memoryFraction + volumeFraction) / 3;
-            double variance = (((cpuFraction - mean) * (cpuFraction - mean)) + ((memoryFraction - mean) * (memoryFraction - mean)) + ((volumeFraction - mean) * (volumeFraction - mean))) / 3;
-            return (int) ((1 - variance) * Constants.PRIORITY_MAX_SCORE);
-        }
+//        if (includeVolumes /*&& utilfeature.DefaultFeatureGate.Enabled(features.BalanceAttachedNodeVolumes)*/ && allocatableVolumes > 0) {
+//            double volumeFraction = (double) requestedVolumes / (double) allocatableVolumes;
+//            if (cpuFraction >= 1 || memoryFraction >= 1 || volumeFraction >= 1) {
+//                // if requested >= capacity, the corresponding host should never be preferred when adding and should be preferred when deleting.
+//                return operation == Constants.OPERATION_ADD ? 0 : Constants.PRIORITY_MAX_SCORE;
+//            }
+//            // Compute variance for all the three fractions.
+//            double mean = (cpuFraction + memoryFraction + volumeFraction) / 3;
+//            double variance = (((cpuFraction - mean) * (cpuFraction - mean)) + ((memoryFraction - mean) * (memoryFraction - mean)) + ((volumeFraction - mean) * (volumeFraction - mean))) / 3;
+//            return (int) ((1 - variance) * Constants.PRIORITY_MAX_SCORE);
+//        }
         if (cpuFraction >= 1 || memoryFraction >= 1) {
             return operation == Constants.OPERATION_ADD ? 0 : Constants.PRIORITY_MAX_SCORE;
         }
@@ -65,7 +59,7 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
         return (int) ((1 - diff) * Constants.PRIORITY_MAX_SCORE);
     }
 
-    private double fractionOfCapacity(int requested, int capacity) {
+    private double fractionOfCapacity(long requested, long capacity) {
         if (capacity == 0) {
             return 1;
         }

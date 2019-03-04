@@ -5,7 +5,6 @@ public class Toleration {
     private TolerationOperator operator;
     private String value;
     private TaintEffect effect;
-    private int tolerationSeconds;
 
     public String getKey() {
         return key;
@@ -37,13 +36,5 @@ public class Toleration {
 
     public void setEffect(TaintEffect effect) {
         this.effect = effect;
-    }
-
-    public int getTolerationSeconds() {
-        return tolerationSeconds;
-    }
-
-    public void setTolerationSeconds(int tolerationSeconds) {
-        this.tolerationSeconds = tolerationSeconds;
     }
 }

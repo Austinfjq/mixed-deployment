@@ -3,25 +3,20 @@ package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 import cn.harmonycloud.schedulingalgorithm.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.AffinityTermProperties;
-import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
-import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelector;
-import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinityTerm;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
-import cn.harmonycloud.schedulingalgorithm.affinity.Requirement;
-import cn.harmonycloud.schedulingalgorithm.affinity.SelectOperation;
 import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
 import cn.harmonycloud.schedulingalgorithm.affinity.TopologyPair;
 import cn.harmonycloud.schedulingalgorithm.affinity.TopologyPairsMaps;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
+import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +31,7 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
         }
         // 2. satisfiesPodsAffinityAntiAffinity
         // Now check if <pod> requirements will be satisfied on this node.
-        Affinity affinity = new Affinity(); // TODO get	affinity := pod.Spec.Affinity
+        Affinity affinity = pod.getAffinityObject();
         if (!satisfiesPodsAffinityAntiAffinity(pod, node, affinity, cache)) {
             return false;
         }
@@ -64,26 +59,11 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
             if (term.getTopologyKey() == null || term.getTopologyKey().isEmpty()) {
                 return new boolean[]{false, false};
             }
-            if (!nodesHaveSameTopologyKey(node, targetPodNode, term.getTopologyKey())) {
+            if (!RuleUtil.nodesHaveSameTopologyKey(node, targetPodNode, term.getTopologyKey())) {
                 return new boolean[]{false, true};
             }
         }
         return new boolean[]{true, true};
-    }
-
-    private boolean nodesHaveSameTopologyKey(Node nodeA, Node nodeB, String topologyKey) {
-        // TODO get labels of node
-        Map<String, String> nodeALabels = new HashMap<>();
-        Map<String, String> nodeBLabels = new HashMap<>();
-        if (topologyKey == null || topologyKey.isEmpty() || nodeALabels == null || nodeBLabels == null) {
-            return false;
-        }
-        String nodeALabel = nodeALabels.get(topologyKey);
-        String nodeBLabel = nodeBLabels.get(topologyKey);
-        if (nodeALabel != null && nodeBLabel != null) {
-            return nodeALabel.equals(nodeBLabel);
-        }
-        return false;
     }
 
     private boolean podMatchesAllAffinityTermProperties(Pod pod, List<AffinityTermProperties> properties) {
@@ -91,7 +71,7 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
             return false;
         }
         for (AffinityTermProperties property : properties) {
-            if (!podMatchesTermsNamespaceAndSelector(pod, property.getNamespaces(), property.getSelector())) {
+            if (!RuleUtil.podMatchesTermsNamespaceAndSelector(pod, property.getNamespaces(), property.getSelector())) {
                 return false;
             }
         }
@@ -104,8 +84,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
             return properties;
         }
         for (PodAffinityTerm term : terms) {
-            Set<String> namespaces = getNamespacesFromPodAffinityTerm(pod, term);
-            Selector selector = labelSelectorAsSelector(term.getLabelSelector());
+            Set<String> namespaces = RuleUtil.getNamespacesFromPodAffinityTerm(pod, term);
+            Selector selector = RuleUtil.labelSelectorAsSelector(term.getLabelSelector());
             properties.add(new AffinityTermProperties(namespaces, selector));
         }
         return properties;
@@ -159,8 +139,7 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
     }
 
     private boolean targetPodMatchesAffinityOfPod(Pod pod, Pod targetPod) {
-        //TODO get affinity of pod
-        Affinity affinity = new Affinity();
+        Affinity affinity = pod.getAffinityObject();
         if (affinity == null || affinity.getPodAffinity() == null) {
             return false;
         }
@@ -170,8 +149,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
 
     private List<PodAffinityTerm> getPodAffinityTerms(PodAffinity podAffinity) {
         if (podAffinity != null) {
-            List<PodAffinityTerm> terms = podAffinity.getRequiredDuringSchedulingIgnoredDuringExecution();
-            if (terms != null && !terms.isEmpty()) {
+            List<PodAffinityTerm> terms = Arrays.asList(podAffinity.getRequiredDuringSchedulingIgnoredDuringExecution());
+            if (!terms.isEmpty()) {
                 return terms;
             }
         }
@@ -180,8 +159,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
 
     private List<PodAffinityTerm> getPodAntiAffinityTerms(PodAntiAffinity podAntiAffinity) {
         if (podAntiAffinity != null) {
-            List<PodAffinityTerm> terms = podAntiAffinity.getRequiredDuringSchedulingIgnoredDuringExecution();
-            if (terms != null && !terms.isEmpty()) {
+            List<PodAffinityTerm> terms = Arrays.asList(podAntiAffinity.getRequiredDuringSchedulingIgnoredDuringExecution());
+            if (!terms.isEmpty()) {
                 return terms;
             }
         }
@@ -194,7 +173,7 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
         TopologyPairsMaps topologyMaps = getMatchingAntiAffinityTopologyPairsOfPods(pod, existingPods, cache);
         // Iterate over topology pairs to get any of the pods being affected by
         // the scheduled pod anti-affinity terms
-        Map<String, String> nodeLabels = new HashMap<>();
+        Map<String, String> nodeLabels = node.getLabels();
         for (Map.Entry<String, String> entry : nodeLabels.entrySet()) {
             TopologyPair pair = new TopologyPair(entry.getKey(), entry.getValue());
             if (topologyMaps.getTopologyPairToPods().containsKey(pair)) {
@@ -216,17 +195,17 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
 
     private TopologyPairsMaps getMatchingAntiAffinityTopologyPairsOfPod(Pod newPod, Pod existingPod, Node node, Cache cache) {
         TopologyPairsMaps topologyMaps = new TopologyPairsMaps();
-        Affinity affinity = new Affinity(); //TODO = existingPods.getAffinity();
+        Affinity affinity = existingPod.getAffinityObject();
         if (affinity == null || affinity.getPodAffinity() == null) {
             return null;
         }
-        List<PodAffinityTerm> terms = affinity.getPodAffinity().getRequiredDuringSchedulingIgnoredDuringExecution();
+        List<PodAffinityTerm> terms = Arrays.asList(affinity.getPodAffinity().getRequiredDuringSchedulingIgnoredDuringExecution());
         if (terms != null && !terms.isEmpty()) {
             for (PodAffinityTerm term : terms) {
-                Set<String> namespaces = getNamespacesFromPodAffinityTerm(existingPod, term);
-                Selector selector = labelSelectorAsSelector(term.getLabelSelector());
-                if (podMatchesTermsNamespaceAndSelector(newPod, namespaces, selector)) {
-                    Map<String, String> nodeLabels = new HashMap<>(); // todo get node labels
+                Set<String> namespaces = RuleUtil.getNamespacesFromPodAffinityTerm(existingPod, term);
+                Selector selector = RuleUtil.labelSelectorAsSelector(term.getLabelSelector());
+                if (RuleUtil.podMatchesTermsNamespaceAndSelector(newPod, namespaces, selector)) {
+                    Map<String, String> nodeLabels = node.getLabels();
                     if (nodeLabels.containsKey(term.getTopologyKey())) {
                         TopologyPair pair = new TopologyPair(term.getTopologyKey(), nodeLabels.get(term.getTopologyKey()));
                         topologyMaps.addTopologyPair(pair, existingPod);
@@ -235,84 +214,5 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
             }
         }
         return topologyMaps;
-    }
-
-    private boolean podMatchesTermsNamespaceAndSelector(Pod pod, Set<String> namespaces, Selector selector) {
-        if (!namespaces.contains(pod.getNamespace())) {
-            return false;
-        }
-        //TODO get pod labels
-        Map<String, String> podLabels = new HashMap<>();
-        if (!selector.matches(podLabels)) {
-            return false;
-        }
-        return true;
-    }
-
-    private Set<String> getNamespacesFromPodAffinityTerm(Pod pod, PodAffinityTerm term) {
-        Set<String> names = new HashSet<>();
-        if (term.getNamespaces().length == 0) {
-            names.add(pod.getNamespace());
-        } else {
-            names.addAll(Arrays.asList(term.getNamespaces()));
-        }
-        return names;
-    }
-
-    class NothingSelector implements Selector {
-        public boolean matches(Map<String, String> labels) {
-            return false;
-        }
-
-        public boolean isEmpty() {
-            return false;
-        }
-
-        public boolean add(Requirement... r) {
-            return false;
-        }
-
-        public List<Requirement> Requirements() {
-            return null;
-        }
-    }
-
-    private Selector labelSelectorAsSelector(LabelSelector ps) {
-        if (ps == null) {
-            return new NothingSelector();
-        }
-        if (ps.getMatchLabels().isEmpty() && ps.getMatchExpressions().isEmpty()) {
-            return new InternalSelector();
-        }
-        Selector selector = new InternalSelector();
-        for (Map.Entry<String, String> entry : ps.getMatchLabels().entrySet()) {
-            String k = entry.getKey();
-            String[] vs = new String[1];
-            vs[0] = entry.getValue();
-            Requirement r = PodMatchNodeSelectorPredicate.newRequirement(k, SelectOperation.Equals, vs);
-            selector.add(r);
-        }
-        for (LabelSelectorRequirement expr : ps.getMatchExpressions()) {
-            SelectOperation op;
-            switch (expr.getOperator()) {
-                case LabelSelectorOpIn:
-                    op = SelectOperation.In;
-                    break;
-                case LabelSelectorOpNotIn:
-                    op = SelectOperation.NotIn;
-                    break;
-                case LabelSelectorOpExists:
-                    op = SelectOperation.Exists;
-                    break;
-                case LabelSelectorOpDoesNotExist:
-                    op = SelectOperation.DoesNotExist;
-                    break;
-                default:
-                    return null;
-            }
-            Requirement r = PodMatchNodeSelectorPredicate.newRequirement(expr.getKey(), op, expr.getValues());
-            selector.add(r);
-        }
-        return selector;
     }
 }

@@ -10,17 +10,18 @@ import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PodToleratesNodeTaintsPredicate implements PredicateRule {
     @Override
     public boolean predicate(Pod pod, Node node, Cache cache) {
-        List<Toleration> tolerations = new ArrayList<>(); // TODO from pod cache
-        List<Taint> taints = new ArrayList<>(); // TODO from node cache
         // These two lists do not have null elements.
-        if (taints.isEmpty()) {
+        if (pod.getToleration() == null || pod.getToleration().length == 0 || node.getTaints() == null || node.getTaints().length == 0) {
             return true;
         }
+        List<Toleration> tolerations = Arrays.asList(pod.getToleration());
+        List<Taint> taints = Arrays.asList(node.getTaints());
         // t.Effect == v1.TaintEffectNoSchedule || t.Effect == v1.TaintEffectNoExecute
         return taints.stream().filter(t -> t.getEffect() == TaintEffect.TaintEffectNoSchedule
                 || t.getEffect() == TaintEffect.TaintEffectNoExecute)

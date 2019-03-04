@@ -14,6 +14,7 @@ import net.sf.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GreedyScheduler implements Scheduler {
@@ -37,7 +38,6 @@ public class GreedyScheduler implements Scheduler {
         cache.fetchCacheData();
         // 2. 获取应用画像信息
         getPortrait(schedulingRequests);
-        // TODO 检查数据完整性？
         // 3. 预排序
         List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
         // 4. 逐个处理待调度pod
@@ -59,7 +59,7 @@ public class GreedyScheduler implements Scheduler {
         // 挑选节点
         HostPriority selectedHost = greedyAlgorithm.selectHost(hostPriorityList, cache);
         // 调用调度执行器，只发送一个host
-        scheduleExecute(pod, selectedHost.getHost());
+        scheduleExecute(pod, selectedHost.getHost(), cache);
         // 修改缓存
         if (ifUpdateCache) {
             cache.updateCache(pod, selectedHost.getHost());
@@ -87,19 +87,32 @@ public class GreedyScheduler implements Scheduler {
             jsonObject = JSONObject.fromObject(result);
             service.setIntensiveType(jsonObject.optInt("serviceType"));
         }
+
+        //查找同service下的pod，填写新pod的属性
+        pods.forEach(p -> {
+            Pod sp = cache.getPodMap().get(cache.getServiceMap().get(DOUtils.getServiceFullName(p)).getPodList().get(0));
+            p.setCpuRequest(sp.getCpuRequest());
+            p.setMemRequest(sp.getMemRequest());
+            p.setNodeSelector(sp.getNodeSelector());
+            p.setAffinity(sp.getAffinity());
+            p.setContainers(sp.getContainers());
+            p.setWantPorts(sp.getWantPorts());
+            p.setToleration(sp.getToleration());
+        });
     }
 
-    private void scheduleExecute(Pod pod, String host) {
+    private void scheduleExecute(Pod pod, String host, Cache cache) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("namespace", pod.getNamespace());
-        parameters.put("serviceName", pod.getServiceName());
         String uri;
         if (pod.getOperation() == Constants.OPERATION_ADD) {
+            parameters.put("serviceName", pod.getServiceName());
             parameters.put("nodeName", host);
             uri = Constants.URI_EXECUTE_ADD;
         } else {
-            //TODO
-//            parameters.put("podName", podName);
+            Optional<String> op = cache.getNodeMapPodList().get(host).stream().filter(p -> DOUtils.getServiceFullName(pod).equals(DOUtils.getServiceFullName(p))).map(DOUtils::getPodFullName).findFirst();
+            String podName = op.orElse(null);
+            parameters.put("podName", podName);
             uri = Constants.URI_EXECUTE_REMOVE;
         }
         HttpUtil.post(uri, parameters);

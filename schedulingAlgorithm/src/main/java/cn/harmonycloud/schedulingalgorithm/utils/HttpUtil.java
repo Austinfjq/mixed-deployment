@@ -17,12 +17,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class HttpUtil {
+
     public static String get(String uri) {
+        return get(uri, null);
+    }
+
+    public static String get(String uri, Map<String, String> map) {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
-            HttpGet httpget = new HttpGet(uri);
+            StringBuilder sb = new StringBuilder(uri);
+            boolean first = true;
+            if (map != null && !map.isEmpty()) {
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if (first) {
+                        sb.append("?");
+                        first = false;
+                    } else {
+                        sb.append("&");
+                    }
+                    sb.append(entry.getKey());
+                    sb.append("=");
+                    sb.append(entry.getValue());
+                }
+            }
+            HttpGet httpget = new HttpGet(sb.toString());
             CloseableHttpResponse response = httpClient.execute(httpget);
             HttpEntity httpEntity = response.getEntity();
             return EntityUtils.toString(httpEntity);

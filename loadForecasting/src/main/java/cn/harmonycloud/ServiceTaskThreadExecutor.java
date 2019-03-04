@@ -24,7 +24,7 @@ public class ServiceTaskThreadExecutor implements Runnable{
             return;
         }
 
-        DataSet dataSet = DeriveData.getDataSet(forecastCell);
+        DataSet dataSet = DeriveData.Set(forecastCell);
         dataSet.setPeriodsPerYear(forecastCell.getNumberOfPerPeriod());
 
         if (forecastCell.getForecastingModel().equals("")) {

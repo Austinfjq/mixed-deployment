@@ -3,13 +3,26 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 import java.util.List;
 
 public class NodeSelector {
-    private List<NodeSelectorTerm> NodeSelectorTerms;
+    private NodeSelectorTerm[] NodeSelectorTerms;
 
-    public List<NodeSelectorTerm> getNodeSelectorTerms() {
+    public NodeSelectorTerm[] getNodeSelectorTerms() {
         return NodeSelectorTerms;
     }
 
-    public void setNodeSelectorTerms(List<NodeSelectorTerm> nodeSelectorTerms) {
+    public void setNodeSelectorTerms(NodeSelectorTerm[] nodeSelectorTerms) {
         NodeSelectorTerms = nodeSelectorTerms;
+    }
+
+    /**
+     * unused properpy
+     */
+    private Object additionalProperties;
+
+    public Object getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Object additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 }

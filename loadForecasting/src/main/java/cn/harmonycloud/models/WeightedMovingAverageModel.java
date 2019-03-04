@@ -7,7 +7,7 @@ package cn.harmonycloud.models;
  * replaced by the weighted mean of that value and the values for some number
  * of preceding time periods. As you may have guessed from the description,
  * this model is best suited to time-series data; i.e. data that changes over
- * time.
+ * time.q
  *
  * <p>Since the forecast value for any given period is a weighted average of
  * the previous periods, then the forecast will always appear to "lag" behind
@@ -36,22 +36,10 @@ public class WeightedMovingAverageModel extends AbstractTimeBasedModel
         setWeights( weights );
     }
 
-    public WeightedMovingAverageModel(String independentVariable,
-                                      double[] weights )
-    {
-        super( independentVariable );
-        setWeights( weights );
-    }
-
     protected WeightedMovingAverageModel()
     {
     }
     
-
-    protected WeightedMovingAverageModel(String independentVariable )
-    {
-        super( independentVariable );
-    }
 
     protected void setWeights( double[] weights )
     {

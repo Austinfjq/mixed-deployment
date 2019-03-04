@@ -1,39 +1,39 @@
 package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 public class Resource {
-    private Integer milliCPU;
-    private Integer memory;
-    private Integer allowedPodNumber;
+    private Long milliCPU;
+    private Long memory;
+    private Long allowedPodNumber;
 
     public Resource() {}
 
-    public Resource(Integer milliCPU, Integer memory, Integer allowedPodNumber) {
+    public Resource(Long milliCPU, Long memory, Long allowedPodNumber) {
         this.milliCPU = milliCPU;
         this.memory = memory;
         this.allowedPodNumber = allowedPodNumber;
     }
 
-    public Integer getMilliCPU() {
+    public Long getMilliCPU() {
         return milliCPU;
     }
 
-    public void setMilliCPU(Integer milliCPU) {
+    public void setMilliCPU(Long milliCPU) {
         this.milliCPU = milliCPU;
     }
 
-    public Integer getMemory() {
+    public Long getMemory() {
         return memory;
     }
 
-    public void setMemory(Integer memory) {
+    public void setMemory(Long memory) {
         this.memory = memory;
     }
 
-    public Integer getAllowedPodNumber() {
+    public Long getAllowedPodNumber() {
         return allowedPodNumber;
     }
 
-    public void setAllowedPodNumber(Integer allowedPodNumber) {
+    public void setAllowedPodNumber(Long allowedPodNumber) {
         this.allowedPodNumber = allowedPodNumber;
     }
 }

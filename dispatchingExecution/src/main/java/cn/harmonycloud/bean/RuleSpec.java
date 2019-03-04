@@ -15,9 +15,7 @@ public class RuleSpec implements KubernetesResource {
     private String namespace;
     private int replicas;
     private List<NodeInfo> nodeList = new ArrayList<>();
-
 //    public RuleSpec(){}
-
     public RuleSpec(String namespace,JSONObject owner,JSONArray nodeList){
         switch (owner.get("ownerType").toString()){
             case "deployment":ownerType = OwnTypes.DEPLOYMENT;break;
@@ -77,4 +75,5 @@ public class RuleSpec implements KubernetesResource {
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
+
 }

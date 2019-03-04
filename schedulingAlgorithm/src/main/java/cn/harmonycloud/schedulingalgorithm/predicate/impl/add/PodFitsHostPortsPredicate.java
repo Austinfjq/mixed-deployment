@@ -5,7 +5,7 @@ import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.ProtocalPort;
+import cn.harmonycloud.schedulingalgorithm.dataobject.ProtocolPort;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 
 import java.util.HashMap;
@@ -15,11 +15,13 @@ import java.util.Map;
 public class PodFitsHostPortsPredicate implements PredicateRule {
     @Override
     public boolean predicate(Pod pod, Node node, Cache cache) {
-        ContainerPort[] wantPorts = new ContainerPort[]{}; // TODO: get wantPorts from pod and cache
-        Map<String, List<ProtocalPort>> existingPorts = new HashMap<>(); // TODO: get existingPorts from node and cache
-        for (ContainerPort wp : wantPorts) {
-            if (checkConflict(existingPorts, wp.getHostIP(), wp.getProtocol(), wp.getHostPort())) {
-                return false;
+        ContainerPort[] wantPorts = pod.getWantPorts();
+        Map<String, String> existingPorts = node.getUsedPorts();
+        if (wantPorts != null) {
+            for (ContainerPort wp : wantPorts) {
+                if (checkConflict(existingPorts, wp.getHostIP(), wp.getProtocol(), wp.getHostPort())) {
+                    return false;
+                }
             }
         }
         return true;
@@ -28,7 +30,7 @@ public class PodFitsHostPortsPredicate implements PredicateRule {
     /**
      * if there is any conflict, return true
      */
-    private boolean checkConflict(Map<String, List<ProtocalPort>> existingPorts, String ip, String protocol, int port) {
+    private boolean checkConflict(Map<String, String> existingPorts, String ip, String protocol, int port) {
         if (port <= 0) {
             return false;
         }
@@ -38,26 +40,32 @@ public class PodFitsHostPortsPredicate implements PredicateRule {
         if (protocol.isEmpty()) {
             protocol = Constants.PROTOCOL_TCP;
         }
-        if (ip.equals(Constants.DEFAULT_BIND_ALL_HOST_IP)) {
-            for (List<ProtocalPort> protocolPortList : existingPorts.values()) {
-                for (ProtocalPort pp : protocolPortList) {
-                    if (protocol.equals(pp.getProtocol()) && port == pp.getPort()) {
-                        return true;
-                    }
-                }
-            }
-        } else {
-            for (ProtocalPort pp : existingPorts.get(ip)) {
-                if (protocol.equals(pp.getProtocol()) && port == pp.getPort()) {
-                    return true;
-                }
-            }
-            for (ProtocalPort pp : existingPorts.get(Constants.DEFAULT_BIND_ALL_HOST_IP)) {
-                if (protocol.equals(pp.getProtocol()) && port == pp.getPort()) {
-                    return true;
-                }
+        for (Map.Entry entry : existingPorts.entrySet()) {
+            if (String.valueOf(port).equals(entry.getKey()) && protocol.equals(entry.getValue())) {
+                return true;
             }
         }
         return false;
+//        if (ip.equals(Constants.DEFAULT_BIND_ALL_HOST_IP)) {
+//            for (List<ProtocolPort> protocolPortList : existingPorts.values()) {
+//                for (ProtocolPort pp : protocolPortList) {
+//                    if (protocol.equals(pp.getProtocol()) && port == pp.getPort()) {
+//                        return true;
+//                    }
+//                }
+//            }
+//        } else {
+//            for (ProtocolPort pp : existingPorts.get(ip)) {
+//                if (protocol.equals(pp.getProtocol()) && port == pp.getPort()) {
+//                    return true;
+//                }
+//            }
+//            for (ProtocolPort pp : existingPorts.get(Constants.DEFAULT_BIND_ALL_HOST_IP)) {
+//                if (protocol.equals(pp.getProtocol()) && port == pp.getPort()) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
     }
 }

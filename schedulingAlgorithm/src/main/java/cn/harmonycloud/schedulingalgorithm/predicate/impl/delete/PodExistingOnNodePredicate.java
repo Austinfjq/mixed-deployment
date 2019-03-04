@@ -9,9 +9,9 @@ import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 public class PodExistingOnNodePredicate implements PredicateRule {
     @Override
     public boolean predicate(Pod pod, Node node, Cache cache) {
-        return cache.getPodMap().values().stream()
-                .filter(p -> DOUtils.getServiceFullName(p).equals(DOUtils.getServiceFullName(pod)))
-                .map(Pod::getNodeName)
-                .anyMatch(nodeName -> nodeName.equals(node.getNodeName()));
+        return cache.getNodeMapPodList().get(node.getNodeName()).stream()
+                .anyMatch(ep ->
+                        DOUtils.getServiceFullName(ep).equals(DOUtils.getServiceFullName(pod))
+                );
     }
 }

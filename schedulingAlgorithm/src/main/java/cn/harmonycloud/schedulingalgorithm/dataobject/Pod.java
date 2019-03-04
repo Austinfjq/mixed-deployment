@@ -1,5 +1,12 @@
 package cn.harmonycloud.schedulingalgorithm.dataobject;
 
+import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.SimpleAffinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.Toleration;
+
+import java.util.Date;
+import java.util.Map;
+
 public class Pod {
     /**
      * for pod to be scheduled
@@ -20,7 +27,11 @@ public class Pod {
      */
     private String time;
     /**
+<<<<<<< HEAD
      * Pod名
+=======
+     * Pod名，带namespace
+>>>>>>> 3136146d1eeb88331b20a0ab8a05b5127c68b61d
      */
     private String podName;
     /**
@@ -54,27 +65,27 @@ public class Pod {
     /**
      * Pod的cpu使用量
      */
-    private String cpuUsage;
+    private Double cpuUsage;
     /**
      * Pod的cpu请求量
      */
-    private String cpuRequest;
+    private Double cpuRequest;
     /**
      * Pod的cpu限制量
      */
-    private String cpuLimit;
+    private Double cpuLimit;
     /**
      * Pod的mem使用量
      */
-    private String memUsage;
+    private Double memUsage;
     /**
      * Pod的mem请求量
      */
-    private String memRequest;
+    private Double memRequest;
     /**
      * Pod的mem限制量
      */
-    private String memLimit;
+    private Double memLimit;
     /**
      * Pod存储卷类型
      */
@@ -82,7 +93,7 @@ public class Pod {
     /**
      * Pod存储使用量
      */
-    private String volumeUsage;
+    private Double volumeUsage;
     /**
      * Pod网络请求字节数
      */
@@ -91,6 +102,60 @@ public class Pod {
      * Pod网络传输字节数
      */
     private String responseBytes;
+    /**
+     * Pod对node的选择器
+     */
+    private Map<String, String> nodeSelector;
+    /**
+     * Pod的标签
+     */
+    private Map<String, String> labels;
+    /**
+     * Pod的亲和性 String
+     */
+    private SimpleAffinity affinity;
+    /**
+     * Pod的亲和性 Affinity对象
+     */
+    private Affinity affinityObject;
+    /**
+     * Pod的删除时间戳
+     */
+    private String deletionStamp;
+    /**
+     * 容器
+     */
+    private Container[] containers;
+    /**
+     * 需要的端口
+     */
+    private ContainerPort[] wantPorts;
+    /**
+     * 对node的容忍条件
+     */
+    private Toleration[] toleration;
+
+    /**
+     * 不需要的数据
+     */
+    private String locateNodeIP;
+    private String[] key;
+    private String onlineType;
+    private String ownerReferencesUid;
+    private String[] persistentVolumeClaimNames;
+    private String podIp;
+    private Double readsBytes;
+    private Double receiveBytes;
+    private Double writesBytes;
+
+
+    public Pod() {}
+
+    public Pod(int operation, String namespace, String serviceName) {
+        this.operation = operation;
+        this.namespace = namespace;
+        this.serviceName = serviceName;
+    }
 
     public Integer getOperation() {
         return operation;
@@ -188,51 +253,51 @@ public class Pod {
         this.imageName = imageName;
     }
 
-    public String getCpuUsage() {
+    public Double getCpuUsage() {
         return cpuUsage;
     }
 
-    public void setCpuUsage(String cpuUsage) {
+    public void setCpuUsage(Double cpuUsage) {
         this.cpuUsage = cpuUsage;
     }
 
-    public String getCpuRequest() {
+    public Double getCpuRequest() {
         return cpuRequest;
     }
 
-    public void setCpuRequest(String cpuRequest) {
+    public void setCpuRequest(Double cpuRequest) {
         this.cpuRequest = cpuRequest;
     }
 
-    public String getCpuLimit() {
+    public Double getCpuLimit() {
         return cpuLimit;
     }
 
-    public void setCpuLimit(String cpuLimit) {
+    public void setCpuLimit(Double cpuLimit) {
         this.cpuLimit = cpuLimit;
     }
 
-    public String getMemUsage() {
+    public Double getMemUsage() {
         return memUsage;
     }
 
-    public void setMemUsage(String memUsage) {
+    public void setMemUsage(Double memUsage) {
         this.memUsage = memUsage;
     }
 
-    public String getMemRequest() {
+    public Double getMemRequest() {
         return memRequest;
     }
 
-    public void setMemRequest(String memRequest) {
+    public void setMemRequest(Double memRequest) {
         this.memRequest = memRequest;
     }
 
-    public String getMemLimit() {
+    public Double getMemLimit() {
         return memLimit;
     }
 
-    public void setMemLimit(String memLimit) {
+    public void setMemLimit(Double memLimit) {
         this.memLimit = memLimit;
     }
 
@@ -244,11 +309,11 @@ public class Pod {
         this.volumeType = volumeType;
     }
 
-    public String getVolumeUsage() {
+    public Double getVolumeUsage() {
         return volumeUsage;
     }
 
-    public void setVolumeUsage(String volumeUsage) {
+    public void setVolumeUsage(Double volumeUsage) {
         this.volumeUsage = volumeUsage;
     }
 
@@ -266,5 +331,141 @@ public class Pod {
 
     public void setResponseBytes(String responseBytes) {
         this.responseBytes = responseBytes;
+    }
+
+    public Map<String, String> getNodeSelector() {
+        return nodeSelector;
+    }
+
+    public void setNodeSelector(Map<String, String> nodeSelector) {
+        this.nodeSelector = nodeSelector;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Map<String, String> labels) {
+        this.labels = labels;
+    }
+
+    public SimpleAffinity getAffinity() {
+        return affinity;
+    }
+
+    public void setAffinity(SimpleAffinity affinity) {
+        this.affinity = affinity;
+    }
+
+    public Affinity getAffinityObject() {
+        return affinityObject;
+    }
+
+    public void setAffinityObject(Affinity affinityObject) {
+        this.affinityObject = affinityObject;
+    }
+
+    public String getDeletionStamp() {
+        return deletionStamp;
+    }
+
+    public void setDeletionStamp(String deletionStamp) {
+        this.deletionStamp = deletionStamp;
+    }
+
+    public Container[] getContainers() {
+        return containers;
+    }
+
+    public void setContainers(Container[] containers) {
+        this.containers = containers;
+    }
+
+    public ContainerPort[] getWantPorts() {
+        return wantPorts;
+    }
+
+    public void setWantPorts(ContainerPort[] wantPorts) {
+        this.wantPorts = wantPorts;
+    }
+
+    public Toleration[] getToleration() {
+        return toleration;
+    }
+
+    public void setToleration(Toleration[] toleration) {
+        this.toleration = toleration;
+    }
+
+    public String getLocateNodeIP() {
+        return locateNodeIP;
+    }
+
+    public void setLocateNodeIP(String locateNodeIP) {
+        this.locateNodeIP = locateNodeIP;
+    }
+
+    public String[] getKey() {
+        return key;
+    }
+
+    public void setKey(String[] key) {
+        this.key = key;
+    }
+
+    public String getOnlineType() {
+        return onlineType;
+    }
+
+    public void setOnlineType(String onlineType) {
+        this.onlineType = onlineType;
+    }
+
+    public String getOwnerReferencesUid() {
+        return ownerReferencesUid;
+    }
+
+    public void setOwnerReferencesUid(String ownerReferencesUid) {
+        this.ownerReferencesUid = ownerReferencesUid;
+    }
+
+    public String[] getPersistentVolumeClaimNames() {
+        return persistentVolumeClaimNames;
+    }
+
+    public void setPersistentVolumeClaimNames(String[] persistentVolumeClaimNames) {
+        this.persistentVolumeClaimNames = persistentVolumeClaimNames;
+    }
+
+    public String getPodIp() {
+        return podIp;
+    }
+
+    public void setPodIp(String podIp) {
+        this.podIp = podIp;
+    }
+
+    public Double getReadsBytes() {
+        return readsBytes;
+    }
+
+    public void setReadsBytes(Double readsBytes) {
+        this.readsBytes = readsBytes;
+    }
+
+    public Double getReceiveBytes() {
+        return receiveBytes;
+    }
+
+    public void setReceiveBytes(Double receiveBytes) {
+        this.receiveBytes = receiveBytes;
+    }
+
+    public Double getWritesBytes() {
+        return writesBytes;
+    }
+
+    public void setWritesBytes(Double writesBytes) {
+        this.writesBytes = writesBytes;
     }
 }

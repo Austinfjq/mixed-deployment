@@ -1,1 +1,2 @@
-from getData import utils
+from config.config import Config
+from config.error_config import *

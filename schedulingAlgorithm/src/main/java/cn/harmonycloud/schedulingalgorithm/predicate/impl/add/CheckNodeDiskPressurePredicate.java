@@ -10,12 +10,9 @@ public class CheckNodeDiskPressurePredicate implements PredicateRule {
     public boolean predicate(Pod pod, Node node, Cache cache) {
         // CheckNodeDiskPressure: Check if a pod can be scheduled on a node reporting disk pressure condition.
         // Currently, no pods should be placed on a node under disk pressure as it gets automatically evicted by kubelet.
-        String condition = node.getCondition();
+        String[] conditions = node.getCondition().split(",");
+        String diskPressureStr = conditions[1].trim();
 
-        boolean diskPressure = false; // TODO how to parse condition
-        if (diskPressure) {
-            return false;
-        }
-        return true;
+        return !"true".equals(diskPressureStr);
     }
 }

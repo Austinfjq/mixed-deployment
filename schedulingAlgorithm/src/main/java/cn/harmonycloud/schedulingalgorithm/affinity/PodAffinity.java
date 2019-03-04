@@ -3,22 +3,35 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 import java.util.List;
 
 public class PodAffinity {
-    private List<PodAffinityTerm> requiredDuringSchedulingIgnoredDuringExecution;
-    private List<WeightedPodAffinityTerm> preferredDuringSchedulingIgnoredDuringExecution;
+    private PodAffinityTerm[] requiredDuringSchedulingIgnoredDuringExecution;
+    private WeightedPodAffinityTerm[] preferredDuringSchedulingIgnoredDuringExecution;
 
-    public List<PodAffinityTerm> getRequiredDuringSchedulingIgnoredDuringExecution() {
-        return requiredDuringSchedulingIgnoredDuringExecution;
-    }
-
-    public void setRequiredDuringSchedulingIgnoredDuringExecution(List<PodAffinityTerm> requiredDuringSchedulingIgnoredDuringExecution) {
+    public void setRequiredDuringSchedulingIgnoredDuringExecution(PodAffinityTerm[] requiredDuringSchedulingIgnoredDuringExecution) {
         this.requiredDuringSchedulingIgnoredDuringExecution = requiredDuringSchedulingIgnoredDuringExecution;
     }
 
-    public List<WeightedPodAffinityTerm> getPreferredDuringSchedulingIgnoredDuringExecution() {
+    public PodAffinityTerm[] getRequiredDuringSchedulingIgnoredDuringExecution() {
+        return requiredDuringSchedulingIgnoredDuringExecution;
+    }
+
+    public WeightedPodAffinityTerm[] getPreferredDuringSchedulingIgnoredDuringExecution() {
         return preferredDuringSchedulingIgnoredDuringExecution;
     }
 
-    public void setPreferredDuringSchedulingIgnoredDuringExecution(List<WeightedPodAffinityTerm> preferredDuringSchedulingIgnoredDuringExecution) {
+    public void setPreferredDuringSchedulingIgnoredDuringExecution(WeightedPodAffinityTerm[] preferredDuringSchedulingIgnoredDuringExecution) {
         this.preferredDuringSchedulingIgnoredDuringExecution = preferredDuringSchedulingIgnoredDuringExecution;
+    }
+
+    /**
+     * unused properpy
+     */
+    private Object additionalProperties;
+
+    public Object getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Object additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 }

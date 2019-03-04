@@ -11,6 +11,7 @@ public class ForecastCell {
 
     private int id;
     private String ID; //能唯一标识一个serice或者node
+    private int type;
     private String forecastingIndex; //对该service的那个指标进行预测
     private int timeInterval;   //数据的时间间隔
     private int numberOfPerPeriod;  //在一个周期中的数据个数
@@ -22,9 +23,10 @@ public class ForecastCell {
     public ForecastCell() {
     }
 
-    public ForecastCell(int id, String ID, String forecastingIndex, int timeInterval, int numberOfPerPeriod, String forecastingModel, String modelParams, Date forcastingEndTime) {
+    public ForecastCell(int id, String ID, int type, String forecastingIndex, int timeInterval, int numberOfPerPeriod, String forecastingModel, String modelParams, Date forcastingEndTime) {
         this.id = id;
         this.ID = ID;
+        this.type = type;
         this.forecastingIndex = forecastingIndex;
         this.timeInterval = timeInterval;
         this.numberOfPerPeriod = numberOfPerPeriod;
@@ -33,8 +35,9 @@ public class ForecastCell {
         this.forcastingEndTime = forcastingEndTime;
     }
 
-    public ForecastCell(String ID, String forecastingIndex, int timeInterval, int numberOfPerPeriod, String forecastingModel, String modelParams, Date forcastingEndTime) {
+    public ForecastCell(String ID, int type, String forecastingIndex, int timeInterval, int numberOfPerPeriod, String forecastingModel, String modelParams, Date forcastingEndTime) {
         this.ID = ID;
+        this.type = type;
         this.forecastingIndex = forecastingIndex;
         this.timeInterval = timeInterval;
         this.numberOfPerPeriod = numberOfPerPeriod;
@@ -58,6 +61,14 @@ public class ForecastCell {
 
     public void setID(String ID) {
         this.ID = ID;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getForecastingIndex() {
@@ -113,6 +124,7 @@ public class ForecastCell {
         return "ForecastCell{" +
                 "id=" + id +
                 ", ID='" + ID + '\'' +
+                ", type='" + type + '\'' +
                 ", forecastingIndex='" + forecastingIndex + '\'' +
                 ", timeInterval=" + timeInterval +
                 ", numberOfPerPeriod=" + numberOfPerPeriod +
