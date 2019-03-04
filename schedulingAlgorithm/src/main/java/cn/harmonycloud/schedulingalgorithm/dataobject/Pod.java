@@ -27,11 +27,7 @@ public class Pod {
      */
     private String time;
     /**
-<<<<<<< HEAD
      * Pod名
-=======
-     * Pod名，带namespace
->>>>>>> 3136146d1eeb88331b20a0ab8a05b5127c68b61d
      */
     private String podName;
     /**
@@ -149,7 +145,8 @@ public class Pod {
     private Double writesBytes;
 
 
-    public Pod() {}
+    public Pod() {
+    }
 
     public Pod(int operation, String namespace, String serviceName) {
         this.operation = operation;
