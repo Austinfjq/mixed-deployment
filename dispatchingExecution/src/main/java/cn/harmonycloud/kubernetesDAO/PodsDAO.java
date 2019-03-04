@@ -17,6 +17,7 @@ public class PodsDAO {
             }
         }
         K8sClient.getInstance().apps().deployments().inNamespace(namespace).withName(ownName).scale(deployment.getSpec().getReplicas()+replicas);
+
         return true;
     }
     public static boolean createReplicasetPod(String namespace,String ownName,int replicas){
