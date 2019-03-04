@@ -15,10 +15,9 @@ public class StringUtil {
         }
         return result;
     }
-    public static void main(String[] args){
-        int n = 5;
-        for (int i = 0; i < 100;i++){
-            System.out.println(StringUtil.randomStringGenerator(5));
-        }
+
+
+    public static String combineUrl(String server){
+        return "https://"+server;
     }
 }

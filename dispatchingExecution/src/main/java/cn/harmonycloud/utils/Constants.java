@@ -11,12 +11,13 @@ public class Constants {
     public static String DEFAULT_NAME_SPACE = "default";
 
     //Rule
-    public static String API_VERSION = "crd.k8s.io/v1";
-    public static String KIND = "Rule";
-    public static String NAME_PREFIX = "rule-";
+    public final static String API_VERSION = "crd.k8s.io/v1";
+    public final static String KIND = "Rule";
+    public final static String NAME_PREFIX = "rule-";
 
     //RuleDefinition
-    public static String RULE_API_VERSION = "apiextensions.k8s.io/v1beta1";
-    public static String RULE_KIND = "CustomResourceDefinition";
-    public static String RULE_NAME = "rules.crd.k8s.io";
+    public final static String RULE_API_VERSION = "apiextensions.k8s.io/v1beta1";
+    public final static String RULE_KIND = "CustomResourceDefinition";
+    public final static String RULE_NAME = "rules.crd.k8s.io";
+
 }
