@@ -94,8 +94,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
     private boolean satisfiesPodsAffinityAntiAffinity(Pod pod, Node node, Affinity affinity, Cache cache) {
         // k8s 1.13中这里的pods除去了“nodeName等于当前node但不在nodeInfo中显示的pod”，是抢占机制造成的这种pod。这里忽略抢占。
         Map<String, Pod> existingPods = cache.getPodMap();
-        List<PodAffinityTerm> affinityTerms = getPodAffinityTerms(affinity.getPodAffinity());
-        List<PodAffinityTerm> antiAffinityTerms = getPodAntiAffinityTerms(affinity.getPodAntiAffinity());
+        List<PodAffinityTerm> affinityTerms = getPodAffinityTerms(affinity == null ? null : affinity.getPodAffinity());
+        List<PodAffinityTerm> antiAffinityTerms = getPodAntiAffinityTerms(affinity == null ? null : affinity.getPodAntiAffinity());
         boolean matchFound = false, termsSelectorMatchFound = false;
         for (Pod targetPod : existingPods.values()) {
             // Check all affinity terms.
@@ -176,7 +176,8 @@ public class MatchInterPodAffinityPredicate implements PredicateRule {
         Map<String, String> nodeLabels = node.getLabels();
         for (Map.Entry<String, String> entry : nodeLabels.entrySet()) {
             TopologyPair pair = new TopologyPair(entry.getKey(), entry.getValue());
-            if (topologyMaps.getTopologyPairToPods().containsKey(pair)) {
+            Map<TopologyPair, Set<Pod>> map = topologyMaps.getTopologyPairToPods();
+            if (map != null && map.containsKey(pair)) {
                 return false;
             }
         }

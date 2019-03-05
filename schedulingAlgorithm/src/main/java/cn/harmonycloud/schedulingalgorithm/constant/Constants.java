@@ -9,9 +9,9 @@ public class Constants {
     public static final int INTENSIVE_TYPE_DOWN_NET_IO = 3;
     public static final int INTENSIVE_TYPE_UP_NET_IO = 4;
 
-    public static final String URI_GET_SERVICE = "http://hostname:port/services";
-    public static final String URI_GET_POD = "http://hostname:port/pods";
-    public static final String URI_GET_NODE = "http://hostname:port/nodes";
+    public static final String URI_GET_SERVICE = "http://10.10.101.115:8080/nowService";
+    public static final String URI_GET_POD = "http://10.10.101.115:8080/nowPod";
+    public static final String URI_GET_NODE = "http://10.10.101.115:8080/nowNode";
     public static final String URI_GET_NODE_FORECAST = "http://hostname:port/forecast/forecastValue";
 
     public static final String URI_GET_POD_CONSUME = "http://hostname:port/service/getPodCosume";

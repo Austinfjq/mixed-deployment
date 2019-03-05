@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,9 +75,9 @@ public class Cache {
         List<Service> serviceList;
         List<Pod> podList;
         List<Node> nodeList;
-        serviceList = (List<Service>) (Object) fetchOne(Constants.URI_GET_SERVICE, Service.class);
-        podList = (List<Pod>) (Object) fetchOne(Constants.URI_GET_POD, Pod.class);
-        nodeList = (List<Node>) (Object) fetchOne(Constants.URI_GET_NODE, Node.class);
+        serviceList = (List<Service>) (Object) fetchOne(Constants.URI_GET_SERVICE, Service[].class);
+        podList = (List<Pod>) (Object) fetchOne(Constants.URI_GET_POD, Pod[].class);
+        nodeList = (List<Node>) (Object) fetchOne(Constants.URI_GET_NODE, Node[].class);
 
         serviceMap = new HashMap<>();
         if (serviceList != null) {
@@ -118,17 +119,19 @@ public class Cache {
     }
 
     private void readAffinity(Pod pod) {
-        String nodeAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getNodeAffinity());
-        String podAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAffinity());
-        String podAntiAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAntiAffinity());
-        NodeAffinity nodeAffinity = gson.fromJson(nodeAffinityStr, NodeAffinity.class);
-        PodAffinity podAffinity = gson.fromJson(podAffinityStr, PodAffinity.class);
-        PodAntiAffinity podAntiAffinity = gson.fromJson(podAntiAffinityStr, PodAntiAffinity.class);
-        Affinity affinity = new Affinity();
-        affinity.setNodeAffinity(nodeAffinity);
-        affinity.setPodAffinity(podAffinity);
-        affinity.setPodAntiAffinity(podAntiAffinity);
-        pod.setAffinityObject(affinity);
+        if (pod.getAffinity() != null) {
+            String nodeAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getNodeAffinity());
+            String podAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAffinity());
+            String podAntiAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAntiAffinity());
+            NodeAffinity nodeAffinity = gson.fromJson(nodeAffinityStr, NodeAffinity.class);
+            PodAffinity podAffinity = gson.fromJson(podAffinityStr, PodAffinity.class);
+            PodAntiAffinity podAntiAffinity = gson.fromJson(podAntiAffinityStr, PodAntiAffinity.class);
+            Affinity affinity = new Affinity();
+            affinity.setNodeAffinity(nodeAffinity);
+            affinity.setPodAffinity(podAffinity);
+            affinity.setPodAntiAffinity(podAntiAffinity);
+            pod.setAffinityObject(affinity);
+        }
     }
 
     private void readTaints(Node node) {
@@ -161,7 +164,7 @@ public class Cache {
                 try {
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
                     String value = jsonObject.optString("value");
-                    resource.setMilliCPU(Double.valueOf(value).longValue());
+                    resource.setMilliCPU((long) (Double.valueOf(value) * 1000));
                 } catch (Exception e) {
                     // ignore
                 }
@@ -184,27 +187,12 @@ public class Cache {
         return map;
     }
 
-    private List<Object> fetchOne(String uri, Class clazz) {
+    private <T> List<Object> fetchOne(String uri, Class<T> clazz) {
         List<Object> result = new ArrayList<>();
         String jsonStr = HttpUtil.get(uri);
-        try {
-            JSONArray jsonArray = JSONArray.fromObject(jsonStr);
-            if (jsonArray == null) {
-                return null;
-            }
-            for (int i = 0; i < jsonArray.size(); i++) {
-                try {
-                    JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                    Object object = JSONObject.toBean(jsonObject1, clazz);
-                    result.add(object);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-            return result;
-        } catch (Exception e) {
-            return result;
-        }
+        Object[] objects = (Object[]) gson.fromJson(jsonStr, clazz);
+        Collections.addAll(result, objects);
+        return result;
     }
 
     /**

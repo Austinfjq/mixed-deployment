@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class SchedulingAlgorithmController {
@@ -23,15 +25,18 @@ public class SchedulingAlgorithmController {
      * @return 是否成功
      */
     @RequestMapping("/schedulepod")
-    public boolean schedulePod(@RequestBody List<SchedulePod> schedulePods) {
+    public Map<String, Object> schedulePod(@RequestBody List<SchedulePod> schedulePods) {
+        Map<String, Object> responseMap = new HashMap<>();
         // check parameter
         if (CheckUtil.nullOrEmpty(schedulePods)) {
-            return false;
+            responseMap.put("isSucceed", false);
+            return responseMap;
         }
         for (SchedulePod pod : schedulePods) {
             if (pod == null || pod.getOperation() == null || pod.getNamespace() == null || pod.getServiceName() == null
                     || !CheckUtil.range(pod.getOperation(), Constants.OPERATION_ADD, Constants.OPERATION_DELETE)) {
-                return false;
+                responseMap.put("isSucceed", false);
+                return responseMap;
             }
         }
         // 放入队列
@@ -50,10 +55,12 @@ public class SchedulingAlgorithmController {
             if (result) {
                 SchedulingAlgorithmApp.semaphore.release();
             }
-            return result;
+            responseMap.put("isSucceed", result);
+            return responseMap;
         } catch (Exception e) {
             // TODO
-            return false;
+            responseMap.put("isSucceed", false);
+            return responseMap;
         }
     }
 }
