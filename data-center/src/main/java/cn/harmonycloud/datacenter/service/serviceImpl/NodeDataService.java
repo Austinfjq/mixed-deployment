@@ -61,7 +61,7 @@ public class NodeDataService implements INodeDataService {
     }
 
     @Override
-    public List<Map> getNowNodes() {
+    public List<NodeData> getNowNodes() {
         return nodeDataDao.getNowNodes();
     }
 }

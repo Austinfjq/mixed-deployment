@@ -5,6 +5,7 @@ import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
 import com.google.common.collect.Lists;
+import com.sun.xml.internal.ws.api.server.SDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -246,7 +247,7 @@ public class ServiceDataController {
      * @return
      */
     @GetMapping("/nowService")
-    public List<Map> getNowServices(){
+    public List<ServiceData> getNowServices(){
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         return serviceDataService.getNowServices();

@@ -23,5 +23,5 @@ public interface INodeDataDao {
     //获得Node的Conditions
     public Map<String,Object> getNodeConditions(String nodeName, String nodeIP);
     //获得当前时间的Node
-    public List<Map> getNowNodes();
+    public List<NodeData> getNowNodes();
 }

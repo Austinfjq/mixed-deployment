@@ -702,7 +702,7 @@ public class ServiceDataDao implements IServiceDataDao {
     }
 
     @Override
-    public List<Map> getNowServices() {
+    public List<ServiceData> getNowServices() {
         //{
         //	"query":{
         //		"bool":{
@@ -713,36 +713,36 @@ public class ServiceDataDao implements IServiceDataDao {
         //	},
         //	"_source":["namespace","serviceName","podNums","cpuUsage","memUsage","onlineType"]
         //}
-        List<Map> resultList = new ArrayList<>();
-        final SearchResultMapper nowServiceResultMapper = new SearchResultMapper() {
-            @Override
-            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-                List<Map> result = new ArrayList<>();
-                for (SearchHit searchHit : response.getHits()) {
-                    if (response.getHits().getHits().length <= 0) {
-                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
-                    }
-                    Map map = searchHit.getSourceAsMap();
-                    Map<String, Object> values = new HashMap<>();
-                    values.put("namespace", map.get("namespace"));
-                    values.put("serviceName", map.get("serviceName"));
-                    values.put("podNums", map.get("podNums"));
-                    values.put("cpuUsage", map.get("cpuUsage"));
-                    values.put("memUsage", map.get("memUsage"));
-                    String onlineType = (String) map.get("onlineType");
-                    if (onlineType.equals("1")) {
-                        values.put("isOffline", true);
-                    } else {
-                        values.put("isOffline", false);
-                    }
-                    result.add(values);
-                }
-                if (result.size() > 0) {
-                    return new AggregatedPageImpl<T>((List<T>) result, response.getScrollId());
-                }
-                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
-            }
-        };
+        List<ServiceData> resultList = new ArrayList<>();
+//        final SearchResultMapper nowServiceResultMapper = new SearchResultMapper() {
+//            @Override
+//            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
+//                List<Map> result = new ArrayList<>();
+//                for (SearchHit searchHit : response.getHits()) {
+//                    if (response.getHits().getHits().length <= 0) {
+//                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+//                    }
+//                    Map map = searchHit.getSourceAsMap();
+//                    Map<String, Object> values = new HashMap<>();
+//                    values.put("namespace", map.get("namespace"));
+//                    values.put("serviceName", map.get("serviceName"));
+//                    values.put("podNums", map.get("podNums"));
+//                    values.put("cpuUsage", map.get("cpuUsage"));
+//                    values.put("memUsage", map.get("memUsage"));
+//                    String onlineType = (String) map.get("onlineType");
+//                    if (onlineType.equals("1")) {
+//                        values.put("isOffline", true);
+//                    } else {
+//                        values.put("isOffline", false);
+//                    }
+//                    result.add(values);
+//                }
+//                if (result.size() > 0) {
+//                    return new AggregatedPageImpl<T>((List<T>) result, response.getScrollId());
+//                }
+//                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+//            }
+//        };
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",getRecentTime()));
@@ -758,12 +758,12 @@ public class ServiceDataDao implements IServiceDataDao {
                 .withPageable(PageRequest.of(0,10))
                 .build();
 
-        Page<Map> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, Map.class,nowServiceResultMapper);
+        Page<ServiceData> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, ServiceData.class);
         String scrollId = ((ScrolledPage) scroll).getScrollId();
         while (scroll.hasContent()) {
             resultList.addAll(scroll.getContent());
             scrollId = ((ScrolledPage) scroll).getScrollId();
-            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, Map.class, nowServiceResultMapper);
+            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, ServiceData.class);
         }
         elasticsearchTemplate.clearScroll(scrollId);
 

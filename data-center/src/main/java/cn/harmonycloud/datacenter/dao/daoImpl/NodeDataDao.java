@@ -227,7 +227,7 @@ public class NodeDataDao implements INodeDataDao {
     }
 
     @Override
-    public List<Map> getNowNodes() {
+    public List<NodeData> getNowNodes() {
         //GET /node/nodedata/_search
         //{
         //    "query":{
@@ -239,30 +239,30 @@ public class NodeDataDao implements INodeDataDao {
         //    },
         //	"_source":["nodeName","nodeIP","podNums","cpuUsage","memUsage"]
         //}
-        List<Map> resultList = new ArrayList<>();
-        final SearchResultMapper nowNodeResultMapper = new SearchResultMapper() {
-            @Override
-            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-                List<Map> result = new ArrayList<>();
-                for (SearchHit searchHit : response.getHits()) {
-                    if (response.getHits().getHits().length <= 0) {
-                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
-                    }
-                    Map map = searchHit.getSourceAsMap();
-                    Map<String, Object> values = new HashMap<>();
-                    values.put("hostName", map.get("nodeName"));
-                    values.put("hostIP", map.get("nodeIP"));
-                    values.put("podNums", map.get("podNums"));
-                    values.put("cpuUsage", map.get("cpuUsage"));
-                    values.put("memUsage", map.get("memUsage"));
-                    result.add(values);
-                }
-                if (result.size() > 0) {
-                    return new AggregatedPageImpl<T>((List<T>) result, response.getScrollId());
-                }
-                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
-            }
-        };
+        List<NodeData> resultList = new ArrayList<>();
+//        final SearchResultMapper nowNodeResultMapper = new SearchResultMapper() {
+//            @Override
+//            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
+//                List<Map> result = new ArrayList<>();
+//                for (SearchHit searchHit : response.getHits()) {
+//                    if (response.getHits().getHits().length <= 0) {
+//                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+//                    }
+//                    Map map = searchHit.getSourceAsMap();
+//                    Map<String, Object> values = new HashMap<>();
+//                    values.put("hostName", map.get("nodeName"));
+//                    values.put("hostIP", map.get("nodeIP"));
+//                    values.put("podNums", map.get("podNums"));
+//                    values.put("cpuUsage", map.get("cpuUsage"));
+//                    values.put("memUsage", map.get("memUsage"));
+//                    result.add(values);
+//                }
+//                if (result.size() > 0) {
+//                    return new AggregatedPageImpl<T>((List<T>) result, response.getScrollId());
+//                }
+//                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+//            }
+//        };
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",getRecentTime()));
@@ -272,12 +272,12 @@ public class NodeDataDao implements INodeDataDao {
                 .withTypes(NODE_TYPE)
                 .withSearchType(SearchType.DEFAULT)
                 .build();
-        Page<Map> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, Map.class,nowNodeResultMapper);
+        Page<NodeData> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, NodeData.class);
         String scrollId = ((ScrolledPage) scroll).getScrollId();
         while (scroll.hasContent()) {
             resultList.addAll(scroll.getContent());
             scrollId = ((ScrolledPage) scroll).getScrollId();
-            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, Map.class, nowNodeResultMapper);
+            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, NodeData.class);
         }
         elasticsearchTemplate.clearScroll(scrollId);
         return resultList;
