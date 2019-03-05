@@ -90,7 +90,8 @@ public class GreedyScheduler implements Scheduler {
 
         //查找同service下的pod，填写新pod的属性
         pods.forEach(p -> {
-            Pod sp = cache.getPodMap().get(cache.getServiceMap().get(DOUtils.getServiceFullName(p)).getPodList().get(0));
+            Service service = cache.getServiceMap().get(DOUtils.getServiceFullName(p));
+            Pod sp = cache.getPodMap().get(DOUtils.getPodFullName(service.getPodList().get(0), p.getNamespace()));
             p.setCpuRequest(sp.getCpuRequest());
             p.setMemRequest(sp.getMemRequest());
             p.setNodeSelector(sp.getNodeSelector());

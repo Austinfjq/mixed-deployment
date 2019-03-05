@@ -25,7 +25,7 @@ public class PodMatchNodeSelectorPredicate implements PredicateRule {
         // 1. node selector
         Map<String, String> podNodeSelectorMap = pod.getNodeSelector();
         Map<String, String> labels = node.getLabels();
-        if (!podNodeSelectorMap.isEmpty()) {
+        if (podNodeSelectorMap != null && !podNodeSelectorMap.isEmpty()) {
             Selector selector = new InternalSelector(podNodeSelectorMap);
             if (!selector.matches(labels)) {
                 return false;

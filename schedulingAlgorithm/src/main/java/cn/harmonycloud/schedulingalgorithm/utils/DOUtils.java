@@ -22,6 +22,10 @@ public class DOUtils {
         return pod.getPodName() + NAME_SPLIT + pod.getNamespace();
     }
 
+    public static String getPodFullName(String podName, String namespace) {
+        return podName + NAME_SPLIT + namespace;
+    }
+
     public static void main(String[] args) {
         // 测试k8sObjectToJson()
         String s = "Affinity(nodeAffinity=null, podAffinity=null, podAntiAffinity=PodAntiAffinity(preferredDuringSchedulingIgnoredDuringExecution=[WeightedPodAffinityTerm(podAffinityTerm=PodAffinityTerm(labelSelector=LabelSelector(matchExpressions=[LabelSelectorRequirement(key=app, operator=In, values=[group-schedule], additionalProperties={})], matchLabels=null, additionalProperties={}), namespaces=[cbl], topologyKey=kubernetes.io/hostname, additionalProperties={}), weight=50, additionalProperties={}), WeightedPodAffinityTerm(podAffinityTerm=PodAffinityTerm(labelSelector=LabelSelector(matchExpressions=[LabelSelectorRequirement(key=app, operator=In, values=[group-schedule], additionalProperties={})], matchLabels=null, additionalProperties={}), namespaces=[cbl], topologyKey=harmonycloud.cn/group, additionalProperties={}), weight=50, additionalProperties={})], requiredDuringSchedulingIgnoredDuringExecution=[], additionalProperties={}), additionalProperties={})";

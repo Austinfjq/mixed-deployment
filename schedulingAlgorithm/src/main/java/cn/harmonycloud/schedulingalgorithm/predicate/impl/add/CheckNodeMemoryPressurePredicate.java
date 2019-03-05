@@ -3,9 +3,11 @@ package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 import cn.harmonycloud.schedulingalgorithm.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Container;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
+import cn.harmonycloud.schedulingalgorithm.dataobject.NodeCondition;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Quantity;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
+import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -22,11 +24,11 @@ public class CheckNodeMemoryPressurePredicate implements PredicateRule {
             return true;
         }
 
-        String[] conditions = node.getCondition().split(",");
-        String memoryPressureStr = conditions[0].trim();
-
-        return !"true".equals(memoryPressureStr);
+        return RuleUtil.checkNodeCondition(node.getNodeConditions(), types, statuses);
     }
+
+    private static final String[] types = {"memoryPressure"};
+    private static final String[] statuses = {"true"};
 
     private boolean isPodBestEffort(Pod pod) {
         return allZero(pod.getCpuRequest(), pod.getMemRequest(), pod.getCpuLimit(), pod.getMemLimit());

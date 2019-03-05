@@ -15,6 +15,7 @@ import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
 import cn.harmonycloud.schedulingalgorithm.affinity.Toleration;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
+import cn.harmonycloud.schedulingalgorithm.dataobject.NodeCondition;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import org.apache.commons.lang.StringUtils;
@@ -35,10 +36,10 @@ public class RuleUtil {
         Resource requested = new Resource();
 
         if (op == Constants.OPERATION_ADD) {
-            requested.setMilliCPU(node.getCpuUsage().longValue() + pod.getCpuRequest().longValue());
+            requested.setMilliCPU((long) (1000 * (node.getCpuUsage() + pod.getCpuRequest())));
             requested.setMemory(node.getMemUsage().longValue() + pod.getMemRequest().longValue());
         } else {
-            requested.setMilliCPU(node.getCpuUsage().longValue() - pod.getCpuRequest().longValue());
+            requested.setMilliCPU((long) (1000 * (node.getCpuUsage() - pod.getCpuRequest())));
             requested.setMemory(node.getMemUsage().longValue() - pod.getMemRequest().longValue());
         }
         return requested;
@@ -368,8 +369,24 @@ public class RuleUtil {
 
     public static Resource getNodeAllocatableResource(Node node) {
         Resource allocatable = new Resource();
-        allocatable.setMilliCPU(node.getAllocatableCpuCores().longValue());
+        allocatable.setMilliCPU((long) (node.getAllocatableCpuCores() * 1000));
         allocatable.setMemory(node.getAllocatableMem().longValue());
         return allocatable;
+    }
+
+    public static boolean checkNodeCondition(NodeCondition nodeCondition, String[] types, String[] statuses) {
+        if (nodeCondition == null) {
+            return true;
+        }
+        for (String type : types) {
+            if (type.equalsIgnoreCase(nodeCondition.getType())) {
+                for (String status : statuses) {
+                    if (status.equalsIgnoreCase(nodeCondition.getType())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }

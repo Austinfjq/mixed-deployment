@@ -47,10 +47,6 @@ public class Node {
      */
     private Double netBandwidth;
     /**
-     * 节点pressure状态
-     */
-    private String condition;
-    /**
      * 节点标签
      */
     private Map<String, String> labels;
@@ -181,14 +177,6 @@ public class Node {
 
     public void setNetBandwidth(Double netBandwidth) {
         this.netBandwidth = netBandwidth;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
     }
 
     public Map<String, String> getLabels() {
