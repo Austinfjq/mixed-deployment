@@ -3,16 +3,17 @@ package cn.harmonycloud.dao;
 import cn.harmonycloud.beans.HttpClientResult;
 import cn.harmonycloud.entry.ForecastNode;
 import cn.harmonycloud.entry.NowNode;
-import cn.harmonycloud.tools.HttpClientUtils;
+import cn.harmonycloud.tools.Constant;
 
 import com.alibaba.fastjson.JSON;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static cn.harmonycloud.tools.HttpSend.sendGet;
+import static com.alibaba.fastjson.serializer.SerializerFeature.*;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 public class NodeDAO {
-
 
     public NodeDAO() {
     }
@@ -25,29 +26,37 @@ public class NodeDAO {
         return HolderClass.instance;
     }
 
-    public static String getData(String url) {
+//    public static String getForecastNode(String startTime,String endTime) {
 //        Map<String, String> params = new HashMap<>();
 //        params.put("startTime", startTime);
 //        params.put("endTime", endTime);
-//        String url = "http://localhost:8080/evaluatesystem/nodes";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult = HttpClientUtils.doGet(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        params.put("id", "node");
+//        String url = "http://"+ Constant.HOST+":"+Constant.PORT+"/forecast/forecastValues";
+//        HttpClientResult httpClientResult = null;
+//        try {
+//            httpClientResult = HttpClientUtils.doGet(url);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (null == httpClientResult || httpClientResult.getCode() != 200) {
+//            System.out.println("get index data failed!");
+//            return null;
+//        }
+//
+//        return httpClientResult.getContent();
+//    }
 
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get index data failed!");
-            return null;
-        }
+    public static String getForecastNode(String startTime, String endTime) {
 
-        return httpClientResult.getContent();
+        String params="id=node"+"&startTime="+startTime+"&endTime="+endTime;
+        String url = "http://" + Constant.HOST + ":" + Constant.PORT + "/forecast/forecastValues";
+
+        return sendGet(url,params);
     }
 
-
     public static List<ForecastNode> getForecastNodeList() {
-        String servicesStr = getData("http://localhost:8080/evaluatesystem/nodes");
+        String servicesStr = getForecastNode("2019-03-04%2017:00:00","2019-03-04%2018:00:00");
 
         if (null == servicesStr) {
             System.out.println("get forecast node data failed!");
@@ -58,7 +67,7 @@ public class NodeDAO {
     }
 
     public static List<NowNode> getNowNodeList() {
-        String servicesStr = getData("http://localhost:8080/evaluatesystem/nodes");
+        String servicesStr = sendGet("http://"+ Constant.HOST+":"+Constant.PORT+"/nowNode","");
 
         if (null == servicesStr) {
             System.out.println("get now node data failed!");
@@ -70,6 +79,9 @@ public class NodeDAO {
 
     public static void main(String[] args) {
 
+        String returnValue = JSON.toJSONString(getForecastNodeList(), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        System.out.println(returnValue);
 //        System.out.println(String.valueOf(getPodNumberByServiceLoad("online","wordpress",56)));
 
     }

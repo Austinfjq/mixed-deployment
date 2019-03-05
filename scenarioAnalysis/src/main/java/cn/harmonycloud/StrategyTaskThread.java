@@ -29,14 +29,17 @@ public class StrategyTaskThread implements Runnable {
     @Override
     public void run() {
 
-        if (podDelList.containsKey("offline") || podDelList.containsKey("online")) {
-
+//        if (podDelList.containsKey("offline") || podDelList.containsKey("online")) {
+        if (podDelList.containsKey("offline")) {
             boolean delOffline = podDelList.containsKey("offline");
-            long podNum = delOffline ? podDelList.get("offline") : podDelList.get("online");
+//            long podNum = delOffline ? podDelList.get("offline") : podDelList.get("online");
 
+            long podNum = podDelList.get("offline");
             for (int i = 0; i < podNum; i++) {
                 for (NowService nowService : nowServiceList) {
-                    if ((nowService.isOffline() && delOffline) || (!nowService.isOffline() && !delOffline)) {
+//                    if ((nowService.isOffline() && delOffline) || (!nowService.isOffline() && !delOffline)) {
+
+                    if (nowService.isOffline() && delOffline && nowService.getNamespace().equals("hadoop")) {
                         Result resultPod = new Result(1, nowService.getNamespace(),
                                 nowService.getServiceName(), "1");
                         results.add(resultPod);
@@ -52,10 +55,13 @@ public class StrategyTaskThread implements Runnable {
             for (int i = 0; i < podNum; i++) {
                 for (NowService nowService : nowServiceList) {
                     if ((nowService.isOffline() && addOffline) || (!nowService.isOffline() && !addOffline)) {
-                        Result resultPod = new Result(0, nowService.getNamespace(),
-                                nowService.getServiceName(), "1");
-                        results.add(resultPod);
-                        nowServiceList.remove(nowService);
+//                    if (!nowService.isOffline() && !addOffline) {
+                        if (nowService.getNamespace().equals("hadoop") || nowService.getNamespace().equals("wordpress")) {
+                            Result resultPod = new Result(0, nowService.getNamespace(),
+                                    nowService.getServiceName(), "1");
+                            results.add(resultPod);
+                            nowServiceList.remove(nowService);
+                        }
                     }
                 }
             }

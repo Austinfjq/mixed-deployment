@@ -3,9 +3,14 @@ package cn.harmonycloud.datacenter.dao.daoImpl;
 import cn.harmonycloud.datacenter.dao.IPodDataDao;
 import cn.harmonycloud.datacenter.entity.es.NodeData;
 import cn.harmonycloud.datacenter.entity.es.PodData;
+import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
+import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,4 +70,77 @@ public class PodDataDao implements IPodDataDao {
 
         return resultList;
     }
+
+    @Override
+    public List<PodData> getNowPods() {
+        //{
+        //	"query":{
+        //		"bool":{
+        //			"must":[
+        //				{"match_phrase" : {"time" : "2019-02-28 18:25:29"}}
+        //			]
+        //		}
+        //	}
+        //}
+        List<PodData> resultList = new ArrayList<>();
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",getRecentTime()));
+//        String[] includes = {"namespace","serviceName","podNums","cpuUsage","memUsage","onlineType"};
+//        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(POD_INDEX)
+                .withTypes(POD_TYPE)
+                .withSearchType(SearchType.DEFAULT)
+//                .withSourceFilter(fetchSourceFilter)
+                .withPageable(PageRequest.of(0,10))
+                .build();
+
+        Page<PodData> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, PodData.class);
+        String scrollId = ((ScrolledPage) scroll).getScrollId();
+        while (scroll.hasContent()) {
+            resultList.addAll(scroll.getContent());
+            scrollId = ((ScrolledPage) scroll).getScrollId();
+            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, PodData.class);
+        }
+        elasticsearchTemplate.clearScroll(scrollId);
+
+        return resultList;
+    }
+
+    /**
+     * 获取最近的时间
+     *
+     * @return
+     */
+    public String getRecentTime(){
+        //GET /pod/podData/_search
+        //{
+        //	"aggs":{
+        //		"recent_time":{
+        //			"max":{
+        //				"field":"time"
+        //			}
+        //		}
+        //	}
+        //}
+        MaxAggregationBuilder maxAggregationBuilder = AggregationBuilders.max("recent_time").field("time");
+
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withIndices(POD_INDEX)
+                .withTypes(POD_TYPE)
+                .withSearchType(SearchType.DEFAULT)
+                .addAggregation(maxAggregationBuilder)
+                .build();
+        Aggregations aggregations = elasticsearchTemplate.query(searchQuery, response -> response.getAggregations());
+        InternalMax internalMax = aggregations.get("recent_time");
+        if(internalMax != null){
+            return internalMax.getValueAsString();
+        } else{
+            return null;
+        }
+    }
+
 }

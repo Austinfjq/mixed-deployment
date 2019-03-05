@@ -21,17 +21,4 @@ public class PodAffinity {
     public void setPreferredDuringSchedulingIgnoredDuringExecution(WeightedPodAffinityTerm[] preferredDuringSchedulingIgnoredDuringExecution) {
         this.preferredDuringSchedulingIgnoredDuringExecution = preferredDuringSchedulingIgnoredDuringExecution;
     }
-
-    /**
-     * unused properpy
-     */
-    private Object additionalProperties;
-
-    public Object getAdditionalProperties() {
-        return additionalProperties;
-    }
-
-    public void setAdditionalProperties(Object additionalProperties) {
-        this.additionalProperties = additionalProperties;
-    }
 }

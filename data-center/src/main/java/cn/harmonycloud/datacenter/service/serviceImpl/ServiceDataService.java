@@ -109,7 +109,7 @@ public class ServiceDataService implements IServiceDataService {
     }
 
     @Override
-    public List<Map> getNowServices() {
+    public List<ServiceData> getNowServices() {
         return serviceDataDao.getNowServices();
     }
 }

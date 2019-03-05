@@ -15,4 +15,5 @@ import java.util.List;
 @Repository
 public interface IPodDataDao {
     public List<PodData> findAllPodDatas();
+    public List<PodData> getNowPods();
 }

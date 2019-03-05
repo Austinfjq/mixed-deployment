@@ -1,16 +1,16 @@
 package cn.harmonycloud.dao;
 
 import cn.harmonycloud.beans.HttpClientResult;
-import cn.harmonycloud.entry.ForecastNode;
 import cn.harmonycloud.entry.ForecastService;
 import cn.harmonycloud.entry.NowService;
-import cn.harmonycloud.tools.HttpClientUtils;
+import cn.harmonycloud.tools.Constant;
 import com.alibaba.fastjson.JSON;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static cn.harmonycloud.tools.HttpSend.sendGet;
+import static com.alibaba.fastjson.serializer.SerializerFeature.*;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 public class ServiceDAO {
 
@@ -26,28 +26,16 @@ public class ServiceDAO {
     }
 
 
-    public static String getData(String url) {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("startTime", startTime);
-//        params.put("endTime", endTime);
-//        String url = "http://localhost:8080/evaluatesystem/nodes";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult = HttpClientUtils.doGet(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static String getForecastService(String startTime, String endTime) {
 
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get index data failed!");
-            return null;
-        }
+        String params="id=service"+"&startTime="+startTime+"&endTime="+endTime;
+        String url = "http://" + Constant.HOST + ":" + Constant.PORT + "/forecast/forecastValues";
 
-        return httpClientResult.getContent();
+        return sendGet(url,params);
     }
 
     public static List<NowService> getNowServiceList() {
-        String servicesStr = getData("http://localhost:8080/evaluatesystem/nodes");
+        String servicesStr = sendGet("http://" + Constant.HOST + ":" + Constant.PORT + "/nowService", "");
 
         if (null == servicesStr) {
             System.out.println("get now service data failed!");
@@ -61,7 +49,7 @@ public class ServiceDAO {
 
 
     public static List<ForecastService> getForecastServiceList() {
-        String servicesStr = getData("http://localhost:8080/evaluatesystem/nodes");
+        String servicesStr = getForecastService("2019-03-04%2017:00:00", "2019-03-04%2018:00:00");
 
         if (null == servicesStr) {
             System.out.println("get forecast service data failed!");
@@ -75,6 +63,10 @@ public class ServiceDAO {
 
 
     public static void main(String[] args) {
+
+        String returnValue = JSON.toJSONString(getNowServiceList(), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        System.out.println(returnValue);
 
 //        System.out.println(String.valueOf(getPodNumberByServiceLoad("online","wordpress",56)));
 

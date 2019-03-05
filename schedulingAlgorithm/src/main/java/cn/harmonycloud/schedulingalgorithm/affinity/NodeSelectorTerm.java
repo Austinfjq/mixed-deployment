@@ -21,17 +21,4 @@ public class NodeSelectorTerm {
     public void setMatchFields(NodeSelectorRequirement[] matchFields) {
         this.matchFields = matchFields;
     }
-
-    /**
-     * unused properpy
-     */
-    private Object additionalProperties;
-
-    public Object getAdditionalProperties() {
-        return additionalProperties;
-    }
-
-    public void setAdditionalProperties(Object additionalProperties) {
-        this.additionalProperties = additionalProperties;
-    }
 }

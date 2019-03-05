@@ -1,7 +1,6 @@
 package cn.harmonycloud.datacenter.controller;
 
-import cn.harmonycloud.datacenter.dao.INodeLoadDao;
-import cn.harmonycloud.datacenter.dao.IServiceLoadDao;
+import cn.harmonycloud.datacenter.entity.ServiceLoad;
 import cn.harmonycloud.datacenter.entity.mysql.ForecastCell;
 import cn.harmonycloud.datacenter.entity.es.ForecastResultCell;
 import cn.harmonycloud.datacenter.service.IForecastCellService;
@@ -11,10 +10,7 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  *@Author: shaodilong
@@ -69,8 +65,15 @@ public class ForecastDataController {
      * @return
      */
     @GetMapping("/forecast/forecastValues")
-    public List<Object> getAllForecastValue(@RequestParam("startTime") String startTime,
-                                            @RequestParam("endTime") String endTime){
-        return forecastDataService.getAllForecastValue(startTime,endTime);
+    public List getAllForecastValue(@RequestParam("id") String id,
+                                                 @RequestParam("startTime") String startTime,
+                                                 @RequestParam("endTime") String endTime){
+        if(id.equals("service")){
+            return forecastDataService.getAllServiceLoads(startTime,endTime);
+        }else if(id.equals("node")){
+            return forecastDataService.getAllNodeLoads(startTime,endTime);
+        }else{
+            return Collections.EMPTY_LIST;
+        }
     }
 }

@@ -43,7 +43,7 @@ public class NodeTaskThread implements Runnable {
             if (nowNode.getCpuUsage() > CpuUsageMaxThreshold) {
 
                 for (ForecastNode forecastNode : forecastNodeList) {
-                    if (forecastNode.getHostIp().equals(nowNode.getHostIp()) &&
+                    if (forecastNode.getNodeIp().equals(nowNode.getHostIP()) &&
                             nowNode.getCpuUsage() > forecastNode.getCpuUsage()) {
                         Result resultPod = new Result(1, offlineSvcNamespace,
                                 offlineSvcName, "1");

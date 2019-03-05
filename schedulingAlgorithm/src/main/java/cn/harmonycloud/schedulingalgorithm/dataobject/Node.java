@@ -63,9 +63,13 @@ public class Node {
      */
     private Map<String, String> usedPorts;
     /**
+     * 节点污点 String
+     */
+    private String taints;
+    /**
      * 节点污点
      */
-    private Taint[] taints;
+    private Taint[] taintsArray;
     /**
      * 节点Condition
      */
@@ -211,20 +215,28 @@ public class Node {
         this.usedPorts = usedPorts;
     }
 
-    public Taint[] getTaints() {
-        return taints;
-    }
-
-    public void setTaints(Taint[] taints) {
-        this.taints = taints;
-    }
-
     public NodeCondition getNodeConditions() {
         return nodeConditions;
     }
 
     public void setNodeConditions(NodeCondition nodeConditions) {
         this.nodeConditions = nodeConditions;
+    }
+
+    public String getTaints() {
+        return taints;
+    }
+
+    public void setTaints(String taints) {
+        this.taints = taints;
+    }
+
+    public Taint[] getTaintsArray() {
+        return taintsArray;
+    }
+
+    public void setTaintsArray(Taint[] taintsArray) {
+        this.taintsArray = taintsArray;
     }
 
     public Double getAllocatablePods() {

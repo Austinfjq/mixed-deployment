@@ -31,19 +31,19 @@ public class ServiceTaskThread implements Runnable {
                 if (nowService.getNamespace().equals(forecastService.getNamespace()) &&
                         nowService.getServiceName().equals(forecastService.getServiceName())) {
 
-                    //service 资源过少
-                    if (nowService.getPodNums() < forecastService.getPodNums()) {
-                        Result resultPod = new Result(0, nowService.getNamespace(),
-                                nowService.getServiceName(), String.valueOf(forecastService.getPodNums()));
-                        results.add(resultPod);
-
-                        //service 资源过多
-                    } else if (nowService.getPodNums() > forecastService.getPodNums()) {
-                        Result resultPod = new Result(1, nowService.getNamespace(),
-                                nowService.getServiceName(), String.valueOf(forecastService.getPodNums()));
-                        results.add(resultPod);
-
-                    }
+//                    //service 资源过少
+//                    if (nowService.getPodNums() < forecastService.getPodNums()) {
+//                        Result resultPod = new Result(0, nowService.getNamespace(),
+//                                nowService.getServiceName(), String.valueOf(forecastService.getPodNums()));
+//                        results.add(resultPod);
+//
+//                        //service 资源过多
+//                    } else if (nowService.getPodNums() > forecastService.getPodNums()) {
+//                        Result resultPod = new Result(1, nowService.getNamespace(),
+//                                nowService.getServiceName(), String.valueOf(forecastService.getPodNums()));
+//                        results.add(resultPod);
+//
+//                    }
 
                 }
             }

@@ -89,7 +89,7 @@ public class NodeDataController {
      * @return
      */
     @GetMapping("/nowNode")
-    public List<Map> getNowNodes(){
+    public List<NodeData> getNowNodes(){
         return nodeDataService.getNowNodes();
     }
 }
