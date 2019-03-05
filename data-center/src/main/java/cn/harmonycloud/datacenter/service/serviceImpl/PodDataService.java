@@ -45,4 +45,9 @@ public class PodDataService implements IPodDataService {
     public List<PodData> findAllPodDatas() {
         return podDataDao.findAllPodDatas();
     }
+
+    @Override
+    public List<PodData> getNowServices() {
+        return podDataDao.getNowPods();
+    }
 }

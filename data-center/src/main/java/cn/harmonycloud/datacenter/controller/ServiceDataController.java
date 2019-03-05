@@ -248,7 +248,6 @@ public class ServiceDataController {
      */
     @GetMapping("/nowService")
     public List<ServiceData> getNowServices(){
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         return serviceDataService.getNowServices();
     }

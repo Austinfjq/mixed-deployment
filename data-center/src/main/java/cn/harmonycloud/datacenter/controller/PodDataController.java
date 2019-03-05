@@ -1,6 +1,7 @@
 package cn.harmonycloud.datacenter.controller;
 
 import cn.harmonycloud.datacenter.entity.es.PodData;
+import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.service.IPodDataService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,5 +71,16 @@ public class PodDataController {
     public List<PodData> findAllPods(){
         List<PodData> pods = podDataService.findAllPodDatas();
         return pods;
+    }
+
+    /**
+     * 获取当前pod数据
+     *
+     * @return
+     */
+    @GetMapping("/nowPod")
+    public List<PodData> getNowServices(){
+
+        return podDataService.getNowServices();
     }
 }
