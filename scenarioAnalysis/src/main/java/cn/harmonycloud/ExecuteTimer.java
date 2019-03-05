@@ -20,7 +20,7 @@ public class ExecuteTimer {
         for (Config cfg : configList) {
 
 //            long daySpan = 24 * 60 * 60 * 1000;
-            long daySpan = 1000;
+            long daySpan = 5000;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + cfg.getTime());
 
             try {
@@ -34,12 +34,11 @@ public class ExecuteTimer {
                     @Override
                     public void run() {
                         StrategyExecutor.run(cfg.getPodAddList(), cfg.getPodDelList());
-                        System.out.println("啦啦啦");
                     }
                 };
 
                 Timer timer = new Timer();
-                timer.scheduleAtFixedRate(task1, startDate.getTime(), daySpan);
+                timer.schedule(task1, startTime, daySpan);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -51,8 +50,8 @@ public class ExecuteTimer {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                System.out.println("lll");
-                ScenarioExecutor.run();
+//                System.out.println("lll");
+//                ScenarioExecutor.run();
             }
         };
         Timer timer = new Timer();

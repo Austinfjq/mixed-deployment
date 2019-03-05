@@ -4,31 +4,31 @@ import java.util.Date;
 
 public class ForecastNode {
 
-    private String hostName;
-    private String hostIp;
-    private Integer podNums;
-    private String period;
+    private String startTime;
+    private String endTime;
+    private String nodeIp;
     private Double cpuUsage;
     private Double memUsage;
+    private Double diskUsage;
 
     public void ForecastService() {
 
     }
 
-    public String getHostName() {
-        return hostName;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public String getHostIp() {
-        return hostIp;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public Integer getPodNums() {
-        return podNums;
+    public String getNodeIp() {
+        return nodeIp;
     }
 
-    public String getPeriod() {
-        return period;
+    public Double getDiskUsage() {
+        return diskUsage;
     }
 
     public Double getCpuUsage() {
@@ -39,20 +39,20 @@ public class ForecastNode {
         return memUsage;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
-    public void setHostIp(String hostIp) {
-        this.hostIp = hostIp;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
-    public void setPodNums(int podNums) {
-        this.podNums = podNums;
+    public void setNodeIp(String nodeIp) {
+        this.nodeIp = nodeIp;
     }
 
-    public void setPeriod(String period) {
-        this.period = period;
+    public void setDiskUsage(Double diskUsage) {
+        this.diskUsage = diskUsage;
     }
 
     public void setCpuUsage(Double cpuUsage) {
