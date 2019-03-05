@@ -4,7 +4,6 @@ public class NowService {
     private String namespace;
     private String serviceName;
     private Integer podNums;
-    private String period;
     private Double cpuUsage;
     private Double memUsage;
     private Boolean isOffline;
@@ -23,9 +22,6 @@ public class NowService {
         return podNums;
     }
 
-    public String getPeriod() {
-        return period;
-    }
 
     public Double getCpuUsage() {
         return cpuUsage;
@@ -51,9 +47,6 @@ public class NowService {
         this.podNums = podNums;
     }
 
-    public void setPeriod(String period) {
-        this.period = period;
-    }
 
     public void setCpuUsage(double cpuUsage) {
         this.cpuUsage = cpuUsage;

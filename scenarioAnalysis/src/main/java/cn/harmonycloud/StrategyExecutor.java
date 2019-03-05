@@ -4,9 +4,15 @@ import cn.harmonycloud.beans.LoadConfigFile;
 import cn.harmonycloud.dao.NodeDAO;
 import cn.harmonycloud.dao.ServiceDAO;
 import cn.harmonycloud.entry.*;
+import cn.harmonycloud.tools.Constant;
 import cn.harmonycloud.tools.Write2ES;
+import com.alibaba.fastjson.JSON;
+import cn.harmonycloud.tools.HttpSend;
 
 import java.util.*;
+
+import static com.alibaba.fastjson.serializer.SerializerFeature.*;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 public class StrategyExecutor {
     public static ArrayList<Result> results = new ArrayList<>();
@@ -41,6 +47,12 @@ public class StrategyExecutor {
 
     public static void run(Map<String, Long> podAddList,
                            Map<String, Long> podDelList) {
-        Write2ES.run(getResults(podAddList, podDelList), "schedulePod");
+
+        Write2ES.run(getResults(podAddList, podDelList), "schedulePods");
+        String returnValue = JSON.toJSONString(getResults(podAddList, podDelList), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        System.out.println(returnValue);
+        HttpSend.sendPost("http://" + Constant.HOST + ":" + Constant.PORT + "/" + "schedulePods", returnValue);
     }
+
 }

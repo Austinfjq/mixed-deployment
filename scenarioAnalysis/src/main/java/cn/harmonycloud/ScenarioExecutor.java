@@ -5,9 +5,15 @@ import cn.harmonycloud.beans.LoadConfigFile;
 import cn.harmonycloud.dao.NodeDAO;
 import cn.harmonycloud.dao.ServiceDAO;
 import cn.harmonycloud.entry.*;
+import cn.harmonycloud.tools.Constant;
+import cn.harmonycloud.tools.HttpSend;
 import cn.harmonycloud.tools.Write2ES;
+import com.alibaba.fastjson.JSON;
 
 import java.util.*;
+
+import static com.alibaba.fastjson.serializer.SerializerFeature.*;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 
 public class ScenarioExecutor {
@@ -62,10 +68,16 @@ public class ScenarioExecutor {
 
     public static void run() {
         Write2ES.run(getResults(), "schedulePods");
+        String returnValue = JSON.toJSONString(getResults(), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        HttpSend.sendPost("http://" + Constant.HOST + ":" + Constant.PORT + "/" + "schedulePods", returnValue);
     }
 
     public static void main(String[] args) {
-        System.out.println(Write2ES.run(getResults(), "schedulePods"));
+        String returnValue = JSON.toJSONString(getResults(), WriteMapNullValue,
+                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+        System.out.println(returnValue);
+//        System.out.println(Write2ES.run(getResults(), "schedulePods"));
     }
 
 }
