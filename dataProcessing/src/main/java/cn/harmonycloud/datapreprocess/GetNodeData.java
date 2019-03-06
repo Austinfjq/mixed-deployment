@@ -54,7 +54,8 @@ public class GetNodeData {
             long podNums = 0l;
 
             for (Pod pod : podList.getItems()) {
-                if (pod.getSpec().getNodeName().equals(d.getMetadata().getName())) {
+                if (pod.getSpec().getNodeName() != null &&
+                        pod.getSpec().getNodeName().equals(d.getMetadata().getName())) {
 
                     podNums++;
                     //get ports
