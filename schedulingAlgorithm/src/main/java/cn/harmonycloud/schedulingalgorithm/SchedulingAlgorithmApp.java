@@ -1,6 +1,8 @@
 package cn.harmonycloud.schedulingalgorithm;
 
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -16,6 +18,7 @@ import java.util.concurrent.Semaphore;
  */
 @SpringBootApplication
 public class SchedulingAlgorithmApp {
+    private final static Logger LOGGER = LoggerFactory.getLogger(SchedulingAlgorithmApp.class);
 
     public static void main(String[] args) {
         SpringApplication.run(SchedulingAlgorithmApp.class, args);
@@ -44,6 +47,7 @@ public class SchedulingAlgorithmApp {
                 semaphore.acquire();
                 // 此处一轮调度开始
                 // 每轮调度进行期间，新加入的pod请求必须等待当前这轮调度结束
+                LOGGER.info("acquire semaphore!");
                 List<Pod> podList = new ArrayList<>();
                 int size = requestQueue.size();
                 for (int i = 0; i < size; i++) {
@@ -57,6 +61,8 @@ public class SchedulingAlgorithmApp {
                 }
                 // 此处一轮调度结束
             } catch (Exception e) {
+                LOGGER.error("startConsuming() exception: ");
+                e.printStackTrace();
                 return;
             }
         }

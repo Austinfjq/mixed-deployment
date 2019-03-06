@@ -19,6 +19,8 @@ import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
 import com.google.gson.Gson;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,11 +31,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 对service, node, pod的缓存
  */
 public class Cache {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Cache.class);
+
     private Map<String, Service> serviceMap;
     private Map<String, Pod> podMap;
     private Map<String, Node> nodeMap;
@@ -72,6 +77,7 @@ public class Cache {
      */
     @SuppressWarnings("unchecked")
     public void fetchCacheData() {
+        LOGGER.info("start fetchCacheData!");
         List<Service> serviceList;
         List<Pod> podList;
         List<Node> nodeList;
@@ -113,6 +119,7 @@ public class Cache {
                 // 转换taints格式
                 readTaints(n);
             });
+            // comment out when debugging
             nodeForecastMap = fetchNodeForecast(nodeList);
         }
         this.nodeList = nodeList;
@@ -120,17 +127,22 @@ public class Cache {
 
     private void readAffinity(Pod pod) {
         if (pod.getAffinity() != null) {
-            String nodeAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getNodeAffinity());
-            String podAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAffinity());
-            String podAntiAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAntiAffinity());
-            NodeAffinity nodeAffinity = gson.fromJson(nodeAffinityStr, NodeAffinity.class);
-            PodAffinity podAffinity = gson.fromJson(podAffinityStr, PodAffinity.class);
-            PodAntiAffinity podAntiAffinity = gson.fromJson(podAntiAffinityStr, PodAntiAffinity.class);
-            Affinity affinity = new Affinity();
-            affinity.setNodeAffinity(nodeAffinity);
-            affinity.setPodAffinity(podAffinity);
-            affinity.setPodAntiAffinity(podAntiAffinity);
-            pod.setAffinityObject(affinity);
+            try {
+                String nodeAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getNodeAffinity());
+                String podAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAffinity());
+                String podAntiAffinityStr = DOUtils.k8sObjectToJson(pod.getAffinity().getPodAntiAffinity());
+                NodeAffinity nodeAffinity = gson.fromJson(nodeAffinityStr, NodeAffinity.class);
+                PodAffinity podAffinity = gson.fromJson(podAffinityStr, PodAffinity.class);
+                PodAntiAffinity podAntiAffinity = gson.fromJson(podAntiAffinityStr, PodAntiAffinity.class);
+                Affinity affinity = new Affinity();
+                affinity.setNodeAffinity(nodeAffinity);
+                affinity.setPodAffinity(podAffinity);
+                affinity.setPodAntiAffinity(podAntiAffinity);
+                pod.setAffinityObject(affinity);
+            } catch (Exception e) {
+                LOGGER.debug("readAffinity error");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -140,58 +152,127 @@ public class Cache {
         node.setTaintsArray(taints);
     }
 
+    public void getPortrait(List<Pod> pods) {
+        LOGGER.info("start getPortrait!");
+        try {
+            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
+            Map<String, Service> serviceMap = getServiceMap();
+            // comment out the for loop below when debugging
+            for (String serviceFullName : serviceFullNames) {
+                // 获取预计占用资源信息
+                Map<String, String> parameters = new HashMap<>();
+                String[] split = serviceFullName.split(DOUtils.NAME_SPLIT);
+                parameters.put("namespace", split[0]);
+                parameters.put("serviceName", split[1]);
+                String result = HttpUtil.post(Constants.URI_GET_POD_CONSUME, parameters);
+                JSONObject jsonObject = JSONObject.fromObject(result);
+                Service service = serviceMap.get(serviceFullName);
+                service.setCpuCosume(jsonObject.optString("cpuCosume"));
+                service.setMemCosume(jsonObject.optString("memCosume"));
+                service.setDownNetIOCosume(jsonObject.optString("DownNetIOCosume"));
+                service.setUPNetIOCosume(jsonObject.optString("UPNetIOCosume"));
+                // 获取对应的service的资源密集类型
+                result = HttpUtil.post(Constants.URI_GET_SERVICE_TYPE, parameters);
+                jsonObject = JSONObject.fromObject(result);
+                service.setIntensiveType(jsonObject.optInt("serviceType"));
+            }
+
+            //查找同service下的pod，填写新pod的属性
+            pods.forEach(p -> {
+                Service service = getServiceMap().get(DOUtils.getServiceFullName(p));
+                Pod sp = getPodMap().get(DOUtils.getPodFullName(service.getPodList().get(0), p.getNamespace()));
+                p.setCpuRequest(sp.getCpuRequest());
+                p.setMemRequest(sp.getMemRequest());
+                p.setNodeSelector(sp.getNodeSelector());
+                p.setAffinity(sp.getAffinity());
+                p.setContainers(sp.getContainers());
+                p.setToleration(sp.getToleration());
+                // setWantPorts
+                String ports = sp.getContainers().getPorts();
+                ContainerPort[] wantPorts = gson.fromJson(ports, ContainerPort[].class);
+                p.setWantPorts(wantPorts);
+
+                // uncomment below when debugging
+//            Affinity affinity = new Affinity();
+//            affinity.setPodAntiAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAntiAffinity());
+//            affinity.setPodAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAffinity());
+//            String ss = "NodeAffinity(preferredDuringSchedulingIgnoredDuringExecution=[PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[amd64], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={}), PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[ppc64le], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={}), PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[s390x], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={})], requiredDuringSchedulingIgnoredDuringExecution=NodeSelector(nodeSelectorTerms=[NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[amd64, ppc64le, s390x], additionalProperties={})], additionalProperties={})], additionalProperties={}), additionalProperties={})";
+//            affinity.setNodeAffinity(gson.fromJson(DOUtils.k8sObjectToJson(ss), NodeAffinity.class));
+//            p.setAffinityObject(affinity);
+            });
+        } catch (Exception e) {
+            LOGGER.debug("getPortrait error");
+            e.printStackTrace();
+        }
+    }
+
     private Map<String, Resource> fetchNodeForecast(List<Node> nodeList) {
         Map<String, Resource> map = new HashMap<>();
+        try {
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String startTime = ft.format(calendar.getTime());
+            calendar.add(Calendar.HOUR_OF_DAY, 1);
+            String endTime = ft.format(calendar.getTime());
 
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String startTime = ft.format(calendar.getTime());
-        calendar.add(Calendar.HOUR_OF_DAY, 1);
-        String endTime = ft.format(calendar.getTime());
+            Map<String, String> paras = new HashMap<>();
+            paras.put("type", "1");
+            paras.put("startTime", startTime);
+            paras.put("endTime", endTime);
+            for (Node node : nodeList) {
+                Resource resource = new Resource();
+                paras.put("id", node.getNodeName() + "&" + node.getNodeIP());
 
-        Map<String, String> paras = new HashMap<>();
-        paras.put("type", "1");
-        paras.put("startTime", startTime);
-        paras.put("endTime", endTime);
-        for (Node node : nodeList) {
-            Resource resource = new Resource();
-            paras.put("id", node.getNodeName() + "&" + node.getNodeIP());
-
-            paras.put("index", "cpu");
-            String res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
-            JSONArray jsonArray = JSONArray.fromObject(res);
-            if (!jsonArray.isEmpty()) {
-                try {
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-                    String value = jsonObject.optString("value");
-                    resource.setMilliCPU((long) (Double.valueOf(value) * 1000));
-                } catch (Exception e) {
-                    // ignore
+                paras.put("index", "cpu");
+                String res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
+                JSONArray jsonArray = JSONArray.fromObject(res);
+                if (!jsonArray.isEmpty()) {
+                    try {
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                        String value = jsonObject.optString("value");
+                        resource.setMilliCPU((long) (Double.valueOf(value) * 1000));
+                    } catch (Exception e) {
+                        // ignore
+                    }
                 }
-            }
 
-            paras.put("index", "memory");
-            res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
-            jsonArray = JSONArray.fromObject(res);
-            if (!jsonArray.isEmpty()) {
-                try {
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-                    String value = jsonObject.optString("value");
-                    resource.setMemory(Double.valueOf(value).longValue());
-                } catch (Exception e) {
-                    // ignore
+                paras.put("index", "memory");
+                res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
+                jsonArray = JSONArray.fromObject(res);
+                if (!jsonArray.isEmpty()) {
+                    try {
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                        String value = jsonObject.optString("value");
+                        resource.setMemory(Double.valueOf(value).longValue());
+                    } catch (Exception e) {
+                        // ignore
+                    }
                 }
+                map.put(node.getNodeName(), resource);
             }
-            map.put(node.getNodeName(), resource);
+        } catch (Exception e) {
+            LOGGER.debug("fetchNodeForecast error");
+            e.printStackTrace();
         }
         return map;
     }
 
     private <T> List<Object> fetchOne(String uri, Class<T> clazz) {
         List<Object> result = new ArrayList<>();
-        String jsonStr = HttpUtil.get(uri);
-        Object[] objects = (Object[]) gson.fromJson(jsonStr, clazz);
-        Collections.addAll(result, objects);
+        String jsonStr = null;
+        try {
+            jsonStr = HttpUtil.get(uri);
+        } catch (Exception e) {
+            LOGGER.debug("Http request fail:\"" + uri + "\"");
+            e.printStackTrace();
+        }
+        try {
+            Object[] objects = (Object[]) gson.fromJson(jsonStr, clazz);
+            Collections.addAll(result, objects);
+        } catch (Exception e) {
+            LOGGER.debug("Data format error:");
+            e.printStackTrace();
+        }
         return result;
     }
 

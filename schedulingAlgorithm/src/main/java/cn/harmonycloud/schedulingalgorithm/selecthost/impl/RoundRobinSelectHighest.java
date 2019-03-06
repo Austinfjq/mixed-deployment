@@ -13,7 +13,6 @@ public class RoundRobinSelectHighest implements SelectHostRule {
     public HostPriority selectHost(List<HostPriority> hostPriorityList) {
         if (hostPriorityList.isEmpty()) {
             return null;
-            // TODO how to pend the pod
         }
         List<Integer> maxScoreIndices = findMaxScores(hostPriorityList);
         int selectedIndex = lastNodeIndex % maxScoreIndices.size();
