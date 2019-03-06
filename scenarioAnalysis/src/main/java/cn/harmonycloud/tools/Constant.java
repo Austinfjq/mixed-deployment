@@ -12,8 +12,9 @@ public class Constant {
 
     public static final String HOST="10.10.101.115";   //10.10.102.25
     public static final String PORT="8080";
+    public static final String PORT2="8081";
 
-    public static final String CONFIG_FIME_NAME = "scenarioAnalysis/src/main/config.xml";
+    public static final String CONFIG_FIME_NAME = "config.xml";
 
 
 }

@@ -8,11 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * @Author: changliu
- * @Date: 2018/12/18 14:27
- * @Description:
- */
+
 public class Metric {
 
     private String hostIp;

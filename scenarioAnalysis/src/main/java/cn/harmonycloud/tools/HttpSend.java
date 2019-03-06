@@ -79,14 +79,15 @@ public class HttpSend {
      * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
      * @return 所代表远程资源的响应结果
      */
-    public static String sendPost(String url1, String param) {
+
+    public static String sendPost(String method, String url1, String param) {
 
         String result = "";
         BufferedReader reader = null;
         try {
             URL url = new URL(url1);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("PUT");
+            conn.setRequestMethod(method);
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setUseCaches(false);

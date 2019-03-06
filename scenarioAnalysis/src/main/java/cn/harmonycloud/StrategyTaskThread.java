@@ -39,7 +39,8 @@ public class StrategyTaskThread implements Runnable {
                 for (NowService nowService : nowServiceList) {
 //                    if ((nowService.isOffline() && delOffline) || (!nowService.isOffline() && !delOffline)) {
 
-                    if (nowService.isOffline() && delOffline && nowService.getNamespace().equals("hadoop")) {
+//                    if ((nowService.getOffline() == 1) && delOffline && nowService.getNamespace().equals("hadoop")) {
+                    if ((nowService.getOnlineType().equals("offline")) && delOffline) {
                         Result resultPod = new Result(1, nowService.getNamespace(),
                                 nowService.getServiceName(), "1");
                         results.add(resultPod);
@@ -54,7 +55,8 @@ public class StrategyTaskThread implements Runnable {
 
             for (int i = 0; i < podNum; i++) {
                 for (NowService nowService : nowServiceList) {
-                    if ((nowService.isOffline() && addOffline) || (!nowService.isOffline() && !addOffline)) {
+                    if (((nowService.getOnlineType().equals("offline")) && addOffline) ||
+                            ((nowService.getOnlineType().equals("online")) && !addOffline)) {
 //                    if (!nowService.isOffline() && !addOffline) {
                         if (nowService.getNamespace().equals("hadoop") || nowService.getNamespace().equals("wordpress")) {
                             Result resultPod = new Result(0, nowService.getNamespace(),

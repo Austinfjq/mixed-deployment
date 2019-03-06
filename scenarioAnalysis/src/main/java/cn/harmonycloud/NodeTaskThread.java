@@ -34,7 +34,7 @@ public class NodeTaskThread implements Runnable {
             String offlineSvcNamespace = "";
             String offlineSvcName = "";
             for (NowService nowService : nowServiceList) {
-                if (nowService.isOffline()) {
+                if (nowService.getOnlineType().equals("offline")) {
                     offlineSvcNamespace = nowService.getNamespace();
                     offlineSvcName = nowService.getServiceName();
                 }
@@ -43,7 +43,7 @@ public class NodeTaskThread implements Runnable {
             if (nowNode.getCpuUsage() > CpuUsageMaxThreshold) {
 
                 for (ForecastNode forecastNode : forecastNodeList) {
-                    if (forecastNode.getNodeIp().equals(nowNode.getHostIP()) &&
+                    if (forecastNode.getNodeIp().equals(nowNode.getNodeIP()) &&
                             nowNode.getCpuUsage() > forecastNode.getCpuUsage()) {
                         Result resultPod = new Result(1, offlineSvcNamespace,
                                 offlineSvcName, "1");

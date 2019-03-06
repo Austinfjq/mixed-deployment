@@ -6,7 +6,7 @@ public class NowService {
     private Integer podNums;
     private Double cpuUsage;
     private Double memUsage;
-    private Boolean isOffline;
+    private String onlineType;
 
     public void NowService(){}
 
@@ -22,6 +22,9 @@ public class NowService {
         return podNums;
     }
 
+    public String getOnlineType() {
+        return onlineType;
+    }
 
     public Double getCpuUsage() {
         return cpuUsage;
@@ -29,10 +32,6 @@ public class NowService {
 
     public Double getMemUsage() {
         return memUsage;
-    }
-
-    public Boolean isOffline() {
-        return isOffline;
     }
 
     public void setNamespace(String namespace) {
@@ -47,6 +46,9 @@ public class NowService {
         this.podNums = podNums;
     }
 
+    public void setOnlineType(String onlineType) {
+        this.onlineType = onlineType;
+    }
 
     public void setCpuUsage(double cpuUsage) {
         this.cpuUsage = cpuUsage;
@@ -54,9 +56,5 @@ public class NowService {
 
     public void setMemUsage(double memUsage) {
         this.memUsage = memUsage;
-    }
-
-    public void setOffline(Boolean offline) {
-        isOffline = offline;
     }
 }

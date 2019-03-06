@@ -41,6 +41,13 @@ public class GetSvcData {
                 svc.setNodePort(String.valueOf(item.getNodePort()));
             }
 
+            //get svc online type
+            if (svc.getNamespace().equals("hadoop")) {
+                svc.setOnlineType("offline");
+            } else {
+                svc.setOnlineType("online");
+            }
+
             //get svc pod list nums
             ArrayList<String> podNameList = new ArrayList<>();
             if (d.getMetadata().getLabels() != null

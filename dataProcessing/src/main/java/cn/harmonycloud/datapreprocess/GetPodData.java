@@ -45,6 +45,14 @@ public class GetPodData {
             pod.setDeletionStamp(d.getMetadata().getDeletionTimestamp());
             pod.setLabels(d.getMetadata().getLabels());
 
+            if (pod.getNamespace().equals("hadoop")) {
+                pod.setOnlineType("offline");
+            } else if (d.getMetadata().getLabels().get("service_attribute") != null) {
+                pod.setOnlineType(d.getMetadata().getLabels().get("service_attribute"));
+            } else {
+                pod.setOnlineType("online");
+            }
+
 //            for (OwnerReference item : d.getMetadata().getOwnerReferences()) {
 //                pod.setResourceKind(item.getKind());
 //                pod.setResourceName(item.getName());

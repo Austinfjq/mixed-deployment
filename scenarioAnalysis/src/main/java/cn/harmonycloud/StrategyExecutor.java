@@ -37,7 +37,7 @@ public class StrategyExecutor {
         //执行service分析的线程
 
         StrategyTaskThread strategyTaskThread = new StrategyTaskThread(forecastNodeList, nowNodeList,
-                forecastServiceList, nowServiceList, results,podAddList,podDelList);
+                forecastServiceList, nowServiceList, results, podAddList, podDelList);
         Thread strategyThread = new Thread(strategyTaskThread);
         strategyThread.start();
 
@@ -52,7 +52,7 @@ public class StrategyExecutor {
         String returnValue = JSON.toJSONString(getResults(podAddList, podDelList), WriteMapNullValue,
                 WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
         System.out.println(returnValue);
-        HttpSend.sendPost("http://" + Constant.HOST + ":" + Constant.PORT + "/" + "schedulePods", returnValue);
+        HttpSend.sendPost("POST", "http://" + Constant.HOST + ":" + Constant.PORT2 + "/" + "schedulepod", returnValue);
     }
 
 }

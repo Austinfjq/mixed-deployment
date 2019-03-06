@@ -7,6 +7,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 
 import static cn.harmonycloud.tools.Constant.*;
@@ -20,7 +22,10 @@ public class LoadConfigFile {
 
         try {
             SAXReader reader = new SAXReader();
-            Document document = reader.read(new File(CONFIG_FIME_NAME));
+//            URL fileURL = LoadConfigFile.class.getClass().getResource("config.xml");
+//            System.out.println(fileURL);
+            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FIME_NAME);
+            Document document = reader.read(inputStream);
 
             Element root = document.getRootElement();
 //            System.out.println("获取了根元素:" + root.getName());

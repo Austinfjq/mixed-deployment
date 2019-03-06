@@ -10,7 +10,7 @@ public class Write2ES {
     public static String run(Object list, String saveUrl) {
         String returnValue = JSON.toJSONString(list, WriteMapNullValue,
                 WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
-        HttpSend.sendPost("http://" + Constant.HOST + ":" + Constant.PORT + "/" + saveUrl, returnValue);
+        HttpSend.sendPost("PUT","http://" + Constant.HOST + ":" + Constant.PORT + "/" + saveUrl, returnValue);
         return returnValue;
     }
 }

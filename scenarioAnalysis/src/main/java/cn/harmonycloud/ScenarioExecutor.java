@@ -70,7 +70,7 @@ public class ScenarioExecutor {
         Write2ES.run(getResults(), "schedulePods");
         String returnValue = JSON.toJSONString(getResults(), WriteMapNullValue,
                 WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
-        HttpSend.sendPost("http://" + Constant.HOST + ":" + Constant.PORT + "/" + "schedulePods", returnValue);
+        HttpSend.sendPost("POST", "http://" + Constant.HOST + ":" + Constant.PORT2 + "/" + "schedulepod", returnValue);
     }
 
     public static void main(String[] args) {

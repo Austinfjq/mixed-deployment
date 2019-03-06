@@ -79,7 +79,7 @@ public class NodeDAO {
 
     public static void main(String[] args) {
 
-        String returnValue = JSON.toJSONString(getForecastNodeList(), WriteMapNullValue,
+        String returnValue = JSON.toJSONString(getNowNodeList(), WriteMapNullValue,
                 WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
         System.out.println(returnValue);
 //        System.out.println(String.valueOf(getPodNumberByServiceLoad("online","wordpress",56)));

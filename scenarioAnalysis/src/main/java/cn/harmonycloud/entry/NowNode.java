@@ -2,8 +2,8 @@ package cn.harmonycloud.entry;
 
 public class NowNode {
 
-    private String hostName;
-    private String hostIP;
+    private String nodeName;
+    private String nodeIP;
     private Integer podNums;
     private Double cpuUsage;
     private Double memUsage;
@@ -11,12 +11,12 @@ public class NowNode {
     public void NowNode() {
     }
 
-    public String getHostName() {
-        return hostName;
+    public String getNodeName() {
+        return nodeName;
     }
 
-    public String getHostIP() {
-        return hostIP;
+    public String getNodeIP() {
+        return nodeIP;
     }
 
     public int getPodNums() {
@@ -31,12 +31,12 @@ public class NowNode {
         return memUsage;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 
-    public void setHostIP(String hostIP) {
-        this.hostIP = hostIP;
+    public void setNodeIP(String nodeIP) {
+        this.nodeIP = nodeIP;
     }
 
     public void setPodNums(int podNums) {
