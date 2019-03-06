@@ -3,12 +3,14 @@ package cn.harmonycloud.schedulingalgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
+import com.google.gson.Gson;
 import net.sf.json.JSONObject;
 
 import java.util.HashMap;
@@ -26,6 +28,8 @@ public class GreedyScheduler implements Scheduler {
         greedyAlgorithm = new DefaultGreedyAlgorithm();
         cache = new Cache();
     }
+
+    private static final Gson gson = new Gson();
 
     /**
      * 每轮调度从待调度队列取出调度请求列表，在此执行调度
@@ -97,8 +101,11 @@ public class GreedyScheduler implements Scheduler {
             p.setNodeSelector(sp.getNodeSelector());
             p.setAffinity(sp.getAffinity());
             p.setContainers(sp.getContainers());
-            p.setWantPorts(sp.getWantPorts());
             p.setToleration(sp.getToleration());
+            // setWantPorts
+            String ports = sp.getContainers().getPorts();
+            ContainerPort[] wantPorts = gson.fromJson(ports, ContainerPort[].class);
+            p.setWantPorts(wantPorts);
         });
     }
 

@@ -19,7 +19,7 @@ public class PodFitsHostPortsPredicate implements PredicateRule {
         Map<String, String> existingPorts = node.getUsedPorts();
         if (wantPorts != null) {
             for (ContainerPort wp : wantPorts) {
-                if (checkConflict(existingPorts, wp.getHostIP(), wp.getProtocol(), wp.getHostPort())) {
+                if (checkConflict(existingPorts, wp.getHostIP(), wp.getProtocol(), wp.getContainerPort())) {
                     return false;
                 }
             }
@@ -30,22 +30,26 @@ public class PodFitsHostPortsPredicate implements PredicateRule {
     /**
      * if there is any conflict, return true
      */
-    private boolean checkConflict(Map<String, String> existingPorts, String ip, String protocol, int port) {
-        if (port <= 0) {
+    private boolean checkConflict(Map<String, String> existingPorts, String ip, String protocol, Integer port) {
+        if (port == null || port <= 0) {
             return false;
         }
-        if (ip.isEmpty()) {
+        if (ip == null || ip.isEmpty()) {
             ip = Constants.DEFAULT_BIND_ALL_HOST_IP;
         }
-        if (protocol.isEmpty()) {
+        if (protocol == null || protocol.isEmpty()) {
             protocol = Constants.PROTOCOL_TCP;
         }
-        for (Map.Entry entry : existingPorts.entrySet()) {
+        // assume: one node has only one hostIP.
+        for (Map.Entry<String, String> entry : existingPorts.entrySet()) {
             if (String.valueOf(port).equals(entry.getKey()) && protocol.equals(entry.getValue())) {
                 return true;
             }
         }
         return false;
+
+        // if one node may have several hostIPs, use codes below:
+
 //        if (ip.equals(Constants.DEFAULT_BIND_ALL_HOST_IP)) {
 //            for (List<ProtocolPort> protocolPortList : existingPorts.values()) {
 //                for (ProtocolPort pp : protocolPortList) {
