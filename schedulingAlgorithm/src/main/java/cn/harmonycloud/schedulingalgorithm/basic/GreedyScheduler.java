@@ -19,15 +19,8 @@ import java.util.Optional;
 public class GreedyScheduler implements Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(GreedyScheduler.class);
 
-    private GreedyAlgorithm greedyAlgorithm;
-    private Cache cache;
-
-    public GreedyScheduler() {
-        super();
-        greedyAlgorithm = new DefaultGreedyAlgorithm();
-        cache = new Cache();
-    }
-
+    private GreedyAlgorithm greedyAlgorithm = new DefaultGreedyAlgorithm();
+    private Cache cache = new Cache();
 
     /**
      * 每轮调度从待调度队列取出调度请求列表，在此执行调度
@@ -49,12 +42,15 @@ public class GreedyScheduler implements Scheduler {
             List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
             // 4. 逐个处理待调度pod
             for (int i = 0; i < sortedPods.size(); i++) {
+                String nodeName;
                 // 调度本轮最后一个pod后，不需再更新缓存
                 if (i == sortedPods.size() - 1) {
-                    scheduleOne(sortedPods.get(i), false);
+                    nodeName = scheduleOne(sortedPods.get(i), false);
                 } else {
-                    scheduleOne(sortedPods.get(i), true);
+                    nodeName = scheduleOne(sortedPods.get(i), true);
                 }
+                // 调用调度执行器，只发送一个host
+                scheduleExecute(sortedPods.get(i), nodeName, cache);
             }
         } catch (Exception e) {
             LOGGER.debug("schedule Exception:");
@@ -62,27 +58,29 @@ public class GreedyScheduler implements Scheduler {
         }
     }
 
-    private void scheduleOne(Pod pod, boolean ifUpdateCache) {
+    public String scheduleOne(Pod pod, boolean ifUpdateCache) {
         LOGGER.info("start scheduleOne!");
         // 预选
         List<Node> predicatedNodes = greedyAlgorithm.predicates(pod, cache);
         if (predicatedNodes.isEmpty()) {
             LOGGER.warn("Cannot find any node to schedule this pod. " + "serviceName=" + pod.getServiceName() + ",namespace=" + pod.getNamespace());
-            return;
+            return null;
         }
         // 优选
         List<HostPriority> hostPriorityList = greedyAlgorithm.priorities(pod, predicatedNodes, cache);
         // 挑选节点
         HostPriority selectedHost = greedyAlgorithm.selectHost(hostPriorityList, cache);
-        // 调用调度执行器，只发送一个host
-        scheduleExecute(pod, selectedHost.getHost(), cache);
         // 修改缓存
         if (ifUpdateCache) {
             cache.updateCache(pod, selectedHost.getHost());
         }
+        return selectedHost.getHost();
     }
 
     private void scheduleExecute(Pod pod, String host, Cache cache) {
+        if (host == null) {
+            return;
+        }
         LOGGER.info("start scheduleExecute!" + DOUtils.getPodFullName(pod) + ", " + host);
         try {
             // uncomment when debugging
@@ -106,5 +104,21 @@ public class GreedyScheduler implements Scheduler {
             LOGGER.debug("scheduleExecute fail");
             e.printStackTrace();
         }
+    }
+
+    public GreedyAlgorithm getGreedyAlgorithm() {
+        return greedyAlgorithm;
+    }
+
+    public void setGreedyAlgorithm(GreedyAlgorithm greedyAlgorithm) {
+        this.greedyAlgorithm = greedyAlgorithm;
+    }
+
+    public Cache getCache() {
+        return cache;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 }

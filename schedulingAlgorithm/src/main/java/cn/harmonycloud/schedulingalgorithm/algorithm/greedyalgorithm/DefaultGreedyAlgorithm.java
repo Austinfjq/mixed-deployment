@@ -132,13 +132,16 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     public List<Node> predicates(Pod pod, Cache cache) {
         // 分别处理各个节点
         long enough = Long.MAX_VALUE;
+        if (cache.getNodeList().size() > 100) {
+            enough = (long) (cache.getNodeList().size() * Constants.FILTER_PERCENTAGE);
+        }
         return cache.getNodeList().stream()
                 .filter(node -> runAllPredicates(pod, node, cache))
                 .limit(enough)
                 .collect(Collectors.toList());
     }
 
-    private boolean runAllPredicates(Pod pod, Node node, Cache cache) {
+    public boolean runAllPredicates(Pod pod, Node node, Cache cache) {
         // 分别处理各个预选规则，预选规则大概只有10个，规则判断不会很耗时
         List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
         return rules.stream().allMatch(rule -> {

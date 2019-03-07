@@ -26,4 +26,8 @@ public class Constants {
     public static final String PROTOCOL_SCTP = "SCTP";
 
     public static final int PRIORITY_MAX_SCORE = 10;
+    /**
+     * filter 的计算比例，
+     */
+    public static final double FILTER_PERCENTAGE = 1.0D;
 }
