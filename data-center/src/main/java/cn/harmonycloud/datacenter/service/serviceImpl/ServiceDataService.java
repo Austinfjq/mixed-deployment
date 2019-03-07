@@ -112,4 +112,9 @@ public class ServiceDataService implements IServiceDataService {
     public List<ServiceData> getNowServices() {
         return serviceDataDao.getNowServices();
     }
+
+    @Override
+    public Map<String, Object> getManagement(String namespace, String serviceName) {
+        return serviceDataDao.getManagement(namespace,serviceName);
+    }
 }

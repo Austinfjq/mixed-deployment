@@ -251,4 +251,17 @@ public class ServiceDataController {
 
         return serviceDataService.getNowServices();
     }
+
+    /**
+     * 获取Service的管理方式信息
+     *
+     * @param namespace
+     * @param serviceName
+     * @return
+     */
+    @GetMapping("/management")
+    public Map<String,Object> getManagement(@RequestParam("namespace") String namespace,
+                                            @RequestParam("serviceName") String serviceName){
+        return serviceDataService.getManagement(namespace,serviceName);
+    }
 }

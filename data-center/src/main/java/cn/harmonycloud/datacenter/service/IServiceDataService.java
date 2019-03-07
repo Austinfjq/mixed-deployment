@@ -43,4 +43,6 @@ public interface IServiceDataService {
     public Double getAvgResponseTime(String namespace,String serviceName,String clusterIP);
     //获取当前service数据
     public List<ServiceData> getNowServices();
+    //获取Service的管理方式信息
+    public Map<String,Object> getManagement(String namespace, String serviceName);
 }
