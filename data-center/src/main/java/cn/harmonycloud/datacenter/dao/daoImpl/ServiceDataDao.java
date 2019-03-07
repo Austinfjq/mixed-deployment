@@ -787,7 +787,7 @@ public class ServiceDataDao implements IServiceDataDao {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("namespace",namespace));
         boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
-        String[] includes = {"resourceKind","resourceType"};
+        String[] includes = {"resourceKind","resourceName"};
         FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQueryBuilder)
