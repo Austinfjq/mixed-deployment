@@ -1,16 +1,12 @@
 package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Container;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
-import cn.harmonycloud.schedulingalgorithm.dataobject.NodeCondition;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Quantity;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
 
 public class CheckNodeMemoryPressurePredicate implements PredicateRule {

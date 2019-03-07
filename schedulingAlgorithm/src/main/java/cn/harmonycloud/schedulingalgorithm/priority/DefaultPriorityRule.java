@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.priority;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 

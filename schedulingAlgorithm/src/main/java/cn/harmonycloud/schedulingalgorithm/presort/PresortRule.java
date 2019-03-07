@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.presort;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 
 import java.util.List;

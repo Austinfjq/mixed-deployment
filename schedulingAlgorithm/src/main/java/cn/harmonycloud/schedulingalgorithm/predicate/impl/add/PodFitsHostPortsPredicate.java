@@ -1,15 +1,12 @@
 package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.ProtocolPort;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PodFitsHostPortsPredicate implements PredicateRule {

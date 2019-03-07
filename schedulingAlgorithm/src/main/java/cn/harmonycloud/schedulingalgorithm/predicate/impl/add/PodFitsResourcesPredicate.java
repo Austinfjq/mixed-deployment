@@ -1,13 +1,9 @@
 package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
-import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
-
-import java.util.Objects;
 
 public class PodFitsResourcesPredicate implements PredicateRule {
     @Override

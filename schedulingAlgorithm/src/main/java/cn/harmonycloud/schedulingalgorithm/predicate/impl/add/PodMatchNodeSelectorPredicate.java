@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeAffinity;

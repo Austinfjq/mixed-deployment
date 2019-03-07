@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelector;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorOperator;
@@ -22,14 +22,11 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import static cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorOperator.LabelSelectorOpIn;
 
 public class RuleUtil {
     public static Resource getRequestedAfterOp(Pod pod, Node node, int op) {

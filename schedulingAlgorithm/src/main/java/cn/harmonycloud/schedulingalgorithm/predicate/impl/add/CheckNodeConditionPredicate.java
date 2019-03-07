@@ -1,13 +1,10 @@
 package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.NodeCondition;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CheckNodeConditionPredicate implements PredicateRule {
     @Override

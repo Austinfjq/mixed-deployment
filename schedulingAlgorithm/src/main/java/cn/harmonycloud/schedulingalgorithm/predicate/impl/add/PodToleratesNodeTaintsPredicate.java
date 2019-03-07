@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.predicate.impl.add;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
 import cn.harmonycloud.schedulingalgorithm.affinity.TaintEffect;
 import cn.harmonycloud.schedulingalgorithm.affinity.Toleration;
@@ -9,7 +9,6 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.predicate.PredicateRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

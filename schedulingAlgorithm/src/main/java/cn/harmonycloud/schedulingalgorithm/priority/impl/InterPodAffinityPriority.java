@@ -1,6 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinityTerm;
 import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;

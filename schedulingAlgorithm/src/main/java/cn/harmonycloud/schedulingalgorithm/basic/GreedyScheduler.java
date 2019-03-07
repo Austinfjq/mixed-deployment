@@ -1,19 +1,13 @@
-package cn.harmonycloud.schedulingalgorithm;
+package cn.harmonycloud.schedulingalgorithm.basic;
 
-import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
-import cn.harmonycloud.schedulingalgorithm.affinity.NodeAffinity;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
-import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
-import com.google.gson.Gson;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class GreedyScheduler implements Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(GreedyScheduler.class);
-    private final static Gson gson = new Gson();
 
     private GreedyAlgorithm greedyAlgorithm;
     private Cache cache;
 
-    GreedyScheduler() {
+    public GreedyScheduler() {
         super();
         greedyAlgorithm = new DefaultGreedyAlgorithm();
         cache = new Cache();

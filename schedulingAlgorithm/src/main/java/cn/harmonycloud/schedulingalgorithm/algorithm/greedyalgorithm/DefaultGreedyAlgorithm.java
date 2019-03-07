@@ -1,7 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
-import cn.harmonycloud.schedulingalgorithm.GreedyScheduler;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
@@ -11,7 +10,6 @@ import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodeCondition
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodeDiskPressurePredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodeMemoryPressurePredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckNodePIDPressurePredicate;
-import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.CheckVolumeBindingPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.MatchInterPodAffinityPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.PodFitsHostPortsPredicate;
 import cn.harmonycloud.schedulingalgorithm.predicate.impl.add.PodFitsResourcesPredicate;
@@ -22,11 +20,9 @@ import cn.harmonycloud.schedulingalgorithm.presort.PresortRule;
 import cn.harmonycloud.schedulingalgorithm.presort.impl.DecreasingSortRule;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRuleConfig;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.BalancedResourceAllocationPriority;
-import cn.harmonycloud.schedulingalgorithm.priority.impl.ImageLocalityPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.InterPodAffinityPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.NodeAffinityPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.NodeLoadForecastPriority;
-import cn.harmonycloud.schedulingalgorithm.priority.impl.NodePreferAvoidPodsPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.RequestedPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.SelectorSpreadPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.TaintTolerationPriority;

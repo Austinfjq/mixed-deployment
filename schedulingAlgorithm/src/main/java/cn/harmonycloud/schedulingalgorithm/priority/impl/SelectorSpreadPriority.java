@@ -1,7 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
-import cn.harmonycloud.schedulingalgorithm.Cache;
-import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
+import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
@@ -9,11 +8,9 @@ import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SelectorSpreadPriority implements PriorityRule {
