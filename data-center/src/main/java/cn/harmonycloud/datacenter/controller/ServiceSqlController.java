@@ -19,10 +19,9 @@ public class ServiceSqlController {
     @Autowired
     private IServiceSqlService serviceSqlService;
 
-    @GetMapping("/management")
-    public Map<String, Object> getOwnerTypeAndName(@RequestParam("namespace") String namespace,
-                                                   @RequestParam("serviceName") String serviceName){
-        return serviceSqlService.getOwnerTypeAndName(namespace,serviceName);
-    }
-
+//    @GetMapping("/management")
+//    public Map<String, Object> getOwnerTypeAndName(@RequestParam("namespace") String namespace,
+//                                                   @RequestParam("serviceName") String serviceName){
+//        return serviceSqlService.getOwnerTypeAndName(namespace,serviceName);
+//    }
 }

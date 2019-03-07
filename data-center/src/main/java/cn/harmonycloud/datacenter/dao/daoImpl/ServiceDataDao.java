@@ -769,4 +769,41 @@ public class ServiceDataDao implements IServiceDataDao {
 
         return resultList;
     }
+
+    @Override
+    public Map<String, Object> getManagement(String namespace, String serviceName) {
+        //{
+        //	"query":{
+        //		"bool":{
+        //			"must":[
+        //				{"match_phrase" : {"namespace" : "xxx"}},
+        //				{"match_phrase" : {"serviceName" : "xxx"}}
+        //			]
+        //		}
+        //	},
+        //	"_source":["resourceKind","resourceType"]
+        //}
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("namespace",namespace));
+        boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
+        String[] includes = {"resourceKind","resourceName"};
+        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(SERVICE_INDEX)
+                .withTypes(SERVICE_TYPE)
+                .withSourceFilter(fetchSourceFilter)
+                .withSearchType(SearchType.DEFAULT)
+                .build();
+        SearchResponse searchResponse = elasticsearchTemplate.query(searchQuery, response -> response);
+        SearchHits searchHits = searchResponse.getHits();
+        if(searchHits.getTotalHits() > 0){
+            for (SearchHit searchHit : searchHits.getHits()){
+                Map map = searchHit.getSourceAsMap();
+                return map;
+            }
+        }
+        return new HashMap<>();
+    }
 }
