@@ -25,6 +25,20 @@ public class TaintTolerationPriority implements PriorityRule {
         return computeTaintTolerationPriorityReduce(pod, nodes, cache, mapResult);
     }
 
+    @Override
+    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
+    }
+
+    @Override
+    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
+    }
+
     private int computeTaintTolerationPriorityMap(Pod pod, Node node, Cache cache) {
         if (node == null) {
             return 0;

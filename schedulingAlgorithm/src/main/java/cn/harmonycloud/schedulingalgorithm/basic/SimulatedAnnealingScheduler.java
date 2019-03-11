@@ -33,26 +33,48 @@ public class SimulatedAnnealingScheduler implements Scheduler {
     }
 
     /**
-     * maxCount控制退火时间，作用相当于降温系数
+     * maxCount 控制退火时间，作用相当于降温系数
      */
     private final static long maxCount = 10000;
     /**
-     * constant控制收敛速度，作用相当于初温
+     * constant 控制收敛速度，作用相当于初温
      */
     private final static double constant = 0.5;
 
+    /**
+     * calScore 是否计算出每轮转移后解的得分而不是得分差
+     * for debug，为 true 时会很耗时
+     */
+    private final static boolean calScore = false;
+
+    /**
+     * 模拟退火计算最优解
+     * @param pods 调度请求pods
+     * @param cache 集群状态缓存
+     * @return 模拟退火得到的解
+     */
     private Solution simulatedAnnealing(List<Pod> pods, Cache cache) {
         Random random = new Random();
+        Solution bestSolution = null;
         // 初始解
         Solution solution = Solution.getRandomSolution(cache, pods);
         // 开始搜索
         long count = 0;
-        // TODO 保留退火中的最优解 做不到的
         while (count < maxCount) {
             // 随机选取邻近状态
             Solution newSolution = solution.neighbour();
-            // 计算分数差
-            int deltaScore = Solution.getDeltaScore(solution, newSolution);
+            // 计算分数
+            int deltaScore;
+            if (calScore) {
+                int oldScore = solution.getScore();
+                int newScore = newSolution.getScore();
+                if (bestSolution == null) {
+                    bestSolution = oldScore > newScore ? solution : newSolution;
+                }
+                deltaScore = newScore - oldScore;
+            } else {
+                deltaScore = Solution.getDeltaScore(solution, newSolution);
+            }
             // 新分数更优，转移
             if (deltaScore > 0) {
                 solution = newSolution;
@@ -62,6 +84,13 @@ public class SimulatedAnnealingScheduler implements Scheduler {
                 solution = newSolution;
             }
             count++;
+        }
+        if (calScore) {
+            if (solution != bestSolution) {
+                LOGGER.info("Lost the best solution: score="+ bestSolution.getScore() + ", hosts=" + bestSolution.getHosts());
+            } else {
+                LOGGER.info("The result solution is the best solution during simulating annealing.");
+            }
         }
         return solution;
     }

@@ -7,6 +7,7 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 
+import java.util.List;
 import java.util.Map;
 
 public class NodeLoadForecastPriority implements DefaultPriorityRule {
@@ -42,6 +43,20 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
         } else {
             return score;
         }
+    }
+
+    @Override
+    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
+    }
+
+    @Override
+    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
     }
 
     private double normalize(double a) {

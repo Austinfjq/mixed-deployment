@@ -8,9 +8,14 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,15 +47,15 @@ public class GreedyScheduler implements Scheduler {
             List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
             // 4. 逐个处理待调度pod
             for (int i = 0; i < sortedPods.size(); i++) {
-                String nodeName;
+                HostPriority host;
                 // 调度本轮最后一个pod后，不需再更新缓存
                 if (i == sortedPods.size() - 1) {
-                    nodeName = scheduleOne(sortedPods.get(i), false);
+                    host = scheduleOne(sortedPods.get(i), false);
                 } else {
-                    nodeName = scheduleOne(sortedPods.get(i), true);
+                    host = scheduleOne(sortedPods.get(i), true);
                 }
                 // 调用调度执行器，只发送一个host
-                scheduleExecute(sortedPods.get(i), nodeName, cache);
+                scheduleExecute(sortedPods.get(i), host, cache);
             }
         } catch (Exception e) {
             LOGGER.debug("schedule Exception:");
@@ -58,7 +63,7 @@ public class GreedyScheduler implements Scheduler {
         }
     }
 
-    public String scheduleOne(Pod pod, boolean ifUpdateCache) {
+    public HostPriority scheduleOne(Pod pod, boolean ifUpdateCache) {
         LOGGER.info("start scheduleOne!");
         // 预选
         List<Node> predicatedNodes = greedyAlgorithm.predicates(pod, cache);
@@ -72,12 +77,12 @@ public class GreedyScheduler implements Scheduler {
         HostPriority selectedHost = greedyAlgorithm.selectHost(hostPriorityList, cache);
         // 修改缓存
         if (ifUpdateCache) {
-            cache.updateCache(pod, selectedHost.getHost());
+            cache.updateCache(pod, selectedHost.getHostname());
         }
-        return selectedHost.getHost();
+        return selectedHost;
     }
 
-    private void scheduleExecute(Pod pod, String host, Cache cache) {
+    private void scheduleExecute(Pod pod, HostPriority host, Cache cache) {
         if (host == null) {
             return;
         }
@@ -86,20 +91,25 @@ public class GreedyScheduler implements Scheduler {
             // uncomment when debugging
 //            System.out.println((pod.getOperation() == Constants.OPERATION_ADD ? "add" : "delete") + ":Service=" + DOUtils.getServiceFullName(pod) + ",host=" + host);
             // comment below when debugging
-            Map<String, String> parameters = new HashMap<>();
-            parameters.put("namespace", pod.getNamespace());
+            List<NameValuePair> paramList = new ArrayList<>();
+            paramList.add(new BasicNameValuePair("namespace", pod.getNamespace()));
             String uri;
             if (pod.getOperation() == Constants.OPERATION_ADD) {
-                parameters.put("serviceName", pod.getServiceName());
-                parameters.put("nodeName", host);
+                paramList.add(new BasicNameValuePair("serviceName", pod.getServiceName()));
+                JSONArray jsonArray = new JSONArray();
+                JSONObject nodeJson = new JSONObject();
+                nodeJson.put("hostname", host.getHostname());
+                nodeJson.put("score", host.getScore().toString());
+                jsonArray.add(nodeJson);
+                paramList.add(new BasicNameValuePair("nodeList", jsonArray.toString()));
                 uri = Constants.URI_EXECUTE_ADD;
             } else {
                 Optional<String> op = cache.getNodeMapPodList().get(host).stream().filter(p -> DOUtils.getServiceFullName(pod).equals(DOUtils.getServiceFullName(p))).map(DOUtils::getPodFullName).findFirst();
                 String podName = op.orElse(null);
-                parameters.put("podName", podName);
+                paramList.add(new BasicNameValuePair("podName", podName));
                 uri = Constants.URI_EXECUTE_REMOVE;
             }
-            HttpUtil.post(uri, parameters);
+            HttpUtil.get(uri, paramList);
         } catch (Exception e) {
             LOGGER.debug("scheduleExecute fail");
             e.printStackTrace();

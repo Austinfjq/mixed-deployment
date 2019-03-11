@@ -5,6 +5,8 @@ import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
+
+import java.util.List;
 //import net.sf.json.JSONObject;
 //
 //import java.util.HashMap;
@@ -29,6 +31,16 @@ public class NodePreferAvoidPodsPriority implements DefaultPriorityRule {
 //        } else {
 //            return Constants.PRIORITY_MAX_SCORE - calculateNodePreferAvoidPodsPriorityMap(pod, node, cache);
 //        }
+    }
+
+    @Override
+    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
+        return 0;
+    }
+
+    @Override
+    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
+        return 0;
     }
 
 //    private int calculateNodePreferAvoidPodsPriorityMap(Pod pod, Node node, Cache cache) {

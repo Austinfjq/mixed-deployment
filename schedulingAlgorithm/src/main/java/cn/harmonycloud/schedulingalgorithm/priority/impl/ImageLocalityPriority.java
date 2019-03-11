@@ -6,6 +6,8 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 
+import java.util.List;
+
 //import java.util.ArrayList;
 //import java.util.HashMap;
 //import java.util.List;
@@ -17,6 +19,16 @@ public class ImageLocalityPriority implements DefaultPriorityRule {
         // 已弃用
         return 0;
 //        return imageLocalityPriorityMap(pod, node, cache);
+    }
+
+    @Override
+    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
+        return 0;
+    }
+
+    @Override
+    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
+        return 0;
     }
 
 //    private int imageLocalityPriorityMap(Pod pod, Node node, Cache cache) {

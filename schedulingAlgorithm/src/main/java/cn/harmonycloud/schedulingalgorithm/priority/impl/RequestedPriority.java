@@ -8,6 +8,8 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
+import java.util.List;
+
 public class RequestedPriority implements DefaultPriorityRule {
     private int operation;
 
@@ -23,6 +25,20 @@ public class RequestedPriority implements DefaultPriorityRule {
         Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
         Resource requested = RuleUtil.getRequestedAfterOp(pod, node, operation);
         return (int) resourceScorer(requested, allocatable);
+    }
+
+    @Override
+    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
+    }
+
+    @Override
+    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
     }
 
     private long resourceScorer(Resource requested, Resource allocatable) {

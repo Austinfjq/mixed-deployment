@@ -36,6 +36,20 @@ public class InterPodAffinityPriority implements PriorityRule {
         return calculateInterPodAffinityPriority(pod, nodes, cache);
     }
 
+    @Override
+    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
+    }
+
+    @Override
+    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
+        // use operation of Pod instead of Rule
+        // TODO multi
+        return null;
+    }
+
     private List<Integer> calculateInterPodAffinityPriority(Pod pod, List<Node> nodes, Cache cache) {
         Affinity affinity = pod.getAffinityObject();
         boolean hasAffinityConstraints = affinity != null && affinity.getPodAffinity() != null;

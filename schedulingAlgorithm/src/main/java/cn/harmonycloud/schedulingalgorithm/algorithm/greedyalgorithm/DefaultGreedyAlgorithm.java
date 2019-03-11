@@ -131,7 +131,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     @Override
     public List<Node> predicates(Pod pod, Cache cache) {
         // 分别处理各个节点
-        long enough = Long.MAX_VALUE;
+        long enough = Integer.MAX_VALUE;
         if (cache.getNodeList().size() > 100) {
             enough = (long) (cache.getNodeList().size() * Constants.FILTER_PERCENTAGE);
         }

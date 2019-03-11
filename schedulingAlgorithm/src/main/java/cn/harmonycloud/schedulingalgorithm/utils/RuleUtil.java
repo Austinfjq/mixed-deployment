@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,34 @@ public class RuleUtil {
             requested.setMemory(node.getMemUsage().longValue() - pod.getMemRequest().longValue());
         }
         return requested;
+    }
+
+    public static void updateRequestedAfterOp(Pod pod, Resource resource, int op) {
+        if (op == Constants.OPERATION_ADD) {
+            resource.setMilliCPU(resource.getMilliCPU() + (long) (pod.getCpuRequest() * 1000));
+            resource.setMemory(resource.getMemory() + pod.getMemRequest().longValue());
+        } else {
+            resource.setMilliCPU(resource.getMilliCPU() - (long) (pod.getCpuRequest() * 1000));
+            resource.setMemory(resource.getMemory() - pod.getMemRequest().longValue());
+        }
+    }
+
+    public static Resource getNodeResource(Node node) {
+        Resource resource = new Resource();
+        resource.setMilliCPU((long) (1000 * (node.getCpuUsage())));
+        resource.setMemory(node.getMemUsage().longValue());
+        return resource;
+    }
+
+    public static Map<String, List<Pod>> getHostsToPodsMap(List<Pod> pods, List<String> hosts) {
+        HashMap<String, List<Pod>> hostPodMap = new HashMap<>();
+        for (int i = 0; i < pods.size(); i++) {
+            if (!hostPodMap.containsKey(hosts.get(i))) {
+                hostPodMap.put(hosts.get(i), new ArrayList<>());
+            }
+            hostPodMap.get(hosts.get(i)).add(pods.get(i));
+        }
+        return hostPodMap;
     }
 
     private static final String LabelZoneRegion = "failure-domain.beta.kubernetes.io/region";
