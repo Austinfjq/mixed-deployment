@@ -7,6 +7,7 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
+import cn.harmonycloud.schedulingalgorithm.utils.ExecuteUtil;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -42,7 +43,7 @@ public class GreedyScheduler implements Scheduler {
             cache.getPortrait(schedulingRequests);
             // 3. 预排序
             // uncomment when debugging
-            // List<Pod> sortedPods = schedulingRequests;
+//             List<Pod> sortedPods = schedulingRequests;
             // comment out when debugging
             List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
             // 4. 逐个处理待调度pod
@@ -55,7 +56,7 @@ public class GreedyScheduler implements Scheduler {
                     host = scheduleOne(sortedPods.get(i), true);
                 }
                 // 调用调度执行器，只发送一个host
-                scheduleExecute(sortedPods.get(i), host, cache);
+                ExecuteUtil.scheduleExecute(sortedPods.get(i), host, cache);
             }
         } catch (Exception e) {
             LOGGER.debug("schedule Exception:");
@@ -80,40 +81,6 @@ public class GreedyScheduler implements Scheduler {
             cache.updateCache(pod, selectedHost.getHostname());
         }
         return selectedHost;
-    }
-
-    private void scheduleExecute(Pod pod, HostPriority host, Cache cache) {
-        if (host == null) {
-            return;
-        }
-        LOGGER.info("start scheduleExecute!" + DOUtils.getPodFullName(pod) + ", " + host);
-        try {
-            // uncomment when debugging
-//            System.out.println((pod.getOperation() == Constants.OPERATION_ADD ? "add" : "delete") + ":Service=" + DOUtils.getServiceFullName(pod) + ",host=" + host);
-            // comment below when debugging
-            List<NameValuePair> paramList = new ArrayList<>();
-            paramList.add(new BasicNameValuePair("namespace", pod.getNamespace()));
-            String uri;
-            if (pod.getOperation() == Constants.OPERATION_ADD) {
-                paramList.add(new BasicNameValuePair("serviceName", pod.getServiceName()));
-                JSONArray jsonArray = new JSONArray();
-                JSONObject nodeJson = new JSONObject();
-                nodeJson.put("hostname", host.getHostname());
-                nodeJson.put("score", host.getScore().toString());
-                jsonArray.add(nodeJson);
-                paramList.add(new BasicNameValuePair("nodeList", jsonArray.toString()));
-                uri = Constants.URI_EXECUTE_ADD;
-            } else {
-                Optional<String> op = cache.getNodeMapPodList().get(host).stream().filter(p -> DOUtils.getServiceFullName(pod).equals(DOUtils.getServiceFullName(p))).map(DOUtils::getPodFullName).findFirst();
-                String podName = op.orElse(null);
-                paramList.add(new BasicNameValuePair("podName", podName));
-                uri = Constants.URI_EXECUTE_REMOVE;
-            }
-            HttpUtil.get(uri, paramList);
-        } catch (Exception e) {
-            LOGGER.debug("scheduleExecute fail");
-            e.printStackTrace();
-        }
     }
 
     public GreedyAlgorithm getGreedyAlgorithm() {

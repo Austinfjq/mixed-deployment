@@ -188,12 +188,12 @@ public class Cache {
                 p.setWantPorts(wantPorts);
 
                 // uncomment below when debugging
-//            Affinity affinity = new Affinity();
-//            affinity.setPodAntiAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAntiAffinity());
-//            affinity.setPodAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAffinity());
-//            String ss = "NodeAffinity(preferredDuringSchedulingIgnoredDuringExecution=[PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[amd64], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={}), PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[ppc64le], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={}), PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[s390x], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={})], requiredDuringSchedulingIgnoredDuringExecution=NodeSelector(nodeSelectorTerms=[NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[amd64, ppc64le, s390x], additionalProperties={})], additionalProperties={})], additionalProperties={}), additionalProperties={})";
-//            affinity.setNodeAffinity(gson.fromJson(DOUtils.k8sObjectToJson(ss), NodeAffinity.class));
-//            p.setAffinityObject(affinity);
+//                Affinity affinity = new Affinity();
+//                affinity.setPodAntiAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAntiAffinity());
+//                affinity.setPodAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAffinity());
+//                String ss = "NodeAffinity(preferredDuringSchedulingIgnoredDuringExecution=[PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[amd64], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={}), PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[ppc64le], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={}), PreferredSchedulingTerm(preference=NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[s390x], additionalProperties={})], additionalProperties={}), weight=2, additionalProperties={})], requiredDuringSchedulingIgnoredDuringExecution=NodeSelector(nodeSelectorTerms=[NodeSelectorTerm(matchExpressions=[NodeSelectorRequirement(key=beta.kubernetes.io/arch, operator=In, values=[amd64, ppc64le, s390x], additionalProperties={})], additionalProperties={})], additionalProperties={}), additionalProperties={})";
+//                affinity.setNodeAffinity(gson.fromJson(DOUtils.k8sObjectToJson(ss), NodeAffinity.class));
+//                p.setAffinityObject(affinity);
             });
         } catch (Exception e) {
             LOGGER.debug("getPortrait error");
