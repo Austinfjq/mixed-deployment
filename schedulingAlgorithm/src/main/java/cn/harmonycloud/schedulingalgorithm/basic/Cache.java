@@ -304,7 +304,13 @@ public class Cache {
         node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest());
         // 更新node下pod列表，nodeMapPodList
         if (isAdd) {
-            nodeMapPodList.get(host).add(pod);
+            if (nodeMapPodList.containsKey(host)) {
+                nodeMapPodList.get(host).add(pod);
+            } else {
+                List<Pod> li = new ArrayList<>();
+                li.add(pod);
+                nodeMapPodList.put(host, li);
+            }
         } else {
             List<Pod> li = nodeMapPodList.get(host);
             for (int i = 0; i < li.size(); i++) {

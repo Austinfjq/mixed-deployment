@@ -8,6 +8,8 @@ import cn.harmonycloud.schedulingalgorithm.affinity.WeightedPodAffinityTerm;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import cn.harmonycloud.schedulingalgorithm.priority.AssumePodsOnNodeMultiPriorityRule;
+import cn.harmonycloud.schedulingalgorithm.priority.DefaultMultiPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
@@ -34,20 +36,6 @@ public class InterPodAffinityPriority implements PriorityRule {
     @Override
     public List<Integer> priority(Pod pod, List<Node> nodes, Cache cache) {
         return calculateInterPodAffinityPriority(pod, nodes, cache);
-    }
-
-    @Override
-    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
-        // use operation of Pod instead of Rule
-        // TODO multi
-        return null;
-    }
-
-    @Override
-    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
-        // use operation of Pod instead of Rule
-        // TODO multi
-        return null;
     }
 
     private List<Integer> calculateInterPodAffinityPriority(Pod pod, List<Node> nodes, Cache cache) {

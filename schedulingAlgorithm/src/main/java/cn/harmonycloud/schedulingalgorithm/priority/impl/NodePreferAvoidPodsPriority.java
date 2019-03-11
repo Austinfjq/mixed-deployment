@@ -33,16 +33,6 @@ public class NodePreferAvoidPodsPriority implements DefaultPriorityRule {
 //        }
     }
 
-    @Override
-    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
-        return 0;
-    }
-
-    @Override
-    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
-        return 0;
-    }
-
 //    private int calculateNodePreferAvoidPodsPriorityMap(Pod pod, Node node, Cache cache) {
 ////        var controllerRef *metav1.OwnerReference
 ////        TO DO controllerRef = metav1.GetControllerOf(pod)

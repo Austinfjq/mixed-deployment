@@ -60,6 +60,17 @@ public class RuleUtil {
         return resource;
     }
 
+    public static Resource getNodeFinalResource(Node node, Map<String, List<Pod>> hostPodMap) {
+        Resource finalResource = RuleUtil.getNodeResource(node);
+        if (hostPodMap.containsKey(node.getNodeName())) {
+            List<Pod> pods1 = hostPodMap.get(node.getNodeName());
+            for (Pod pod : pods1) {
+                RuleUtil.updateRequestedAfterOp(pod, finalResource, pod.getOperation());
+            }
+        }
+        return finalResource;
+    }
+
     public static Map<String, List<Pod>> getHostsToPodsMap(List<Pod> pods, List<String> hosts) {
         HashMap<String, List<Pod>> hostPodMap = new HashMap<>();
         for (int i = 0; i < pods.size(); i++) {

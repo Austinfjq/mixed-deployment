@@ -45,20 +45,6 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
         }
     }
 
-    @Override
-    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
-        // use operation of Pod instead of Rule
-        // TODO multi
-        return null;
-    }
-
-    @Override
-    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
-        // use operation of Pod instead of Rule
-        // TODO multi
-        return null;
-    }
-
     private double normalize(double a) {
         if (a > 1D) {
             a = 1D;

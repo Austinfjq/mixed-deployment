@@ -94,6 +94,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_DELETE), 1));
 //        弃用priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_DELETE), 1));
+        // comment out when debugging
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_DELETE), 1));
 
         /*

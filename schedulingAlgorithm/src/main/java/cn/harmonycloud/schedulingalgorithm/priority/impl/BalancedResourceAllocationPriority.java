@@ -5,6 +5,7 @@ import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
+import cn.harmonycloud.schedulingalgorithm.priority.DefaultMultiPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
+public class BalancedResourceAllocationPriority implements DefaultPriorityRule, DefaultMultiPriorityRule {
     private int operation;
 
     public BalancedResourceAllocationPriority(int operation) {
@@ -74,36 +75,9 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
     }
 
     @Override
-    public Integer multiPriority(List<Pod> pods, List<String> hosts, Cache cache) {
-        // use operation of Pod instead of Rule
-        Map<String, List<Pod>> hostPodMap = RuleUtil.getHostsToPodsMap(pods, hosts);
-        return cache.getNodeList().stream().mapToInt(node -> getNodeScore(node, hostPodMap)).sum();
-    }
-
-    private int getNodeScore(Node node, Map<String, List<Pod>> hostPodMap) {
-        Resource finalResource = RuleUtil.getNodeResource(node);
+    public int getNodeMultiPriority(Node node, Map<String, List<Pod>> hostPodMap, Cache cache) {
+        Resource finalResource = RuleUtil.getNodeFinalResource(node, hostPodMap);
         Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
-        if (hostPodMap.containsKey(node.getNodeName())) {
-            List<Pod> pods1 = hostPodMap.get(node.getNodeName());
-            for (Pod pod : pods1) {
-                RuleUtil.updateRequestedAfterOp(pod, finalResource, pod.getOperation());
-            }
-        }
         return balancedResourceScorer(finalResource, allocatable, false, 0, 0);
-    }
-
-    @Override
-    public Integer deltaMultiPriority(List<Pod> pods, List<String> oldHosts, List<String> newHosts, Cache cache) {
-        // use operation of Pod instead of Rule
-        Set<String> relativeNodes = new HashSet<>(oldHosts);
-        relativeNodes.addAll(newHosts);
-        Map<String, List<Pod>> hostPodMapOld = RuleUtil.getHostsToPodsMap(pods, oldHosts);
-        Map<String, List<Pod>> hostPodMapNew = RuleUtil.getHostsToPodsMap(pods, newHosts);
-        int finalScore = 0;
-        for (String node : relativeNodes) {
-            int deltaNodeScore = getNodeScore(cache.getNodeMap().get(node), hostPodMapNew) - getNodeScore(cache.getNodeMap().get(node), hostPodMapOld);
-            finalScore += deltaNodeScore;
-        }
-        return finalScore;
     }
 }
