@@ -42,9 +42,6 @@ public class GreedyScheduler implements Scheduler {
             // 2. 获取应用画像信息
             cache.getPortrait(schedulingRequests);
             // 3. 预排序
-            // uncomment when debugging
-//             List<Pod> sortedPods = schedulingRequests;
-            // comment out when debugging
             List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
             // 4. 逐个处理待调度pod
             for (int i = 0; i < sortedPods.size(); i++) {

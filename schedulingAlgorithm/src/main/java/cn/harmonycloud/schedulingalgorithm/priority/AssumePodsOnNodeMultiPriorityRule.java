@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface AssumePodsOnNodeMultiPriorityRule extends DefaultMultiPriorityRule {
+    /**
+     * cannot be paralleled
+     */
     default int getNodeMultiPriority(Node node, Map<String, List<Pod>> hostPodMap, Cache cache) {
         List<Pod> backupOfNodePodList = cache.getNodeMapPodList().get(node.getNodeName());
         List<Pod> assumePodList = new ArrayList<>(backupOfNodePodList);

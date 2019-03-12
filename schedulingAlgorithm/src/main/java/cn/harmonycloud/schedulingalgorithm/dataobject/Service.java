@@ -7,11 +7,11 @@ public class Service {
     /**
      * for pods to be scheduled
      */
-    private String cpuCosume;
+    private Double cpuCosume;
     /**
      * for pods to be scheduled
      */
-    private String memCosume;
+    private Double memCosume;
     /**
      * for pods to be scheduled
      */
@@ -107,19 +107,19 @@ public class Service {
         this.nodePort = nodePort;
     }
 
-    public String getCpuCosume() {
+    public Double getCpuCosume() {
         return cpuCosume;
     }
 
-    public void setCpuCosume(String cpuCosume) {
+    public void setCpuCosume(Double cpuCosume) {
         this.cpuCosume = cpuCosume;
     }
 
-    public String getMemCosume() {
+    public Double getMemCosume() {
         return memCosume;
     }
 
-    public void setMemCosume(String memCosume) {
+    public void setMemCosume(Double memCosume) {
         this.memCosume = memCosume;
     }
 

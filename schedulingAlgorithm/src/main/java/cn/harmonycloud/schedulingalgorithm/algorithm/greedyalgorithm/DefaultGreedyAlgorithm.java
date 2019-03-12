@@ -86,7 +86,6 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
 //        弃用priorityRuleConfigs.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_ADD), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
-        // comment out when debugging
         priorityRuleConfigs.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_ADD), 1));
 
         priorityRuleConfigsOnDelete = new ArrayList<>();
@@ -94,7 +93,6 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_DELETE), 1));
 //        弃用priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_DELETE), 1));
-        // comment out when debugging
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_DELETE), 1));
 
         /*
@@ -132,8 +130,8 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     @Override
     public List<Node> predicates(Pod pod, Cache cache) {
         // 分别处理各个节点
-        long enough = Integer.MAX_VALUE;
-        if (cache.getNodeList().size() > 100) {
+        long enough = Long.MAX_VALUE;
+        if (cache.getNodeList().size() > 50) {
             enough = (long) (cache.getNodeList().size() * Constants.FILTER_PERCENTAGE);
         }
         return cache.getNodeList().stream()
