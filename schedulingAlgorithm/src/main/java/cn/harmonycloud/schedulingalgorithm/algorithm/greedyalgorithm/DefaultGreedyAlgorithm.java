@@ -145,7 +145,9 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
         return rules.stream().allMatch(rule -> {
             try {
-                return rule.predicate(pod, node, cache);
+                boolean res = rule.predicate(pod, node, cache);
+                LOGGER.info("Predicate rule, " + rule.toString() + ":" + res);
+                return res;
             } catch (Exception e) {
                 LOGGER.debug("predicate rule error:" + rule);
                 e.printStackTrace();
@@ -175,6 +177,9 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         try {
             // 优选规则内部处理各个node，可以自己决定是否对各个node的评分并发处理
             List<Integer> list = config.getPriorityRule().priority(pod, nodes, cache);
+            if (Constants.LOG_PRIORITY_RESULT) {
+                LOGGER.info("Priority rule, " + config.getPriorityRule().toString() + ":score=" + list.toString() + ", nodes=" + nodes.stream().map(Node::getNodeName).collect(Collectors.toList()).toString());
+            }
             // 计算权重后的得分
             int weight = config.getWeight();
             return list.stream().map(score -> weight * score).collect(Collectors.toList());

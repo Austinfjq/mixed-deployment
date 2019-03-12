@@ -30,4 +30,6 @@ public class Constants {
      * filter 的计算比例，
      */
     public static final double FILTER_PERCENTAGE = 1.0D;
+
+    public static final boolean LOG_PRIORITY_RESULT = true;
 }
