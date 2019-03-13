@@ -29,6 +29,7 @@ import cn.harmonycloud.schedulingalgorithm.priority.impl.SelectorSpreadPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.TaintTolerationPriority;
 import cn.harmonycloud.schedulingalgorithm.selecthost.SelectHostRule;
 import cn.harmonycloud.schedulingalgorithm.selecthost.impl.RoundRobinSelectHighest;
+import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +137,11 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
             enough = (long) (cache.getNodeList().size() * GlobalSetting.FILTER_PERCENTAGE);
         }
         return cache.getNodeList().stream()
-                .filter(node -> runAllPredicates(pod, node, cache))
+                .filter(node -> {
+                    boolean res = runAllPredicates(pod, node, cache);
+                    LOGGER.info("Predicate result:" + res + "," + node.getNodeName() + ", " + pod.getServiceName() + ", ");
+                    return res;
+                })
                 .limit(enough)
                 .collect(Collectors.toList());
     }
@@ -147,14 +152,20 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         return rules.stream().allMatch(rule -> {
             try {
                 boolean res = rule.predicate(pod, node, cache);
-                LOGGER.info("Predicate rule, " + rule.toString() + ":" + res);
+                if (!res) {
+                    LOGGER.info("Predicate false: " + RuleUtil.getLastName(rule.toString()) + ": " + node.getNodeName() + ", " + pod.getServiceName());
+                }
                 return res;
             } catch (Exception e) {
-                LOGGER.debug("predicate rule error:" + rule);
+                LOGGER.debug("predicate rule error:" + RuleUtil.getLastName(rule.toString()));
                 e.printStackTrace();
                 return false;
             }
         });
+    }
+
+    public static void main(String[] args) {
+        System.out.println(BalancedResourceAllocationPriority.class.getName());
     }
 
     @Override
@@ -179,7 +190,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
             // 优选规则内部处理各个node，可以自己决定是否对各个node的评分并发处理
             List<Integer> list = config.getPriorityRule().priority(pod, nodes, cache);
             if (GlobalSetting.LOG_PRIORITY_RESULT) {
-                LOGGER.info("Priority rule, " + config.getPriorityRule().toString() + ":score=" + list.toString() + ", nodes=" + nodes.stream().map(Node::getNodeName).collect(Collectors.toList()).toString());
+                LOGGER.info("Priority rule, " + RuleUtil.getLastName(config.getPriorityRule().toString()) + ":score=" + list.toString() + ", nodes=" + nodes.stream().map(Node::getNodeName).collect(Collectors.toList()).toString());
             }
             // 计算权重后的得分
             int weight = config.getWeight();

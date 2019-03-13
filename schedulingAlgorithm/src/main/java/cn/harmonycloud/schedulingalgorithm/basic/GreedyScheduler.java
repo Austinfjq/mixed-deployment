@@ -62,7 +62,7 @@ public class GreedyScheduler implements Scheduler {
     }
 
     public HostPriority scheduleOne(Pod pod, boolean ifUpdateCache) {
-        LOGGER.info("start scheduleOne!");
+        LOGGER.info("start scheduleOne! operation=" + pod.getOperation() + ", servicename=" + pod.getServiceName(), ", namespace=" + pod.getNamespace());
         // 预选
         List<Node> predicatedNodes = greedyAlgorithm.predicates(pod, cache);
         if (predicatedNodes.isEmpty()) {
