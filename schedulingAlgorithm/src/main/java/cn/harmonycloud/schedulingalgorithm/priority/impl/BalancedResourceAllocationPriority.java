@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
@@ -49,12 +50,12 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule, 
 //            double volumeFraction = (double) requestedVolumes / (double) allocatableVolumes;
 //            if (cpuFraction >= 1 || memoryFraction >= 1 || volumeFraction >= 1) {
 //                // if requested >= capacity, the corresponding host should never be preferred when adding and should be preferred when deleting.
-//                return operation == Constants.OPERATION_ADD ? 0 : Constants.PRIORITY_MAX_SCORE;
+//                return operation == Constants.OPERATION_ADD ? 0 : GlobalSetting.PRIORITY_MAX_SCORE;
 //            }
 //            // Compute variance for all the three fractions.
 //            double mean = (cpuFraction + memoryFraction + volumeFraction) / 3;
 //            double variance = (((cpuFraction - mean) * (cpuFraction - mean)) + ((memoryFraction - mean) * (memoryFraction - mean)) + ((volumeFraction - mean) * (volumeFraction - mean))) / 3;
-//            return (int) ((1 - variance) * Constants.PRIORITY_MAX_SCORE);
+//            return (int) ((1 - variance) * GlobalSetting.PRIORITY_MAX_SCORE);
 //        }
         if (cpuFraction >= 1 || memoryFraction >= 1) {
             return 0;
@@ -64,7 +65,7 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule, 
         // 0-10 with 0 representing well balanced allocation and 10 poorly balanced. Subtracting it from
         // 10 leads to the score which also scales from 0 to 10 while 10 representing well balanced.
         double diff = Math.abs(cpuFraction - memoryFraction);
-        return (int) ((1 - diff) * Constants.PRIORITY_MAX_SCORE);
+        return (int) ((1 - diff) * GlobalSetting.PRIORITY_MAX_SCORE);
     }
 
     private double fractionOfCapacity(long requested, long capacity) {

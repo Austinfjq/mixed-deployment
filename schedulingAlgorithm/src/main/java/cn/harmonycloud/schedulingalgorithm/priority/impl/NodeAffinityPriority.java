@@ -5,6 +5,7 @@ import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PreferredSchedulingTerm;
 import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
@@ -19,8 +20,7 @@ import java.util.stream.Collectors;
 public class NodeAffinityPriority implements PriorityRule {
     @Override
     public List<Integer> priority(Pod pod, List<Node> nodes, Cache cache) {
-        // map TODO parallel
-        List<Integer> mapResult = nodes.stream()
+        List<Integer> mapResult = (GlobalSetting.PARALLEL ? nodes.parallelStream() : nodes.stream())
                 .map(node -> calculateNodeAffinityPriorityMap(pod, node, cache))
                 .collect(Collectors.toList());
         // reduce
@@ -59,6 +59,6 @@ public class NodeAffinityPriority implements PriorityRule {
     }
 
     private List<Integer> calculateNodeAffinityPriorityReduce(Pod pod, List<Node> nodes, Cache cache, List<Integer> mapResult) {
-        return RuleUtil.normalizeReduce(pod, nodes, cache, mapResult, Constants.PRIORITY_MAX_SCORE, false);
+        return RuleUtil.normalizeReduce(pod, nodes, cache, mapResult, GlobalSetting.PRIORITY_MAX_SCORE, false);
     }
 }

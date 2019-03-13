@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DecreasingSortRule implements PresortRule {
-    //TODO need test
     @Override
     public List<Pod> sort(List<Pod> pods, Cache cache) {
         Map<String, Service> serviceMap = cache.getServiceMap();

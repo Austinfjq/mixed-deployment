@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
@@ -132,7 +133,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         // 分别处理各个节点
         long enough = Long.MAX_VALUE;
         if (cache.getNodeList().size() > 50) {
-            enough = (long) (cache.getNodeList().size() * Constants.FILTER_PERCENTAGE);
+            enough = (long) (cache.getNodeList().size() * GlobalSetting.FILTER_PERCENTAGE);
         }
         return cache.getNodeList().stream()
                 .filter(node -> runAllPredicates(pod, node, cache))
@@ -177,7 +178,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         try {
             // 优选规则内部处理各个node，可以自己决定是否对各个node的评分并发处理
             List<Integer> list = config.getPriorityRule().priority(pod, nodes, cache);
-            if (Constants.LOG_PRIORITY_RESULT) {
+            if (GlobalSetting.LOG_PRIORITY_RESULT) {
                 LOGGER.info("Priority rule, " + config.getPriorityRule().toString() + ":score=" + list.toString() + ", nodes=" + nodes.stream().map(Node::getNodeName).collect(Collectors.toList()).toString());
             }
             // 计算权重后的得分

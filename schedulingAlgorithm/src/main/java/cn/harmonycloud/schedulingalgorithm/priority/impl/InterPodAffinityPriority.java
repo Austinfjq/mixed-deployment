@@ -6,6 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinityTerm;
 import cn.harmonycloud.schedulingalgorithm.affinity.Selector;
 import cn.harmonycloud.schedulingalgorithm.affinity.WeightedPodAffinityTerm;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.AssumePodsOnNodeMultiPriorityRule;
@@ -50,8 +51,7 @@ public class InterPodAffinityPriority implements PriorityRule {
         context.affinity = affinity;
         context.cache = cache;
 
-        // TODO parallel stream
-        nodes.stream().forEach(n -> {
+        (GlobalSetting.PARALLEL ? nodes.parallelStream() : nodes.stream()).forEach(n -> {
             context.counts.put(n.getNodeName(), 0D);
             processNode(context, n);
         });
@@ -71,7 +71,7 @@ public class InterPodAffinityPriority implements PriorityRule {
         for (Node node : nodes) {
             double fScore = 0;
             if (maxCount - minCount > 0) {
-                fScore = (double) (Constants.PRIORITY_MAX_SCORE) * ((context.counts.get(node.getNodeName()) - minCount) / (maxCount - minCount));
+                fScore = (double) (GlobalSetting.PRIORITY_MAX_SCORE) * ((context.counts.get(node.getNodeName()) - minCount) / (maxCount - minCount));
             }
             result.add((int) fScore);
         }

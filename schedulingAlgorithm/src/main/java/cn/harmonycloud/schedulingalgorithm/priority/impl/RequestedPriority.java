@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
@@ -52,7 +53,7 @@ public class RequestedPriority implements DefaultPriorityRule, DefaultMultiPrior
             if (requested > capacity) {
                 return 0;
             }
-            return ((capacity - requested) * Constants.PRIORITY_MAX_SCORE) / capacity;
+            return ((capacity - requested) * GlobalSetting.PRIORITY_MAX_SCORE) / capacity;
         }
         // mostRequestedScore
         else {
@@ -60,12 +61,12 @@ public class RequestedPriority implements DefaultPriorityRule, DefaultMultiPrior
                 return 0;
             }
             if (capacity == 0) {
-                return Constants.PRIORITY_MAX_SCORE;
+                return GlobalSetting.PRIORITY_MAX_SCORE;
             }
             if (requested > capacity) {
-                return Constants.PRIORITY_MAX_SCORE;
+                return GlobalSetting.PRIORITY_MAX_SCORE;
             }
-            return (requested * Constants.PRIORITY_MAX_SCORE) / capacity;
+            return (requested * GlobalSetting.PRIORITY_MAX_SCORE) / capacity;
         }
     }
 }

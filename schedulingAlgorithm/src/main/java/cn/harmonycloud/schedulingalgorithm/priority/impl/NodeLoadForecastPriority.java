@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
@@ -27,7 +28,7 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
         // when deleting, score *= -1
         Map<String, NodeForecastData> forecastMap = cache.getNodeForecastMap();
         if (forecastMap == null || !forecastMap.containsKey(node.getNodeIP())) {
-            return Constants.PRIORITY_MAX_SCORE / 2;
+            return GlobalSetting.PRIORITY_MAX_SCORE / 2;
         }
         NodeForecastData forecastResource = forecastMap.get(node.getNodeIP());
         double cpuScore = ((node.getCpuUsage() - (double) forecastResource.getCpuUsage()) / pod.getCpuRequest());
@@ -36,10 +37,10 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
         cpuScore = normalize(cpuScore);
         memScore = normalize(memScore);
 
-        int score = (int) ((1 + (cpuScore + memScore) / 2) / 2 * Constants.PRIORITY_MAX_SCORE);
+        int score = (int) ((1 + (cpuScore + memScore) / 2) / 2 * GlobalSetting.PRIORITY_MAX_SCORE);
 
         if (operation == Constants.OPERATION_DELETE) {
-            return Constants.PRIORITY_MAX_SCORE - score;
+            return GlobalSetting.PRIORITY_MAX_SCORE - score;
         } else {
             return score;
         }

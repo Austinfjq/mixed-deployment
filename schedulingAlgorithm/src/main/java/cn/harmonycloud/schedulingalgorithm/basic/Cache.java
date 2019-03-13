@@ -6,6 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.URIs;
 import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
@@ -79,9 +80,9 @@ public class Cache {
         List<Service> serviceList;
         List<Pod> podList;
         List<Node> nodeList;
-        serviceList = (List<Service>) (Object) fetchOne(Constants.URI_GET_SERVICE, Service[].class);
-        podList = (List<Pod>) (Object) fetchOne(Constants.URI_GET_POD, Pod[].class);
-        nodeList = (List<Node>) (Object) fetchOne(Constants.URI_GET_NODE, Node[].class);
+        serviceList = (List<Service>) (Object) fetchOne(URIs.URI_GET_SERVICE, Service[].class);
+        podList = (List<Pod>) (Object) fetchOne(URIs.URI_GET_POD, Pod[].class);
+        nodeList = (List<Node>) (Object) fetchOne(URIs.URI_GET_NODE, Node[].class);
 
         serviceMap = new HashMap<>();
         if (serviceList != null) {
@@ -161,7 +162,7 @@ public class Cache {
 //                String[] split = serviceFullName.split(DOUtils.NAME_SPLIT);
 //                parameters.put("namespace", split[0]);
 //                parameters.put("serviceName", split[1]);
-//                String result = HttpUtil.post(Constants.URI_GET_POD_CONSUME, parameters);
+//                String result = HttpUtil.post(URIs.URI_GET_POD_CONSUME, parameters);
 //                JSONObject jsonObject = JSONObject.fromObject(result);
 //                Service service = serviceMap.get(serviceFullName);
 //                service.setCpuCosume(jsonObject.optString("cpuCosume"));
@@ -169,7 +170,7 @@ public class Cache {
 //                service.setDownNetIOCosume(jsonObject.optString("DownNetIOCosume"));
 //                service.setUPNetIOCosume(jsonObject.optString("UPNetIOCosume"));
 //                // 获取对应的service的资源密集类型
-//                result = HttpUtil.post(Constants.URI_GET_SERVICE_TYPE, parameters);
+//                result = HttpUtil.post(URIs.URI_GET_SERVICE_TYPE, parameters);
 //                jsonObject = JSONObject.fromObject(result);
 //                service.setIntensiveType(jsonObject.optInt("serviceType"));
 //            }
@@ -220,7 +221,7 @@ public class Cache {
             paramList.add(new BasicNameValuePair("startTime", startTime));
             paramList.add(new BasicNameValuePair("endTime", endTime));
             paramList.add(new BasicNameValuePair("id", "node"));
-            String res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paramList);
+            String res = HttpUtil.get(URIs.URI_GET_NODE_FORECAST, paramList);
             NodeForecastData[] nodeForecastDataList = gson.fromJson(res, NodeForecastData[].class);
             for (NodeForecastData data : nodeForecastDataList) {
                 map.put(data.getNodeIP(), data);

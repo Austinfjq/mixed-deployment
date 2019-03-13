@@ -15,7 +15,7 @@ public class CheckNodeMemoryPressurePredicate implements PredicateRule {
         // Check if a pod can be scheduled on a node reporting memory pressure condition.
         // Currently, no BestEffort should be placed on a node under memory pressure as it gets automatically evicted by kubelet.
         // BestEffort qos类型的pod不允许被调度到内存压力节点上，因为会被kubelet自动驱逐
-        boolean podBestEffort = isPodBestEffort(pod); // TODO
+        boolean podBestEffort = isPodBestEffort(pod);
         if (!podBestEffort) {
             return true;
         }

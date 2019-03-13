@@ -29,7 +29,7 @@ public class NodePreferAvoidPodsPriority implements DefaultPriorityRule {
 //        if (operation == Constants.OPERATION_ADD) {
 //            return calculateNodePreferAvoidPodsPriorityMap(pod, node, cache);
 //        } else {
-//            return Constants.PRIORITY_MAX_SCORE - calculateNodePreferAvoidPodsPriorityMap(pod, node, cache);
+//            return GlobalSetting.PRIORITY_MAX_SCORE - calculateNodePreferAvoidPodsPriorityMap(pod, node, cache);
 //        }
     }
 
@@ -37,17 +37,17 @@ public class NodePreferAvoidPodsPriority implements DefaultPriorityRule {
 ////        var controllerRef *metav1.OwnerReference
 ////        TO DO controllerRef = metav1.GetControllerOf(pod)
 //        OwnerReference controllerRef = new OwnerReference();
-////        if (controllerRef == null) return Constants.PRIORITY_MAX_SCORE;
+////        if (controllerRef == null) return GlobalSetting.PRIORITY_MAX_SCORE;
 //        AvoidPods avoids = getAvoidPodsFromNodeAnnotations(new HashMap<>()/*TO DO node.Annotations*/);
 //        if (avoids == null) {
-//            return Constants.PRIORITY_MAX_SCORE;
+//            return GlobalSetting.PRIORITY_MAX_SCORE;
 //        }
 //        for (PreferAvoidPodsEntry avoid : avoids.preferAvoidPods) {
 //            if (Objects.equals(avoid.podSignature.podController.kind, controllerRef.kind) && Objects.equals(avoid.podSignature.podController.uid, controllerRef.uid)) {
 //                return 0;
 //            }
 //        }
-//        return Constants.PRIORITY_MAX_SCORE;
+//        return GlobalSetting.PRIORITY_MAX_SCORE;
 //    }
 //
 //    private static final String preferAvoidPodsAnnotationKey = "scheduler.alpha.kubernetes.io/preferAvoidPods";
