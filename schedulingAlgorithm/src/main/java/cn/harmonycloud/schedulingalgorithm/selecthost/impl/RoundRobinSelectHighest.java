@@ -3,14 +3,12 @@ package cn.harmonycloud.schedulingalgorithm.selecthost.impl;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.selecthost.SelectHostRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RoundRobinSelectHighest implements SelectHostRule {
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultGreedyAlgorithm.class);
@@ -32,8 +30,8 @@ public class RoundRobinSelectHighest implements SelectHostRule {
         List<Integer> indices = new ArrayList<>();
         for (int i = 0; i < hostPriorityList.size(); i++) {
             Integer score = hostPriorityList.get(i).getScore();
-            if (GlobalSetting.LOG_PRIORITY_RESULT) {
-                LOGGER.info("Priority rule, score sum=" + score + ", node=" + hostPriorityList.get(i).getHostname());
+            if (GlobalSetting.LOG_DETAIL) {
+                LOGGER.info("score sum=" + score + ", node=" + hostPriorityList.get(i).getHostname());
             }
             if (score != null) {
                 if (score > maxScore) {

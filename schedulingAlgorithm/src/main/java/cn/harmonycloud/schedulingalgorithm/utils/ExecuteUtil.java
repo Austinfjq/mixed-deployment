@@ -24,9 +24,8 @@ public class ExecuteUtil {
         if (host == null) {
             return;
         }
-        LOGGER.info("start scheduleExecute!" + pod.getServiceName() + ", " + host.getHostname());
         try {
-            LOGGER.info((pod.getOperation() == Constants.OPERATION_ADD ? "add" : "delete") + ":Service=" + DOUtils.getServiceFullName(pod) + ",host=" + host);
+            LOGGER.info("start scheduleExecute: " + (pod.getOperation() == Constants.OPERATION_ADD ? "add" : "delete") + ": Service=" + DOUtils.getServiceFullName(pod) + ", host=" + host.getHostname());
             List<NameValuePair> paramList = new ArrayList<>();
             paramList.add(new BasicNameValuePair("namespace", pod.getNamespace()));
             paramList.add(new BasicNameValuePair("servicename", pod.getServiceName()));

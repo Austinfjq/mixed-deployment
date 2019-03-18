@@ -12,7 +12,7 @@ public class GlobalSetting {
     /**
      * 是否开启
      */
-    public static final boolean LOG_PRIORITY_RESULT = true;
+    public static final boolean LOG_DETAIL = true;
     /**
      * 并行优化 TODO 开启
      */
