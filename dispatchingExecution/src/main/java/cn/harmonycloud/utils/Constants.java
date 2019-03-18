@@ -19,6 +19,4 @@ public class Constants {
     public final static String RULE_API_VERSION = "apiextensions.k8s.io/v1beta1";
     public final static String RULE_KIND = "CustomResourceDefinition";
     public final static String RULE_NAME = "rules.crd.k8s.io";
-
-
 }

@@ -1,7 +1,13 @@
 package cn.harmonycloud.kubernetesDAO;
 
+import cn.harmonycloud.utils.Constants;
 import cn.harmonycloud.utils.K8sClient;
 import io.fabric8.kubernetes.api.model.apps.*;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +18,7 @@ public class PodsDAO {
     private final static Logger LOGGER = LoggerFactory.getLogger(PodsDAO.class);
     //createPod func
     public static boolean createDeploymentPod(String namespace,String ownName,int replicas){
+        KubernetesClient client = new DefaultKubernetesClient(new ConfigBuilder().withTrustCerts(true).withMasterUrl(Constants.MASTER).build());
         Deployment deployment = new Deployment();
         DeploymentList deploymentList = K8sClient.getInstance().apps().deployments().list();
         for (Deployment e : deploymentList.getItems()){
@@ -19,9 +26,27 @@ public class PodsDAO {
                 deployment = e;
             }
         }
-        K8sClient.getInstance().apps().deployments().inNamespace(namespace).withName(ownName).scale(deployment.getSpec().getReplicas()+replicas);
+        LOGGER.info("namespace["+namespace+"]ownName["+ownName+"]replicas["+replicas+"]");
+//        LOGGER.info("Deployment.class:"+deployment.getClass().toString());
+//        LOGGER.info("deployment.Spec.Replicas:"+deployment.getSpec().getReplicas());
+        NonNamespaceOperation<Deployment,DeploymentList,DoneableDeployment,RollableScalableResource<Deployment,DoneableDeployment>> operation = client.apps().deployments().inNamespace(namespace);
+        RollableScalableResource rollableScalableResource = null;
+        try{
+            rollableScalableResource = operation.withName(ownName);//.scale(deployment.getSpec().getReplicas()+replicas,true);
+        }catch (ClassCastException e){
+            e.getStackTrace();
+            e.getCause();
+            e.printStackTrace();
+            return false;
+        }
+        rollableScalableResource.scale(deployment.getSpec().getReplicas()+replicas,true);
         LOGGER.info("Create Pod{Deployment.Namespace["+namespace+"],Deployment.Name["+ownName+"]} Successfully!");
         return true;
+    }
+
+    public static void main(String[] args){
+        createDeploymentPod("wordpress","wordpress",2);
+
     }
     public static boolean createReplicasetPod(String namespace,String ownName,int replicas){
         ReplicaSet replicaSet = new ReplicaSet();
