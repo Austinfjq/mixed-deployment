@@ -177,7 +177,7 @@
     <offlineService>
         <index>
             <name>
-                hadoop-datanode
+                hadoop-nodemanager
             </name>
             <namespace>
                 hadoop
