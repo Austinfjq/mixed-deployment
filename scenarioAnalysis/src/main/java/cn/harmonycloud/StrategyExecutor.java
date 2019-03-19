@@ -18,10 +18,30 @@ import org.slf4j.LoggerFactory;
 
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
+import static java.lang.Math.abs;
 
 public class StrategyExecutor {
+
+    private List<ForecastNode> forecastNodeList;
+    private List<NowNode> nowNodeList;
+    private List<ForecastService> forecastServiceList;
+    private List<NowService> nowServiceList;
+    //    private ArrayList<Result> results;
+    private int onlineNum;
+    private int offlineNum;
+
+    public StrategyExecutor(List<ForecastNode> forecastNodeList, List<NowNode> nowNodeList, List<ForecastService> forecastServiceList, List<NowService> nowServiceList, int onlineNum, int offlineNum) {
+        this.forecastNodeList = forecastNodeList;
+        this.nowNodeList = nowNodeList;
+        this.forecastServiceList = forecastServiceList;
+        this.nowServiceList = nowServiceList;
+        this.onlineNum = onlineNum;
+        this.offlineNum = offlineNum;
+
+    }
+
     private final static Logger LOGGER = LoggerFactory.getLogger(StrategyExecutor.class);
-    public static ArrayList<Result> results = new ArrayList<>();
+
 
     public static ArrayList<Result> getResults(int onlineNum, int offlineNum) {
 
@@ -39,12 +59,45 @@ public class StrategyExecutor {
             }
         });
 
-        //执行service分析的线程
+        ArrayList<Result> results = new ArrayList<>();
 
-        StrategyTaskThread strategyTaskThread = new StrategyTaskThread(forecastNodeList, nowNodeList,
-                forecastServiceList, nowServiceList, results, onlineNum, offlineNum);
-        Thread strategyThread = new Thread(strategyTaskThread);
-        strategyThread.start();
+        AppList appList = new AppList();
+        appList.init();
+
+        int podNum = 0;
+
+        for (int i = 0; i < appList.getOnlineApp().size(); i++) {
+
+            for (NowService nowService : nowServiceList) {
+                if (nowService.getServiceName().equals(appList.getOnlineApp().get(i).get("name"))
+                        && nowService.getNamespace().equals(appList.getOnlineApp().get(i).get("namespace"))) {
+                    podNum = nowService.getPodNums() - onlineNum;
+                    break;
+                }
+            }
+
+            Result resultPod = new Result(podNum < 0 ? 1 : 2, appList.getOnlineApp().get(i).get("namespace"),
+                    appList.getOnlineApp().get(i).get("name"), String.valueOf(abs(podNum)));//1增加，2减少
+            results.add(resultPod);
+
+        }
+
+        for (int i = 0; i < appList.getOfflineApp().size(); i++) {
+
+            for (NowService nowService : nowServiceList) {
+                if (nowService.getServiceName().equals(appList.getOfflineApp().get(i).get("name"))
+                        && nowService.getNamespace().equals(appList.getOfflineApp().get(i).get("namespace"))) {
+                    podNum = nowService.getPodNums() - offlineNum;
+                    break;
+                }
+            }
+
+            Result resultPod = new Result(podNum < 0 ? 1 : 2, appList.getOfflineApp().get(i).get("namespace"),
+                    appList.getOfflineApp().get(i).get("name"), String.valueOf(abs(podNum)));//1增加，2减少
+            results.add(resultPod);
+
+        }
+
 
         return results;
     }
