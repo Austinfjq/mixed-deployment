@@ -6,15 +6,39 @@
 
         <index>
 
-            <time>12:53:00</time>
+            <time>00:00:00</time>
             <onlineService>
-                <add>true</add>
-                <num>5</num>
+                <num>8</num>
             </onlineService>
 
             <offlineService>
-                <add>true</add>
-                <num>5</num>
+                <num>2</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>02:00:00</time>
+            <onlineService>
+                <num>2</num>
+            </onlineService>
+
+            <offlineService>
+                <num>8</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>04:00:00</time>
+            <onlineService>
+                <num>8</num>
+            </onlineService>
+
+            <offlineService>
+                <num>2</num>
             </offlineService>
 
         </index>
@@ -23,13 +47,11 @@
 
             <time>06:00:00</time>
             <onlineService>
-                <add>true</add>
-                <num>3</num>
+                <num>2</num>
             </onlineService>
 
             <offlineService>
-                <add>false</add>
-                <num>0</num>
+                <num>8</num>
             </offlineService>
 
         </index>
@@ -38,75 +60,36 @@
 
             <time>08:00:00</time>
             <onlineService>
-                <add>true</add>
-                <num>5</num>
+                <num>8</num>
             </onlineService>
 
             <offlineService>
-                <add>false</add>
-                <num>5</num>
-            </offlineService>
-
-        </index>
-
-
-        <index>
-
-            <time>10:00:00</time>
-
-            <onlineService>
-                <add>true</add>
-                <num>5</num>
-            </onlineService>
-
-            <offlineService>
-                <add>false</add>
-                <num>5</num>
+                <num>2</num>
             </offlineService>
 
         </index>
 
         <index>
 
-            <time>11:00:00</time>
+            <time>10:00:00</time>
             <onlineService>
-                <add>true</add>
                 <num>2</num>
             </onlineService>
 
             <offlineService>
-                <add>false</add>
-                <num>2</num>
+                <num>8</num>
             </offlineService>
 
         </index>
-
 
         <index>
 
             <time>12:00:00</time>
             <onlineService>
-                <add>true</add>
-                <num>2</num>
+                <num>8</num>
             </onlineService>
 
             <offlineService>
-                <add>false</add>
-                <num>2</num>
-            </offlineService>
-
-        </index>
-
-        <index>
-
-            <time>13:06:00</time>
-            <onlineService>
-                <add>true</add>
-                <num>2</num>
-            </onlineService>
-
-            <offlineService>
-                <add>false</add>
                 <num>2</num>
             </offlineService>
 
@@ -116,43 +99,91 @@
 
             <time>14:00:00</time>
             <onlineService>
-                <add>true</add>
-                <num>2</num>
+                <num>8</num>
             </onlineService>
 
             <offlineService>
-                <add>false</add>
                 <num>2</num>
             </offlineService>
 
         </index>
 
-
         <index>
 
-
-            <time>23:35:00</time>
+            <time>16:00:00</time>
             <onlineService>
-                <add>true</add>
-                <num>3</num>
+                <num>2</num>
             </onlineService>
 
             <offlineService>
-                <add>false</add>
-                <num>3</num>
+                <num>8</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>18:00:00</time>
+            <onlineService>
+                <num>8</num>
+            </onlineService>
+
+            <offlineService>
+                <num>2</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>20:00:00</time>
+            <onlineService>
+                <num>2</num>
+            </onlineService>
+
+            <offlineService>
+                <num>8</num>
+            </offlineService>
+
+        </index>
+
+        <index>
+
+            <time>22:00:00</time>
+            <onlineService>
+                <num>8</num>
+            </onlineService>
+
+            <offlineService>
+                <num>2</num>
             </offlineService>
 
         </index>
 
     </times>
 
-    <offlineService>
-
-    </offlineService>
-
     <onlineService>
+        <index>
+            <name>
+                wordpress-wp
+            </name>
+            <namespace>
+                wordpress
+            </namespace>
+        </index>
 
     </onlineService>
+
+    <offlineService>
+        <index>
+            <name>
+                hadoop-datanode
+            </name>
+            <namespace>
+                hadoop
+            </namespace>
+        </index>
+    </offlineService>
 
     <temp>
 

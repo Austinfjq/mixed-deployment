@@ -36,8 +36,8 @@ public class LoadConfigFile {
 
             while (iter.hasNext()) {
                 Config config = new Config();
-                Map<String, Long> podAddList = new HashMap<>();
-                Map<String, Long> podDelList = new HashMap<>();
+//                Map<String, Long> podAddList = new HashMap<>();
+//                Map<String, Long> podDelList = new HashMap<>();
 
                 Element recordEle = (Element) iter.next();
                 config.setTime(recordEle.elementTextTrim("time"));
@@ -47,30 +47,34 @@ public class LoadConfigFile {
 
                 while (onlineIters.hasNext()) {
                     Element itemEle = (Element) onlineIters.next();
-                    String add = itemEle.elementTextTrim("add"); // 拿到head下的子节点的值
+//                    String add = itemEle.elementTextTrim("add"); // 拿到head下的子节点的值
                     String num = itemEle.elementTextTrim("num");
-                    if (add.equals("true")) {
-                        podAddList.put("online", Long.parseLong(num));
-                    } else if (add.equals("false")) {
-                        podDelList.put("online", Long.parseLong(num));
-                    }
+//                    if (add.equals("true")) {
+//                        podAddList.put("online", Long.parseLong(num));
+//                    } else if (add.equals("false")) {
+//                        podDelList.put("online", Long.parseLong(num));
+//                    }
+                    config.setOnlineNum(Integer.parseInt(num));
                 }
 
 
                 while (offlineIters.hasNext()) {
                     Element itemEle = (Element) offlineIters.next();
-                    String add = itemEle.elementTextTrim("add");
+//                    String add = itemEle.elementTextTrim("add");
                     String num = itemEle.elementTextTrim("num");
-                    if (add.equals("true")) {
-                        podAddList.put("offline", Long.parseLong(num));
-                    } else if (add.equals("false")) {
-                        podDelList.put("offline", Long.parseLong(num));
-                    }
+//                    if (add.equals("true")) {
+//                        podAddList.put("offline", Long.parseLong(num));
+//                    } else if (add.equals("false")) {
+//                        podDelList.put("offline", Long.parseLong(num));
+//                    }
+                    config.setOfflineNum(Integer.parseInt(num));
                 }
 
-                config.setPodAddList(podAddList);
-                config.setPodDelList(podDelList);
+//                config.setPodAddList(podAddList);
+//                config.setPodDelList(podDelList);
                 configList.add(config);
+
+
             }
 
 

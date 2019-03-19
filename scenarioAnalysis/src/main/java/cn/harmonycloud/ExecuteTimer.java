@@ -19,8 +19,8 @@ public class ExecuteTimer {
 
         for (Config cfg : configList) {
 
-//            long daySpan = 24 * 60 * 60 * 1000;
-            long daySpan = 5000;
+            long daySpan = 24 * 60 * 60 * 1000;
+//            long daySpan = 5000;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + cfg.getTime());
 
             try {
@@ -33,7 +33,7 @@ public class ExecuteTimer {
                 TimerTask task1 = new TimerTask() {
                     @Override
                     public void run() {
-                        StrategyExecutor.run(cfg.getPodAddList(), cfg.getPodDelList());
+                        StrategyExecutor.run(cfg.getOnlineNum(), cfg.getOfflineNum());
                     }
                 };
 

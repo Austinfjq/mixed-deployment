@@ -9,16 +9,21 @@ import cn.harmonycloud.tools.Write2ES;
 import com.alibaba.fastjson.JSON;
 import cn.harmonycloud.tools.HttpSend;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
 public class StrategyExecutor {
+    private final static Logger LOGGER = LoggerFactory.getLogger(StrategyExecutor.class);
     public static ArrayList<Result> results = new ArrayList<>();
 
-    public static ArrayList<Result> getResults(Map<String, Long> podAddList,
-                                               Map<String, Long> podDelList) {
+    public static ArrayList<Result> getResults(int onlineNum, int offlineNum) {
 
         List<ForecastService> forecastServiceList = ServiceDAO.getForecastServiceList();
         List<NowService> nowServiceList = ServiceDAO.getNowServiceList();
@@ -37,7 +42,7 @@ public class StrategyExecutor {
         //执行service分析的线程
 
         StrategyTaskThread strategyTaskThread = new StrategyTaskThread(forecastNodeList, nowNodeList,
-                forecastServiceList, nowServiceList, results, podAddList, podDelList);
+                forecastServiceList, nowServiceList, results, onlineNum, offlineNum);
         Thread strategyThread = new Thread(strategyTaskThread);
         strategyThread.start();
 
@@ -45,13 +50,19 @@ public class StrategyExecutor {
     }
 
 
-    public static void run(Map<String, Long> podAddList,
-                           Map<String, Long> podDelList) {
+    public static void run(int onlineNum, int offlineNum) {
 
-        Write2ES.run(getResults(podAddList, podDelList), "schedulePods");
-        String returnValue = JSON.toJSONString(getResults(podAddList, podDelList), WriteMapNullValue,
+        Write2ES.run(getResults(onlineNum, offlineNum), "schedulePods");
+        String returnValue = JSON.toJSONString(getResults(onlineNum, offlineNum), WriteMapNullValue,
                 WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
+
+
+        LOGGER.info("StrategyExecutor return value: " + returnValue);
+        Date nowTime = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(df.format(nowTime));
         System.out.println(returnValue);
+
         HttpSend.sendPost("POST", "http://" + Constant.HOST + ":" + Constant.PORT2 + "/" + "schedulepod", returnValue);
     }
 
