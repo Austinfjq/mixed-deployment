@@ -9,6 +9,6 @@ public class URIs {
     public static final String URI_GET_POD_CONSUME = "http://hostname:port/service/getPodCosume";
     public static final String URI_GET_SERVICE_TYPE = "http://hostname:port/service/getServiceType";
 
-    public static final String URI_EXECUTE_ADD = "http://192.168.1.20:8080/dispatching/createPod";
-    public static final String URI_EXECUTE_REMOVE = "http://192.168.1.20:8080/dispatching/deletePod";
+    public static final String URI_EXECUTE_ADD = "http://10.10.101.115:8082/dispatching/createPod";
+    public static final String URI_EXECUTE_REMOVE = "http://10.10.101.115:8082/dispatching/deletePod";
 }
