@@ -6,8 +6,10 @@ import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.URIs;
 import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
+import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
@@ -16,6 +18,8 @@ import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
 import com.google.gson.Gson;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +43,7 @@ public class Cache {
     private Map<String, Node> nodeMap;
     private List<Node> nodeList;
     private Map<String, List<Pod>> nodeMapPodList;
-    private Map<String, Resource> nodeForecastMap;
+    private Map<String, NodeForecastData> nodeForecastMap; // key is node IP
 
     public Map<String, Service> getServiceMap() {
         return serviceMap;
@@ -61,7 +65,7 @@ public class Cache {
         return nodeMapPodList;
     }
 
-    public Map<String, Resource> getNodeForecastMap() {
+    public Map<String, NodeForecastData> getNodeForecastMap() {
         return nodeForecastMap;
     }
 
@@ -76,9 +80,9 @@ public class Cache {
         List<Service> serviceList;
         List<Pod> podList;
         List<Node> nodeList;
-        serviceList = (List<Service>) (Object) fetchOne(Constants.URI_GET_SERVICE, Service[].class);
-        podList = (List<Pod>) (Object) fetchOne(Constants.URI_GET_POD, Pod[].class);
-        nodeList = (List<Node>) (Object) fetchOne(Constants.URI_GET_NODE, Node[].class);
+        serviceList = (List<Service>) (Object) fetchOne(URIs.URI_GET_SERVICE, Service[].class);
+        podList = (List<Pod>) (Object) fetchOne(URIs.URI_GET_POD, Pod[].class);
+        nodeList = (List<Node>) (Object) fetchOne(URIs.URI_GET_NODE, Node[].class);
 
         serviceMap = new HashMap<>();
         if (serviceList != null) {
@@ -114,8 +118,7 @@ public class Cache {
                 // 转换taints格式
                 readTaints(n);
             });
-            // comment out when debugging
-            nodeForecastMap = fetchNodeForecast(nodeList);
+            nodeForecastMap = fetchNodeForecast();
         }
         this.nodeList = nodeList;
     }
@@ -152,25 +155,25 @@ public class Cache {
         try {
             List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
             Map<String, Service> serviceMap = getServiceMap();
-            // comment out the for loop below when debugging
-            for (String serviceFullName : serviceFullNames) {
-                // 获取预计占用资源信息
-                Map<String, String> parameters = new HashMap<>();
-                String[] split = serviceFullName.split(DOUtils.NAME_SPLIT);
-                parameters.put("namespace", split[0]);
-                parameters.put("serviceName", split[1]);
-                String result = HttpUtil.post(Constants.URI_GET_POD_CONSUME, parameters);
-                JSONObject jsonObject = JSONObject.fromObject(result);
-                Service service = serviceMap.get(serviceFullName);
-                service.setCpuCosume(jsonObject.optString("cpuCosume"));
-                service.setMemCosume(jsonObject.optString("memCosume"));
-                service.setDownNetIOCosume(jsonObject.optString("DownNetIOCosume"));
-                service.setUPNetIOCosume(jsonObject.optString("UPNetIOCosume"));
-                // 获取对应的service的资源密集类型
-                result = HttpUtil.post(Constants.URI_GET_SERVICE_TYPE, parameters);
-                jsonObject = JSONObject.fromObject(result);
-                service.setIntensiveType(jsonObject.optInt("serviceType"));
-            }
+            // 不再使用资源画像接口
+//            for (String serviceFullName : serviceFullNames) {
+//                // 获取预计占用资源信息
+//                Map<String, String> parameters = new HashMap<>();
+//                String[] split = serviceFullName.split(DOUtils.NAME_SPLIT);
+//                parameters.put("namespace", split[0]);
+//                parameters.put("serviceName", split[1]);
+//                String result = HttpUtil.post(URIs.URI_GET_POD_CONSUME, parameters);
+//                JSONObject jsonObject = JSONObject.fromObject(result);
+//                Service service = serviceMap.get(serviceFullName);
+//                service.setCpuCosume(jsonObject.optString("cpuCosume"));
+//                service.setMemCosume(jsonObject.optString("memCosume"));
+//                service.setDownNetIOCosume(jsonObject.optString("DownNetIOCosume"));
+//                service.setUPNetIOCosume(jsonObject.optString("UPNetIOCosume"));
+//                // 获取对应的service的资源密集类型
+//                result = HttpUtil.post(URIs.URI_GET_SERVICE_TYPE, parameters);
+//                jsonObject = JSONObject.fromObject(result);
+//                service.setIntensiveType(jsonObject.optInt("serviceType"));
+//            }
 
             //查找同service下的pod，填写新pod的属性
             pods.forEach(p -> {
@@ -182,12 +185,15 @@ public class Cache {
                 p.setAffinity(sp.getAffinity());
                 p.setContainers(sp.getContainers());
                 p.setToleration(sp.getToleration());
+                service.setCpuCosume(sp.getCpuRequest());
+                service.setMemCosume(sp.getMemRequest());
+                service.setIntensiveType(sp.getCpuRequest() * 2000000000 > sp.getMemRequest() ? Constants.INTENSIVE_TYPE_CPU : Constants.INTENSIVE_TYPE_MEMORY);
                 // setWantPorts
                 String ports = sp.getContainers().getPorts();
                 ContainerPort[] wantPorts = gson.fromJson(ports, ContainerPort[].class);
                 p.setWantPorts(wantPorts);
 
-                // uncomment below when debugging
+                // for debug 模拟 affinity
 //                Affinity affinity = new Affinity();
 //                affinity.setPodAntiAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAntiAffinity());
 //                affinity.setPodAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAffinity());
@@ -201,50 +207,26 @@ public class Cache {
         }
     }
 
-    private Map<String, Resource> fetchNodeForecast(List<Node> nodeList) {
-        Map<String, Resource> map = new HashMap<>();
+    private Map<String, NodeForecastData> fetchNodeForecast() {
+        Map<String, NodeForecastData> map = new HashMap<>();
         try {
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            calendar.add(Calendar.MINUTE, -5);
             String startTime = ft.format(calendar.getTime());
-            calendar.add(Calendar.HOUR_OF_DAY, 1);
+            calendar.add(Calendar.HOUR_OF_DAY, 12);
             String endTime = ft.format(calendar.getTime());
 
-            Map<String, String> paras = new HashMap<>();
-            paras.put("type", "1");
-            paras.put("startTime", startTime);
-            paras.put("endTime", endTime);
-            for (Node node : nodeList) {
-                Resource resource = new Resource();
-                paras.put("id", node.getNodeName() + "&" + node.getNodeIP());
-
-                paras.put("index", "cpu");
-                String res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
-                JSONArray jsonArray = JSONArray.fromObject(res);
-                if (!jsonArray.isEmpty()) {
-                    try {
-                        JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String value = jsonObject.optString("value");
-                        resource.setMilliCPU((long) (Double.valueOf(value) * 1000));
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-
-                paras.put("index", "memory");
-                res = HttpUtil.get(Constants.URI_GET_NODE_FORECAST, paras);
-                jsonArray = JSONArray.fromObject(res);
-                if (!jsonArray.isEmpty()) {
-                    try {
-                        JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String value = jsonObject.optString("value");
-                        resource.setMemory(Double.valueOf(value).longValue());
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-                map.put(node.getNodeName(), resource);
+            List<NameValuePair> paramList = new ArrayList<>();
+            paramList.add(new BasicNameValuePair("startTime", startTime));
+            paramList.add(new BasicNameValuePair("endTime", endTime));
+            paramList.add(new BasicNameValuePair("id", "node"));
+            String res = HttpUtil.get(URIs.URI_GET_NODE_FORECAST, paramList);
+            NodeForecastData[] nodeForecastDataList = gson.fromJson(res, NodeForecastData[].class);
+            for (NodeForecastData data : nodeForecastDataList) {
+                map.put(data.getNodeIP(), data);
             }
+            return map;
         } catch (Exception e) {
             LOGGER.debug("fetchNodeForecast error");
             e.printStackTrace();

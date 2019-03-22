@@ -426,4 +426,14 @@ public class RuleUtil {
         }
         return true;
     }
+
+    public static String getLastName(String className) {
+        try {
+            String[] names = className.split("\\.");
+            String[] names1 = names[names.length - 1].split("@");
+            return names1[0];
+        } catch (Exception e) {
+            return className;
+        }
+    }
 }

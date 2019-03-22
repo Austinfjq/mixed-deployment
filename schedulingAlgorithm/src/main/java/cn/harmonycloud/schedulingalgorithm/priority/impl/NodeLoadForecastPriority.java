@@ -2,7 +2,9 @@ package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
+import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
@@ -24,22 +26,21 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
         // next period resource: from node load forecast, format: cpu(0~1.0), mem(xMB)
         // score = (cpu now - cpu next) * weightA + (mem now - mem next) * weightB.
         // when deleting, score *= -1
-        // how to normalize the score to 0~10
-        Map<String, Resource> forecastMap = cache.getNodeForecastMap();
-        if (forecastMap == null || !forecastMap.containsKey(node.getNodeName())) {
-            return 0;
+        Map<String, NodeForecastData> forecastMap = cache.getNodeForecastMap();
+        if (forecastMap == null || !forecastMap.containsKey(node.getNodeIP())) {
+            return GlobalSetting.PRIORITY_MAX_SCORE / 2;
         }
-        Resource forecastResource = forecastMap.get(node.getNodeName());
-        double cpuScore = ((Double.valueOf(node.getCpuUsage()) - (double) forecastResource.getMilliCPU()) / Double.valueOf(pod.getCpuRequest()));
-        double memScore = ((Double.valueOf(node.getMemUsage()) - (double) forecastResource.getMemory()) / Double.valueOf(pod.getMemRequest()));
+        NodeForecastData forecastResource = forecastMap.get(node.getNodeIP());
+        double cpuScore = ((node.getCpuUsage() - (double) forecastResource.getCpuUsage()) / pod.getCpuRequest());
+        double memScore = ((node.getMemUsage() - (double) forecastResource.getMemUsage()) / pod.getMemRequest());
 
         cpuScore = normalize(cpuScore);
         memScore = normalize(memScore);
 
-        int score = (int) ((1 + (cpuScore + memScore) / 2) / 2 * Constants.PRIORITY_MAX_SCORE);
+        int score = (int) ((1 + (cpuScore + memScore) / 2) / 2 * GlobalSetting.PRIORITY_MAX_SCORE);
 
         if (operation == Constants.OPERATION_DELETE) {
-            return Constants.PRIORITY_MAX_SCORE - score;
+            return GlobalSetting.PRIORITY_MAX_SCORE - score;
         } else {
             return score;
         }

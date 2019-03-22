@@ -41,7 +41,7 @@ public class ImageLocalityPriority implements DefaultPriorityRule {
 //        } else if (sumScores > maxThreshold) {
 //            sumScores = maxThreshold;
 //        }
-//        return Constants.PRIORITY_MAX_SCORE * (sumScores - minThreshold) / (maxThreshold - minThreshold);
+//        return GlobalSetting.PRIORITY_MAX_SCORE * (sumScores - minThreshold) / (maxThreshold - minThreshold);
 //    }
 //
 //    class Container {

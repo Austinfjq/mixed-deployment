@@ -17,7 +17,7 @@ public class StringUtil {
     }
 
     public static String combineUrl(String server){
-        return "https://"+server;
+        return "http://"+server;
 
     }
 }

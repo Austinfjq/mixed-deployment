@@ -19,17 +19,17 @@ public class PodsImplementation {
 //            case  DAEMONSET:
 //                flag = PodsDAO.createDaemonsetPod(ruleSpec.getNamespace(),ruleSpec.getOwnName(),ruleSpec.getReplicas());
 //                break;
-            case REPLICASET:
+            case "replicaSet":
                 flag = PodsDAO.createReplicasetPod(ruleSpec.getNamespace(),ruleSpec.getOwnerName(),1);
                 break;
-            case DEPLOYMENT:
+            case "deployment":
                 flag = PodsDAO.createDeploymentPod(ruleSpec.getNamespace(),ruleSpec.getOwnerName(),1);
                 break;
-            case STATEFULSET:
+            case "statefulSet":
                 flag = PodsDAO.createStatefulsetPod(ruleSpec.getNamespace(),ruleSpec.getOwnerName(),1);
                 break;
                 default:
-                    System.out.println("OwnType is unknown!");
+                    LOGGER.info("OwnType is unknown!");
         }
 
         return flag;

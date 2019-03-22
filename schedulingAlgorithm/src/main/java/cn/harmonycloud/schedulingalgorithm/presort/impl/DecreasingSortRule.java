@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DecreasingSortRule implements PresortRule {
-    //TODO need test
     @Override
     public List<Pod> sort(List<Pod> pods, Cache cache) {
         Map<String, Service> serviceMap = cache.getServiceMap();
@@ -43,13 +42,13 @@ public class DecreasingSortRule implements PresortRule {
      */
     private double getPodSortPriority(Service service, Integer operation, double[][] resourceSum) {
         if (Constants.INTENSIVE_TYPE_CPU == service.getIntensiveType()) {
-            return Double.valueOf(service.getCpuCosume()) / resourceSum[Constants.INTENSIVE_TYPE_CPU][operation];
+            return service.getCpuCosume() / resourceSum[Constants.INTENSIVE_TYPE_CPU][operation];
         } else if (Constants.INTENSIVE_TYPE_MEMORY == service.getIntensiveType()) {
-            return Double.valueOf(service.getMemCosume()) / resourceSum[Constants.INTENSIVE_TYPE_MEMORY][operation];
-        } else if (Constants.INTENSIVE_TYPE_DOWN_NET_IO == service.getIntensiveType()) {
-            return Double.valueOf(service.getUPNetIOCosume()) / resourceSum[Constants.INTENSIVE_TYPE_DOWN_NET_IO][operation];
-        } else if (Constants.INTENSIVE_TYPE_UP_NET_IO == service.getIntensiveType()) {
-            return Double.valueOf(service.getUPNetIOCosume()) / resourceSum[Constants.INTENSIVE_TYPE_UP_NET_IO][operation];
+            return service.getMemCosume() / resourceSum[Constants.INTENSIVE_TYPE_MEMORY][operation];
+//        } else if (Constants.INTENSIVE_TYPE_DOWN_NET_IO == service.getIntensiveType()) {
+//            return Double.valueOf(service.getUPNetIOCosume()) / resourceSum[Constants.INTENSIVE_TYPE_DOWN_NET_IO][operation];
+//        } else if (Constants.INTENSIVE_TYPE_UP_NET_IO == service.getIntensiveType()) {
+//            return Double.valueOf(service.getUPNetIOCosume()) / resourceSum[Constants.INTENSIVE_TYPE_UP_NET_IO][operation];
         } else {
             return 0D;
         }
@@ -60,60 +59,56 @@ public class DecreasingSortRule implements PresortRule {
                 .filter(p->p.getOperation() == Constants.OPERATION_ADD)
                 .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
                 .filter(s -> Constants.INTENSIVE_TYPE_CPU == s.getIntensiveType())
-                .map(Service::getCpuCosume)
-                .mapToDouble(Double::valueOf)
+                .mapToDouble(Service::getCpuCosume)
                 .sum();
         resourceSum[Constants.INTENSIVE_TYPE_CPU][Constants.OPERATION_DELETE] = pods.stream()
                 .filter(p->p.getOperation() == Constants.OPERATION_DELETE)
                 .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
                 .filter(s -> Constants.INTENSIVE_TYPE_CPU == s.getIntensiveType())
-                .map(Service::getCpuCosume)
-                .mapToDouble(Double::valueOf)
+                .mapToDouble(Service::getCpuCosume)
                 .sum();
 
         resourceSum[Constants.INTENSIVE_TYPE_MEMORY][Constants.OPERATION_ADD] = pods.stream()
                 .filter(p->p.getOperation() == Constants.OPERATION_ADD)
                 .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
                 .filter(s -> Constants.INTENSIVE_TYPE_MEMORY == s.getIntensiveType())
-                .map(Service::getMemCosume)
-                .mapToDouble(Double::valueOf)
+                .mapToDouble(Service::getMemCosume)
                 .sum();
         resourceSum[Constants.INTENSIVE_TYPE_MEMORY][Constants.OPERATION_DELETE] = pods.stream()
                 .filter(p->p.getOperation() == Constants.OPERATION_DELETE)
                 .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
                 .filter(s -> Constants.INTENSIVE_TYPE_MEMORY == s.getIntensiveType())
-                .map(Service::getMemCosume)
-                .mapToDouble(Double::valueOf)
+                .mapToDouble(Service::getMemCosume)
                 .sum();
 
-        resourceSum[Constants.INTENSIVE_TYPE_DOWN_NET_IO][Constants.OPERATION_ADD] = pods.stream()
-                .filter(p->p.getOperation() == Constants.OPERATION_ADD)
-                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
-                .filter(s -> Constants.INTENSIVE_TYPE_DOWN_NET_IO == s.getIntensiveType())
-                .map(Service::getDownNetIOCosume)
-                .mapToDouble(Double::valueOf)
-                .sum();
-        resourceSum[Constants.INTENSIVE_TYPE_DOWN_NET_IO][Constants.OPERATION_DELETE] = pods.stream()
-                .filter(p->p.getOperation() == Constants.OPERATION_DELETE)
-                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
-                .filter(s -> Constants.INTENSIVE_TYPE_DOWN_NET_IO == s.getIntensiveType())
-                .map(Service::getDownNetIOCosume)
-                .mapToDouble(Double::valueOf)
-                .sum();
-
-        resourceSum[Constants.INTENSIVE_TYPE_UP_NET_IO][Constants.OPERATION_ADD] = pods.stream()
-                .filter(p->p.getOperation() == Constants.OPERATION_ADD)
-                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
-                .filter(s -> Constants.INTENSIVE_TYPE_UP_NET_IO == s.getIntensiveType())
-                .map(Service::getUPNetIOCosume)
-                .mapToDouble(Double::valueOf)
-                .sum();
-        resourceSum[Constants.INTENSIVE_TYPE_UP_NET_IO][Constants.OPERATION_DELETE] = pods.stream()
-                .filter(p->p.getOperation() == Constants.OPERATION_DELETE)
-                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
-                .filter(s -> Constants.INTENSIVE_TYPE_UP_NET_IO == s.getIntensiveType())
-                .map(Service::getUPNetIOCosume)
-                .mapToDouble(Double::valueOf)
-                .sum();
+//        resourceSum[Constants.INTENSIVE_TYPE_DOWN_NET_IO][Constants.OPERATION_ADD] = pods.stream()
+//                .filter(p->p.getOperation() == Constants.OPERATION_ADD)
+//                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
+//                .filter(s -> Constants.INTENSIVE_TYPE_DOWN_NET_IO == s.getIntensiveType())
+//                .map(Service::getDownNetIOCosume)
+//                .mapToDouble(Double::valueOf)
+//                .sum();
+//        resourceSum[Constants.INTENSIVE_TYPE_DOWN_NET_IO][Constants.OPERATION_DELETE] = pods.stream()
+//                .filter(p->p.getOperation() == Constants.OPERATION_DELETE)
+//                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
+//                .filter(s -> Constants.INTENSIVE_TYPE_DOWN_NET_IO == s.getIntensiveType())
+//                .map(Service::getDownNetIOCosume)
+//                .mapToDouble(Double::valueOf)
+//                .sum();
+//
+//        resourceSum[Constants.INTENSIVE_TYPE_UP_NET_IO][Constants.OPERATION_ADD] = pods.stream()
+//                .filter(p->p.getOperation() == Constants.OPERATION_ADD)
+//                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
+//                .filter(s -> Constants.INTENSIVE_TYPE_UP_NET_IO == s.getIntensiveType())
+//                .map(Service::getUPNetIOCosume)
+//                .mapToDouble(Double::valueOf)
+//                .sum();
+//        resourceSum[Constants.INTENSIVE_TYPE_UP_NET_IO][Constants.OPERATION_DELETE] = pods.stream()
+//                .filter(p->p.getOperation() == Constants.OPERATION_DELETE)
+//                .map(p -> serviceMap.get(DOUtils.getServiceFullName(p)))
+//                .filter(s -> Constants.INTENSIVE_TYPE_UP_NET_IO == s.getIntensiveType())
+//                .map(Service::getUPNetIOCosume)
+//                .mapToDouble(Double::valueOf)
+//                .sum();
     }
 }

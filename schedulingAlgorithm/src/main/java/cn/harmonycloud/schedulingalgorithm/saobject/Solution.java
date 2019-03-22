@@ -30,6 +30,7 @@ public class Solution {
         // 为pod随机生成符合predicate rules的可行解
         List<String> hosts = new ArrayList<>();
         for (Pod pod : pods) {
+            // TODO 每次分配下一个pod的节点时，我们假定之前的pod已经被绑定上相应的节点（需要维护一个轻量的集群状态，因为此时并没有真的调度上去），这将影响预选条件的决策。
             String host = getRandomNode(pod, cache);
             hosts.add(host);
         }

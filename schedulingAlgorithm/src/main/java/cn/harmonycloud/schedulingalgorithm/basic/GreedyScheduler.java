@@ -42,9 +42,6 @@ public class GreedyScheduler implements Scheduler {
             // 2. 获取应用画像信息
             cache.getPortrait(schedulingRequests);
             // 3. 预排序
-            // uncomment when debugging
-//             List<Pod> sortedPods = schedulingRequests;
-            // comment out when debugging
             List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
             // 4. 逐个处理待调度pod
             for (int i = 0; i < sortedPods.size(); i++) {
@@ -65,7 +62,7 @@ public class GreedyScheduler implements Scheduler {
     }
 
     public HostPriority scheduleOne(Pod pod, boolean ifUpdateCache) {
-        LOGGER.info("start scheduleOne!");
+        LOGGER.info("start scheduleOne! operation=" + pod.getOperation() + ", servicename=" + pod.getServiceName(), ", namespace=" + pod.getNamespace());
         // 预选
         List<Node> predicatedNodes = greedyAlgorithm.predicates(pod, cache);
         if (predicatedNodes.isEmpty()) {

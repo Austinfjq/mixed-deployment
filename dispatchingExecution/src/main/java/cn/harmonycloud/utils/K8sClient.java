@@ -20,4 +20,9 @@ public class K8sClient {
         }
         return CLIENT;
     }
+
+    public static void main(String[] args){
+        KubernetesClient client = K8sClient.getInstance();
+        System.out.println(client.getVersion());
+    }
 }

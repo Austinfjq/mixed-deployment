@@ -3,7 +3,7 @@ package cn.harmonycloud.entry;
 import java.util.Date;
 
 public class Result {
-    public Integer operation; //0增加，1减少
+    public Integer operation; //1增加，2减少
     public String namespace;
     public String serviceName;
     public String number;

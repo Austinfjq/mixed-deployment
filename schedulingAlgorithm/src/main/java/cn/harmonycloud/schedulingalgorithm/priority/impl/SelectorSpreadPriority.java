@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.priority.impl;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
@@ -23,8 +24,7 @@ public class SelectorSpreadPriority implements PriorityRule {
 
     @Override
     public List<Integer> priority(Pod pod, List<Node> nodes, Cache cache) {
-        // map TODO parallel
-        List<Integer> mapResult = nodes.stream()
+        List<Integer> mapResult = (GlobalSetting.PARALLEL ? nodes.parallelStream() : nodes.stream())
                 .map(node -> calculateSpreadPriorityMap(pod, node, cache))
                 .collect(Collectors.toList());
         // reduce
@@ -91,7 +91,7 @@ public class SelectorSpreadPriority implements PriorityRule {
 
         boolean haveZones = !countsByZone.isEmpty();
         for (int i = 0; i < mapResult.size(); i++) {
-            double fScore = Constants.PRIORITY_MAX_SCORE;
+            double fScore = GlobalSetting.PRIORITY_MAX_SCORE;
             if (maxCountByNodeName > 0) {
                 if (operation == Constants.OPERATION_ADD) {
                     fScore = (maxCountByNodeName - mapResult.get(i)) / (double) maxCountByNodeName;
@@ -102,12 +102,12 @@ public class SelectorSpreadPriority implements PriorityRule {
             if (haveZones) {
                 String zoneID = RuleUtil.getZoneKey(nodes.get(i));
                 if (zoneID != null) {
-                    double zoneScore = Constants.PRIORITY_MAX_SCORE;
+                    double zoneScore = GlobalSetting.PRIORITY_MAX_SCORE;
                     if (maxCountByZone > 0) {
                         if (operation == Constants.OPERATION_ADD) {
-                            zoneScore = Constants.PRIORITY_MAX_SCORE * (maxCountByZone - countsByZone.get(zoneID)) / (double) maxCountByZone;
+                            zoneScore = GlobalSetting.PRIORITY_MAX_SCORE * (maxCountByZone - countsByZone.get(zoneID)) / (double) maxCountByZone;
                         } else {
-                            zoneScore = Constants.PRIORITY_MAX_SCORE * countsByZone.get(zoneID) / (double) maxCountByZone;
+                            zoneScore = GlobalSetting.PRIORITY_MAX_SCORE * countsByZone.get(zoneID) / (double) maxCountByZone;
                         }
                     }
                     fScore = (fScore * (1.0 - zoneWeighting)) + (zoneWeighting * zoneScore);

@@ -2,6 +2,7 @@ package cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
@@ -28,6 +29,8 @@ import cn.harmonycloud.schedulingalgorithm.priority.impl.SelectorSpreadPriority;
 import cn.harmonycloud.schedulingalgorithm.priority.impl.TaintTolerationPriority;
 import cn.harmonycloud.schedulingalgorithm.selecthost.SelectHostRule;
 import cn.harmonycloud.schedulingalgorithm.selecthost.impl.RoundRobinSelectHighest;
+import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
+import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +89,6 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
 //        弃用priorityRuleConfigs.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_ADD), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
-        // comment out when debugging
         priorityRuleConfigs.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_ADD), 1));
 
         priorityRuleConfigsOnDelete = new ArrayList<>();
@@ -94,7 +96,6 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_DELETE), 1));
 //        弃用priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_DELETE), 1));
-        // comment out when debugging
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_DELETE), 1));
 
         /*
@@ -131,13 +132,25 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
 
     @Override
     public List<Node> predicates(Pod pod, Cache cache) {
+        LOGGER.info("start predicates!");
+        if (GlobalSetting.LOG_DETAIL) {
+            List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
+            LOGGER.info("predicate rule list: " + rules.stream().map(r -> RuleUtil.getLastName(r.toString())).collect(Collectors.joining(", ")));
+        }
+
         // 分别处理各个节点
-        long enough = Integer.MAX_VALUE;
-        if (cache.getNodeList().size() > 100) {
-            enough = (long) (cache.getNodeList().size() * Constants.FILTER_PERCENTAGE);
+        long enough = Long.MAX_VALUE;
+        if (cache.getNodeList().size() > 50) {
+            enough = (long) (cache.getNodeList().size() * GlobalSetting.FILTER_PERCENTAGE);
         }
         return cache.getNodeList().stream()
-                .filter(node -> runAllPredicates(pod, node, cache))
+                .filter(node -> {
+                    boolean res = runAllPredicates(pod, node, cache);
+                    if (res) {
+                        LOGGER.info(node.getNodeName() + " predicate success for " + DOUtils.getServiceFullName(pod));
+                    }
+                    return res;
+                })
                 .limit(enough)
                 .collect(Collectors.toList());
     }
@@ -147,20 +160,33 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
         return rules.stream().allMatch(rule -> {
             try {
-                return rule.predicate(pod, node, cache);
+                boolean res = rule.predicate(pod, node, cache);
+                if (!res) {
+                    LOGGER.info(node.getNodeName() + " predicate false for " + DOUtils.getServiceFullName(pod) + " in " + RuleUtil.getLastName(rule.toString()));
+                }
+                return res;
             } catch (Exception e) {
-                LOGGER.debug("predicate rule error:" + rule);
+                LOGGER.debug("predicate rule error:" + RuleUtil.getLastName(rule.toString()));
                 e.printStackTrace();
                 return false;
             }
         });
     }
 
+    public static void main(String[] args) {
+        System.out.println(BalancedResourceAllocationPriority.class.getName());
+    }
+
     @Override
     public List<HostPriority> priorities(Pod pod, List<Node> nodes, Cache cache) {
+        LOGGER.info("start priorities!");
         List<HostPriority> result = new ArrayList<>();
         // 分别处理各个优选规则，优选规则大概只有10个
         List<PriorityRuleConfig> configs = pod.getOperation().equals(Constants.OPERATION_DELETE) ? priorityRuleConfigsOnDelete : priorityRuleConfigs;
+        if (GlobalSetting.LOG_DETAIL) {
+            LOGGER.info("Priority rule list: " + configs.stream().map(c -> RuleUtil.getLastName(c.getPriorityRule().toString())).collect(Collectors.joining(", ")));
+            LOGGER.info("Node list: " + nodes.stream().map(Node::getNodeName).collect(Collectors.joining(", ")));
+        }
         Optional<List<Integer>> optional = configs.stream()
                 .filter(config -> !config.getWeight().equals(0))
                 .map(config -> markFilteredNodes(pod, nodes, config, cache))
@@ -177,6 +203,9 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         try {
             // 优选规则内部处理各个node，可以自己决定是否对各个node的评分并发处理
             List<Integer> list = config.getPriorityRule().priority(pod, nodes, cache);
+            if (GlobalSetting.LOG_DETAIL) {
+                LOGGER.info("Priority rule score=" + list.toString() + " in " + RuleUtil.getLastName(config.getPriorityRule().toString()));
+            }
             // 计算权重后的得分
             int weight = config.getWeight();
             return list.stream().map(score -> weight * score).collect(Collectors.toList());
@@ -220,6 +249,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
      */
     @Override
     public HostPriority selectHost(List<HostPriority> hostPriorityList, Cache cache) {
+        LOGGER.info("start selectHost!");
         return selectHostRule.selectHost(hostPriorityList);
     }
 }

@@ -31,6 +31,7 @@ public class GetNodeData {
             NodeData node = new NodeData();
             node.setNodeName(d.getMetadata().getName());
             node.setLabels(d.getMetadata().getLabels());
+            node.setNodeIP(d.getStatus().getAddresses().get(0).getAddress());
 
             if (d.getSpec().getUnschedulable() != null) {
                 node.setUnschedulable(d.getSpec().getUnschedulable());
@@ -121,9 +122,9 @@ public class GetNodeData {
                         for (NodeData nodeItem : nodeList) {
                             if (nodeItem.getNodeName().equals(nodeHostName)) {
 
-                                if (nodeItem.getNodeIP().equals("")) {
-                                    nodeItem.setNodeIP(nodeHostIp);
-                                }
+//                                if (nodeItem.getNodeIP().equals("")) {
+//                                    nodeItem.setNodeIP(nodeHostIp);
+//                                }
 
                                 SetValue.run(nodeItem, valueNodeTypeList.get(index), value);
 //                                flag = false;

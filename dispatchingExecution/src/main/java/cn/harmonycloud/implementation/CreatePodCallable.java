@@ -11,10 +11,16 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Callable;
 
 public class CreatePodCallable implements Callable<Boolean> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(CreatePodCallable.class);
     private String namespace;
     private String servicename;
     private String nodeList;
@@ -24,14 +30,22 @@ public class CreatePodCallable implements Callable<Boolean> {
         this.nodeList = nodeList;
     }
     @Override
-    public Boolean call() {
+    public Boolean call() throws KeyManagementException, NoSuchAlgorithmException {
         //getOwner
-        JSONObject owner = Reference.getOwnerOfPod(namespace,servicename);
+        JSONObject owner = Reference.getOwnerOfPod(namespace ,servicename);
+        if (owner == null){
+            LOGGER.debug("Owner is null");
+            return false;
+        }
         //创建ruler
         RuleSpec ruleSpec = new RuleSpec(namespace,owner, JSONArray.parseArray(nodeList));
+//        LOGGER.info("RuleSpec:"+ruleSpec.getNodeList().size());
         Rule rule = new Rule(ruleSpec);
         ObjectMeta meta = new ObjectMetaBuilder().withName(Constants.NAME_PREFIX+ StringUtil.randomStringGenerator(5)).build();
+        meta.setNamespace(namespace);
         rule.setMetadata(meta);
+        LOGGER.info("mata:"+meta.toString());
+        LOGGER.info("Rule:"+rule.toString());
         RulesDAO.createRule(rule);
         //创建pod
         PodsImplementation.createPod(rule);

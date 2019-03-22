@@ -3,6 +3,7 @@ package cn.harmonycloud.schedulingalgorithm.utils;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.basic.GreedyScheduler;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.constant.URIs;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import net.sf.json.JSONArray;
@@ -23,9 +24,8 @@ public class ExecuteUtil {
         if (host == null) {
             return;
         }
-        LOGGER.info("start scheduleExecute!" + DOUtils.getPodFullName(pod) + ", " + host);
         try {
-            LOGGER.info((pod.getOperation() == Constants.OPERATION_ADD ? "add" : "delete") + ":Service=" + DOUtils.getServiceFullName(pod) + ",host=" + host);
+            LOGGER.info("start scheduleExecute: " + (pod.getOperation() == Constants.OPERATION_ADD ? "add" : "delete") + ": Service=" + DOUtils.getServiceFullName(pod) + ", host=" + host.getHostname());
             List<NameValuePair> paramList = new ArrayList<>();
             paramList.add(new BasicNameValuePair("namespace", pod.getNamespace()));
             paramList.add(new BasicNameValuePair("servicename", pod.getServiceName()));
@@ -37,12 +37,12 @@ public class ExecuteUtil {
                 nodeJson.put("score", host.getScore().toString());
                 jsonArray.add(nodeJson);
                 paramList.add(new BasicNameValuePair("nodeList", jsonArray.toString()));
-                uri = Constants.URI_EXECUTE_ADD;
+                uri = URIs.URI_EXECUTE_ADD;
             } else {
                 Optional<String> op = cache.getNodeMapPodList().get(host.getHostname()).stream().filter(p -> DOUtils.getServiceFullName(pod).equals(DOUtils.getServiceFullName(p))).map(Pod::getPodName).findFirst();
                 String podName = op.orElse(null);
                 paramList.add(new BasicNameValuePair("podName", podName));
-                uri = Constants.URI_EXECUTE_REMOVE;
+                uri = URIs.URI_EXECUTE_REMOVE;
             }
             String result = HttpUtil.get(uri, paramList);
             LOGGER.info("scheduleExecute result: " + result);
