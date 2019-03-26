@@ -1,9 +1,8 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
-import cn.harmonycloud.schedulingalgorithm.basic.GreedyScheduler;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
-import cn.harmonycloud.schedulingalgorithm.constant.URIs;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import net.sf.json.JSONArray;
@@ -37,12 +36,12 @@ public class ExecuteUtil {
                 nodeJson.put("score", host.getScore().toString());
                 jsonArray.add(nodeJson);
                 paramList.add(new BasicNameValuePair("nodeList", jsonArray.toString()));
-                uri = URIs.URI_EXECUTE_ADD;
+                uri = GlobalSetting.URI_EXECUTE_ADD;
             } else {
                 Optional<String> op = cache.getNodeMapPodList().get(host.getHostname()).stream().filter(p -> DOUtils.getServiceFullName(pod).equals(DOUtils.getServiceFullName(p))).map(Pod::getPodName).findFirst();
                 String podName = op.orElse(null);
                 paramList.add(new BasicNameValuePair("podName", podName));
-                uri = URIs.URI_EXECUTE_REMOVE;
+                uri = GlobalSetting.URI_EXECUTE_REMOVE;
             }
             String result = HttpUtil.get(uri, paramList);
             LOGGER.info("scheduleExecute result: " + result);

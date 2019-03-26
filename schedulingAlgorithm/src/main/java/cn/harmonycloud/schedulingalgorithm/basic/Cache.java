@@ -6,18 +6,15 @@ import cn.harmonycloud.schedulingalgorithm.affinity.PodAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
 import cn.harmonycloud.schedulingalgorithm.constant.Constants;
-import cn.harmonycloud.schedulingalgorithm.constant.URIs;
+import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import cn.harmonycloud.schedulingalgorithm.utils.HttpUtil;
 import com.google.gson.Gson;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -80,9 +77,9 @@ public class Cache {
         List<Service> serviceList;
         List<Pod> podList;
         List<Node> nodeList;
-        serviceList = (List<Service>) (Object) fetchOne(URIs.URI_GET_SERVICE, Service[].class);
-        podList = (List<Pod>) (Object) fetchOne(URIs.URI_GET_POD, Pod[].class);
-        nodeList = (List<Node>) (Object) fetchOne(URIs.URI_GET_NODE, Node[].class);
+        serviceList = (List<Service>) (Object) fetchOne(GlobalSetting.URI_GET_SERVICE, Service[].class);
+        podList = (List<Pod>) (Object) fetchOne(GlobalSetting.URI_GET_POD, Pod[].class);
+        nodeList = (List<Node>) (Object) fetchOne(GlobalSetting.URI_GET_NODE, Node[].class);
 
         serviceMap = new HashMap<>();
         if (serviceList != null) {
@@ -162,7 +159,7 @@ public class Cache {
 //                String[] split = serviceFullName.split(DOUtils.NAME_SPLIT);
 //                parameters.put("namespace", split[0]);
 //                parameters.put("serviceName", split[1]);
-//                String result = HttpUtil.post(URIs.URI_GET_POD_CONSUME, parameters);
+//                String result = HttpUtil.post(GlobalSetting.URI_GET_POD_CONSUME, parameters);
 //                JSONObject jsonObject = JSONObject.fromObject(result);
 //                Service service = serviceMap.get(serviceFullName);
 //                service.setCpuCosume(jsonObject.optString("cpuCosume"));
@@ -170,7 +167,7 @@ public class Cache {
 //                service.setDownNetIOCosume(jsonObject.optString("DownNetIOCosume"));
 //                service.setUPNetIOCosume(jsonObject.optString("UPNetIOCosume"));
 //                // 获取对应的service的资源密集类型
-//                result = HttpUtil.post(URIs.URI_GET_SERVICE_TYPE, parameters);
+//                result = HttpUtil.post(GlobalSetting.URI_GET_SERVICE_TYPE, parameters);
 //                jsonObject = JSONObject.fromObject(result);
 //                service.setIntensiveType(jsonObject.optInt("serviceType"));
 //            }
@@ -221,7 +218,7 @@ public class Cache {
             paramList.add(new BasicNameValuePair("startTime", startTime));
             paramList.add(new BasicNameValuePair("endTime", endTime));
             paramList.add(new BasicNameValuePair("id", "node"));
-            String res = HttpUtil.get(URIs.URI_GET_NODE_FORECAST, paramList);
+            String res = HttpUtil.get(GlobalSetting.URI_GET_NODE_FORECAST, paramList);
             NodeForecastData[] nodeForecastDataList = gson.fromJson(res, NodeForecastData[].class);
             for (NodeForecastData data : nodeForecastDataList) {
                 map.put(data.getNodeIP(), data);
