@@ -3,7 +3,7 @@ package cn.harmonycloud;
 import cn.harmonycloud.datapreprocess.GetNodeData;
 import cn.harmonycloud.datapreprocess.GetPodData;
 import cn.harmonycloud.datapreprocess.GetSvcData;
-import cn.harmonycloud.tools.Constant;
+import cn.harmonycloud.metric.Constant;
 import cn.harmonycloud.tools.Write2ES;
 
 import java.util.Timer;
@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 public class DataProcess {
 
-    public static Integer cacheTime = Integer.parseInt(Constant.StepTime);
+    public static Integer cacheTime = Integer.parseInt(Constant.STEP_TIME);
     //延迟时间，时间单位为毫秒
     public static Integer delay = 0;
 

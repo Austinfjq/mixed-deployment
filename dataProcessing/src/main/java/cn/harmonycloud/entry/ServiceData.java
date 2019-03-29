@@ -1,5 +1,7 @@
 package cn.harmonycloud.entry;
 
+import cn.harmonycloud.metric.Constant;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -25,6 +27,7 @@ public class ServiceData {
     private Double application;
     private String volumeType;
     private Double volumeUsage;
+    private String clusterMasterIP;
 
     private String resourceKind;
     private String resourceName;
@@ -39,6 +42,7 @@ public class ServiceData {
         this.volumeType = "";
         this.volumeUsage = 0.0;
         this.podNums = 0l;
+        this.clusterMasterIP = Constant.K8S_MASTER;
     }
 
     public ServiceData(String serviceNamespace, String serviceName, String clusterIP) {
@@ -130,6 +134,11 @@ public class ServiceData {
     public Double getVolumeUsage() {
         return volumeUsage;
     }
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
 
     public void setServiceNamespace(String serviceNamespace) {
         this.namespace = serviceNamespace;

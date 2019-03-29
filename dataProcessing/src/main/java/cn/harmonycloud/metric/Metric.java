@@ -11,8 +11,8 @@ import java.util.Properties;
 
 public class Metric {
 
-    private String hostIp;
-    private String port;
+    private static String hostIp = Constant.PROMETHEUS_HOST;
+    private static String port = Constant.PROMETHEUS_PORT;
 
     private int queryNum;
     private int labelQueryNum;
@@ -29,11 +29,11 @@ public class Metric {
     public Metric() {
     }
 
-    public String getHostIp() {
+    public static String getHostIp() {
         return hostIp;
     }
 
-    public String getPort() {
+    public static String getPort() {
         return port;
     }
 
@@ -78,9 +78,6 @@ public class Metric {
         try {
             InputStream inputStream = ClassLoader.getSystemResourceAsStream(configFile);
             pps.load(inputStream);
-
-            hostIp = pps.getProperty("hostIp");
-            port = pps.getProperty("port");
 
             queryNum = Integer.parseInt(pps.getProperty("queryNum"));
             labelQueryNum = Integer.parseInt(pps.getProperty("labelQueryNum"));
@@ -131,7 +128,7 @@ public class Metric {
 
     public static void main(String[] args) {
         Metric configFile = new Metric();
-        configFile.init("metric.properties");
+        configFile.init("nodeMetrics.properties");
     }
 
 
