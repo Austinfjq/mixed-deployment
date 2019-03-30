@@ -25,4 +25,6 @@ public class Constant {
     public static final String RESULT_POD_TYPE="resultPod";
 
     public static final int TIME_INTERVAL = 5 * 60;//单位秒
+
+    public static final String K8S_MASTER = "https://10.10.102.25:6443/";
 }

@@ -5,7 +5,6 @@ import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -49,9 +48,6 @@ import static cn.harmonycloud.datacenter.tools.Constant.*;
 public class ServiceDataDao implements IServiceDataDao {
     @Autowired
     ElasticsearchTemplate elasticsearchTemplate;
-
-    @Autowired
-    TransportClient transportClient;
 
     @Override
     public List<ServiceData> findAllServiceDatas() {
