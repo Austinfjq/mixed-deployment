@@ -6,7 +6,6 @@ import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
-import cn.harmonycloud.schedulingalgorithm.priority.DefaultMultiPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RequestedPriority implements DefaultPriorityRule, DefaultMultiPriorityRule {
+public class RequestedPriority implements DefaultPriorityRule {
     private int operation;
 
     public RequestedPriority(int operation) {
@@ -32,12 +31,12 @@ public class RequestedPriority implements DefaultPriorityRule, DefaultMultiPrior
         return (int) resourceScorer(requested, allocatable);
     }
 
-    @Override
-    public int getNodeMultiPriority(Node node, Map<String, List<Pod>> hostPodMap, Cache cache) {
-        Resource finalResource = RuleUtil.getNodeFinalResource(node, hostPodMap);
-        Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
-        return (int) resourceScorer(finalResource, allocatable);
-    }
+//    @Override
+//    public int getNodeMultiPriority(Node node, Map<String, List<Pod>> hostPodMap, Cache cache) {
+//        Resource finalResource = RuleUtil.getNodeFinalResource(node, hostPodMap);
+//        Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
+//        return (int) resourceScorer(finalResource, allocatable);
+//    }
 
     private long resourceScorer(Resource requested, Resource allocatable) {
         return (requestedScore(requested.getMilliCPU(), allocatable.getMilliCPU()) +

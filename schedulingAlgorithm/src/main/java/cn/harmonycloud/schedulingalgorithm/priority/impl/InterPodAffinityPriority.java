@@ -9,8 +9,6 @@ import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.priority.AssumePodsOnNodeMultiPriorityRule;
-import cn.harmonycloud.schedulingalgorithm.priority.DefaultMultiPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.priority.PriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 

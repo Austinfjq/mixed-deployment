@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Random;
 
-public class SimulatedAnnealingScheduler implements Scheduler {
-    private final static Logger LOGGER = LoggerFactory.getLogger(SimulatedAnnealingScheduler.class);
+public class AnnealingScheduler implements Scheduler {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AnnealingScheduler.class);
 
     private Cache cache = new Cache();
     private GreedyScheduler greedyScheduler = new GreedyScheduler();
@@ -25,7 +25,7 @@ public class SimulatedAnnealingScheduler implements Scheduler {
             cache.fetchCacheData();
             // 2. 获取应用画像信息
             cache.getPortrait(schedulingRequests);
-            Solution solution = simulatedAnnealing(schedulingRequests, cache);
+            Solution solution = annealing(schedulingRequests, cache);
         } catch (Exception e) {
             LOGGER.debug("schedule Exception:");
             e.printStackTrace();
@@ -42,32 +42,32 @@ public class SimulatedAnnealingScheduler implements Scheduler {
     private final static double constant = 0.5;
 
     /**
-     * calScore 是否计算出每轮转移后解的得分而不是得分差
-     * for debug，为 true 时会很耗时
+     * calScore 是否计算出每轮转移后解的得分，for debug
      */
     private final static boolean calScore = false;
 
     /**
      * 模拟退火计算最优解
-     * @param pods 调度请求pods
+     *
+     * @param pods  调度请求pods
      * @param cache 集群状态缓存
      * @return 模拟退火得到的解
      */
-    private Solution simulatedAnnealing(List<Pod> pods, Cache cache) {
+    private Solution annealing(List<Pod> pods, Cache cache) {
         Random random = new Random();
         Solution bestSolution = null;
         // 初始解
-        Solution solution = Solution.getRandomSolution(cache, pods);
+        Solution solution = Solution.getInitialSolution(cache, pods);
         // 开始搜索
         long count = 0;
         while (count < maxCount) {
             // 随机选取邻近状态
-            Solution newSolution = solution.neighbour();
+            Solution newSolution = solution.neighbour(cache);
             // 计算分数
             int deltaScore;
             if (calScore) {
-                int oldScore = solution.getScore();
-                int newScore = newSolution.getScore();
+                int oldScore = solution.getScore(cache);
+                int newScore = newSolution.getScore(cache);
                 if (bestSolution == null) {
                     bestSolution = oldScore > newScore ? solution : newSolution;
                 }
@@ -87,7 +87,7 @@ public class SimulatedAnnealingScheduler implements Scheduler {
         }
         if (calScore) {
             if (solution != bestSolution) {
-                LOGGER.info("Lost the best solution: score="+ bestSolution.getScore() + ", hosts=" + bestSolution.getHosts());
+                LOGGER.info("Lost the best solution: score=" + bestSolution.getScore(cache) + ", hosts=" + bestSolution.getHosts());
             } else {
                 LOGGER.info("The result solution is the best solution during simulating annealing.");
             }

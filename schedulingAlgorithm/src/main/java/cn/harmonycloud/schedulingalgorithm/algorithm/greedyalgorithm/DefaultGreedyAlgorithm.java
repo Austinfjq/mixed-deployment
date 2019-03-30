@@ -172,11 +172,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
             }
         });
     }
-
-    public static void main(String[] args) {
-        System.out.println(BalancedResourceAllocationPriority.class.getName());
-    }
-
+    
     @Override
     public List<HostPriority> priorities(Pod pod, List<Node> nodes, Cache cache) {
         LOGGER.info("start priorities!");
