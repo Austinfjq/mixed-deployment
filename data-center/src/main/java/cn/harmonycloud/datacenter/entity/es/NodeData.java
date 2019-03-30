@@ -1,5 +1,6 @@
 package cn.harmonycloud.datacenter.entity.es;
 
+import cn.harmonycloud.datacenter.tools.Constant;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -64,6 +65,7 @@ public class NodeData {
     private Double allocatableVolumesCount;
     private Map<String, String> nodeConditions;
     private String preferAvoidPodsAnnotationKey;
+    private String clusterMasterIP;
 
     public NodeData() {
         this.nodeName = "";
@@ -85,6 +87,7 @@ public class NodeData {
         this.allocatableVolumesCount = 0.0;
         this.preferAvoidPodsAnnotationKey = "";
         this.podNums = 0l;
+        this.clusterMasterIP = Constant.K8S_MASTER;
     }
 
     public NodeData(String hostName, String ip) {
@@ -208,6 +211,10 @@ public class NodeData {
         return preferAvoidPodsAnnotationKey;
     }
 
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
     }
@@ -299,6 +306,10 @@ public class NodeData {
 
     public void setPreferAvoidPodsAnnotationKey(String preferAvoidPodsAnnotationKey) {
         this.preferAvoidPodsAnnotationKey = preferAvoidPodsAnnotationKey;
+    }
+
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
     }
 
     public String getKey() {

@@ -3,11 +3,9 @@ package cn.harmonycloud.datacenter.dao.daoImpl;
 import cn.harmonycloud.datacenter.dao.INodeDataDao;
 import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.NodeData;
-import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -32,8 +30,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 import static cn.harmonycloud.datacenter.tools.Constant.*;
-import static cn.harmonycloud.datacenter.tools.Constant.SERVICE_TYPE;
-
 
 /**
  *@Author: shaodilong

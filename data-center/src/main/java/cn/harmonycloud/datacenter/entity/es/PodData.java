@@ -1,5 +1,6 @@
 package cn.harmonycloud.datacenter.entity.es;
 
+import cn.harmonycloud.datacenter.tools.Constant;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -69,6 +70,7 @@ public class PodData {
     private ArrayList<Map<String, String>> toleration;
     @Field(type = FieldType.Long)
     private Long netErrors;
+    private String clusterMasterIP;
 
     public PodData() {
         this.podName = "";
@@ -96,6 +98,7 @@ public class PodData {
         this.responseBytes = 0.0;
         this.netErrors = 0l;
         this.locateNodeIP = "";
+        this.clusterMasterIP = Constant.K8S_MASTER;
     }
 
     public PodData(String podName, String namespace) {
@@ -251,6 +254,9 @@ public class PodData {
         return netErrors;
     }
 
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
 
     public void setNamespace(String namespace) {
         this.namespace = namespace;
@@ -384,6 +390,9 @@ public class PodData {
         this.netErrors = netErrors;
     }
 
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
+    }
 
     public ArrayList<String> getKey() {
         ArrayList<String> key = new ArrayList<>();

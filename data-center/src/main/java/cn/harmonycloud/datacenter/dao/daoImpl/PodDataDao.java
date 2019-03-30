@@ -1,9 +1,7 @@
 package cn.harmonycloud.datacenter.dao.daoImpl;
 
 import cn.harmonycloud.datacenter.dao.IPodDataDao;
-import cn.harmonycloud.datacenter.entity.es.NodeData;
 import cn.harmonycloud.datacenter.entity.es.PodData;
-import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;

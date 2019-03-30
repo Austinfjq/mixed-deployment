@@ -1,5 +1,7 @@
 package cn.harmonycloud.entry;
 
+import cn.harmonycloud.metric.Constant;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -39,6 +41,7 @@ public class PodData {
     private String ownerReferencesUid;
     private ArrayList<Map<String, String>> toleration;
     private Long netErrors;
+    private String clusterMasterIP;
 
     public PodData() {
         this.podName = "";
@@ -66,6 +69,7 @@ public class PodData {
         this.responseBytes = 0.0;
         this.netErrors = 0l;
         this.locateNodeIP = "";
+        this.clusterMasterIP = Constant.K8S_MASTER;
     }
 
     public PodData(String podName, String namespace) {
@@ -203,6 +207,10 @@ public class PodData {
 
     public Long getNetErrors() {
         return netErrors;
+    }
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
     }
 
 

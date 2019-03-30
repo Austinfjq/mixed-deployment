@@ -1,5 +1,6 @@
 package cn.harmonycloud.datacenter.entity.es;
 
+import cn.harmonycloud.datacenter.tools.Constant;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -56,6 +57,7 @@ public class ServiceData {
     private Double responseTime;
     @Field(type = FieldType.Double)
     private Double application;
+    private String clusterMasterIP;
 
     private String resourceKind;
     private String resourceName;
@@ -74,6 +76,7 @@ public class ServiceData {
 
         this.volumeType = "";
         this.volumeUsage = 0.0;
+        this.clusterMasterIP = Constant.K8S_MASTER;
     }
 
     public ServiceData(String serviceNamespace, String serviceName, String clusterIP) {
@@ -182,6 +185,10 @@ public class ServiceData {
         return volumeUsage;
     }
 
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
     public void setServiceNamespace(String serviceNamespace) {
         this.namespace = serviceNamespace;
     }
@@ -268,6 +275,10 @@ public class ServiceData {
 
     public void setVolumeUsage(Double volumeUsage) {
         this.volumeUsage = volumeUsage;
+    }
+
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
     }
 
     public ArrayList<String> getKey() {

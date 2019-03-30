@@ -197,10 +197,10 @@ public class ServiceDataController {
      */
     @GetMapping("/service/resourceConsume")
     public List<Map> getResourceConsume(@RequestParam("namespace") String namespace,
-                                                 @RequestParam("serviceName") String serviceName,
-                                                 @RequestParam("clusterIP") String clusterIP,
-                                                 @RequestParam("startTime") String startTime,
-                                                 @RequestParam("endTime") String endTime){
+                                        @RequestParam("serviceName") String serviceName,
+                                        @RequestParam("clusterIP") String clusterIP,
+                                        @RequestParam("startTime") String startTime,
+                                        @RequestParam("endTime") String endTime){
         return serviceDataService.getResourceConsume(namespace,serviceName,clusterIP,startTime,endTime);
     }
 
@@ -215,10 +215,10 @@ public class ServiceDataController {
      */
     @GetMapping("/service/loadMappingInstances")
     public List<Map> getLoadMappingInstances(@RequestParam("namespace") String namespace,
-                                                              @RequestParam("serviceName") String serviceName,
-                                                              @RequestParam("clusterIP") String clusterIP,
-                                                              @RequestParam("startTime") String startTime,
-                                                              @RequestParam("endTime") String endTime){
+                                             @RequestParam("serviceName") String serviceName,
+                                             @RequestParam("clusterIP") String clusterIP,
+                                             @RequestParam("startTime") String startTime,
+                                             @RequestParam("endTime") String endTime){
         return serviceDataService.getLoadMappingInstances(namespace,serviceName,clusterIP,startTime,endTime);
     }
 

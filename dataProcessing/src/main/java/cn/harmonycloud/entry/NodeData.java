@@ -1,5 +1,7 @@
 package cn.harmonycloud.entry;
 
+import cn.harmonycloud.metric.Constant;
+
 import java.util.Map;
 
 public class NodeData {
@@ -18,6 +20,7 @@ public class NodeData {
     private Double podMaxCapacity;
     private String condition;
     private Long podNums;
+    private String clusterMasterIP;
 
     private Map<String, String> labels;
     private boolean unschedulable;
@@ -49,6 +52,7 @@ public class NodeData {
         this.allocatableVolumesCount = 0.0;
         this.preferAvoidPodsAnnotationKey = "";
         this.podNums = 0l;
+        this.clusterMasterIP = Constant.K8S_MASTER;
     }
 
     public NodeData(String hostName, String ip) {
@@ -150,6 +154,10 @@ public class NodeData {
 
     public Long getPodNums() {
         return podNums;
+    }
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
     }
 
     public void setNodeName(String nodeName) {
