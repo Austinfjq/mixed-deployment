@@ -12,7 +12,13 @@ public class DataCenterApplication {
 
     public static void main(String[] args) throws IOException {
         Properties properties = new Properties();
-        InputStream in = DataCenterApplication.class.getClassLoader().getResourceAsStream("application.properties");
+        InputStream in = null;
+
+        if(args.length != 0){//args[0]-->配置文件地址
+            in = new FileInputStream(new File(args[0]));
+        }else {
+            in = DataCenterApplication.class.getClassLoader().getResourceAsStream("application.properties");
+        }
         properties.load(in);
         SpringApplication app = new SpringApplication(DataCenterApplication.class);
         app.setDefaultProperties(properties);

@@ -38,9 +38,4 @@ CREATE TABLE `service`  (
   PRIMARY KEY (`service_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
--- ----------------------------
--- Records of service
--- ----------------------------
-INSERT INTO `service` VALUES ('id1', 'space1', 'n1', 'cluster1', 'C', 'cpu', 10, 8, 20, 5, 7, '88', 1);
-
 SET FOREIGN_KEY_CHECKS = 1;
