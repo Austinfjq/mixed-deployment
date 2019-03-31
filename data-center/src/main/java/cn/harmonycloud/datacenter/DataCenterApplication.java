@@ -18,7 +18,7 @@ public class DataCenterApplication {
             in = new FileInputStream(new File(args[0]));
         }else {
             //in = DataCenterApplication.class.getClassLoader().getResourceAsStream("application.properties");
-            in = new FileInputStream(path);
+            in = new FileInputStream(new File(path));
         }
         properties.load(in);
         SpringApplication app = new SpringApplication(DataCenterApplication.class);
