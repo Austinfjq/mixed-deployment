@@ -6,7 +6,6 @@ import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
-import cn.harmonycloud.schedulingalgorithm.priority.DefaultMultiPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 import cn.harmonycloud.schedulingalgorithm.utils.RuleUtil;
 
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BalancedResourceAllocationPriority implements DefaultPriorityRule, DefaultMultiPriorityRule {
+public class BalancedResourceAllocationPriority implements DefaultPriorityRule {
     private int operation;
 
     public BalancedResourceAllocationPriority(int operation) {
@@ -75,10 +74,10 @@ public class BalancedResourceAllocationPriority implements DefaultPriorityRule, 
         return (double) requested / (double) capacity;
     }
 
-    @Override
-    public int getNodeMultiPriority(Node node, Map<String, List<Pod>> hostPodMap, Cache cache) {
-        Resource finalResource = RuleUtil.getNodeFinalResource(node, hostPodMap);
-        Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
-        return balancedResourceScorer(finalResource, allocatable, false, 0, 0);
-    }
+//    @Override
+//    public int getNodeMultiPriority(Node node, Map<String, List<Pod>> hostPodMap, Cache cache) {
+//        Resource finalResource = RuleUtil.getNodeFinalResource(node, hostPodMap);
+//        Resource allocatable = RuleUtil.getNodeAllocatableResource(node);
+//        return balancedResourceScorer(finalResource, allocatable, false, 0, 0);
+//    }
 }

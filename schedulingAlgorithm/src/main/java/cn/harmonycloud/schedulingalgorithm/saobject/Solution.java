@@ -2,39 +2,73 @@ package cn.harmonycloud.schedulingalgorithm.saobject;
 
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
+import cn.harmonycloud.schedulingalgorithm.constant.Constants;
+import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import cn.harmonycloud.schedulingalgorithm.priority.PriorityRuleConfig;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 搜索优化算法中的解
+ * 暂未支持多线程
+ */
 public class Solution {
     private static final DefaultGreedyAlgorithm defaultGreedyAlgorithm = new DefaultGreedyAlgorithm();
     private static final Random random = new Random();
-    private Cache cache;
+    /**
+     * 待调度的pods
+     */
     private List<Pod> pods;
+    /**
+     * 为每个pod分配的节点的名字
+     */
     private List<String> hosts;
+    /**
+     * 解的评分
+     */
     private Integer score;
+    /**
+     * 本解中分配节点发生变化的pod的index
+     * 如果是初始解，indexOfChange==null
+     */
+    private Integer indexOfChange;
+    /**
+     * neighbor生成的新Solution时，假定第k个pod的host变化了，
+     * 那么cacheBeforeChange表示调度了除第k个以外所有pod之后的缓存
+     * 此缓存再调度了第k个pod到指定节点上之后，就是Solution最后的缓存
+     * 为了方便计算deltaScore
+     */
+    private Cache cacheBeforeChange;
 
-    public Solution(Cache cache, List<Pod> pods, List<String> hosts) {
-        this.cache = cache;
+    public Solution(Cache cacheBeforeChange, List<Pod> pods, List<String> hosts, Integer indexOfChange) {
+        this.cacheBeforeChange = cacheBeforeChange;
         this.pods = pods;
         this.hosts = hosts;
+        this.indexOfChange = indexOfChange;
     }
 
-    public static Solution getRandomSolution(Cache cache, List<Pod> pods) {
+    /**
+     * 生成初始解
+     */
+    public static Solution getInitialSolution(Cache cache, List<Pod> pods) {
         // 为pod随机生成符合predicate rules的可行解
         List<String> hosts = new ArrayList<>();
+        // 使用隔离的新缓存
+        Cache laterCache = cache.clone();
         for (Pod pod : pods) {
-            // TODO 每次分配下一个pod的节点时，我们假定之前的pod已经被绑定上相应的节点（需要维护一个轻量的集群状态，因为此时并没有真的调度上去），这将影响预选条件的决策。
-            String host = getRandomNode(pod, cache);
+            String host = getRandomNode(pod, laterCache);
+            laterCache.updateCache(pod, host);
             hosts.add(host);
         }
-        return new Solution(cache, pods, hosts);
+        return new Solution(null, pods, hosts, null);
     }
 
     private static String getRandomNode(Pod pod, Cache cache) {
@@ -79,24 +113,57 @@ public class Solution {
 
     /**
      * Solution 给随机一个pod，随机换一个node
-     * @return 邻近解，hosts可能与this.hosts相同
+     *
+     * @return 邻近解，它的hosts可能与this.hosts相同
      */
-    public Solution neighbour() {
-        List<String> neighbour = new ArrayList<>(this.hosts);
+    public Solution neighbour(Cache initialCache) {
         int randomInt = random.nextInt(pods.size());
+        // 重新生成缓存
+        Cache cache = initialCache.clone();
+        for (int i = 0; i < pods.size(); i++) {
+            if (i != randomInt) {
+                cache.updateCache(pods.get(i), hosts.get(i));
+            }
+        }
+        // 生成新节点，不计入cacheBeforeChange
         String node = getRandomNode(pods.get(randomInt), cache);
+        // 修改节点列表，生成解
+        List<String> neighbour = new ArrayList<>(this.hosts);
         neighbour.set(randomInt, node);
-        return new Solution(cache, pods, neighbour);
+        return new Solution(cache, pods, neighbour, randomInt);
     }
 
+    /**
+     * 计算评分差
+     * 严格地说，分数差应该是两个调度方案的每个分配的得分之和的差
+     * 这里简单计算：如果newS变异的是第k个pod，假定调度顺序是先调度别的所有pod，最后调度第k个pod，从这个调整过的顺序来看，oldS和newS只有最后一次调度时分数会不同，只计算这个部分。（实际上，同一个调度方案，调度分配相同，调度顺序不同，每个分配的得分之和可能会有不同）
+     *
+     * @param oldS 上次的解
+     * @param newS 新变异后的解
+     * @return 得分差 newScore - oldScore
+     */
     public static int getDeltaScore(Solution oldS, Solution newS) {
-        // TODO
-        return 0;
+        Cache cache = newS.cacheBeforeChange;
+        int indexOfChange = newS.indexOfChange;
+        Pod pod = newS.pods.get(indexOfChange);
+        ArrayList<Node> nodes = new ArrayList<>();
+        nodes.add(cache.getNodeMap().get(oldS.getHosts().get(indexOfChange)));
+        nodes.add(cache.getNodeMap().get(newS.getHosts().get(indexOfChange)));
+        List<HostPriority> scores = defaultGreedyAlgorithm.priorities(pod, nodes, cache);
+        return scores.get(1).getScore() - scores.get(0).getScore();
     }
 
-    public int getScore() {
+    public int getScore(Cache cache) {
+        Cache tmp = cache.clone();
         if (score == null) {
-            // TODO calculate score and store it
+            int sum = 0;
+            for (int i = 0; i < pods.size(); i++) {
+                Pod pod = pods.get(i);
+                Node[] node = new Node[]{tmp.getNodeMap().get(hosts.get(i))};
+                sum += defaultGreedyAlgorithm.priorities(pod, Arrays.asList(node), tmp).get(0).getScore();
+                tmp.updateCache(pod, hosts.get(i));
+            }
+            score = sum;
         }
         return score;
     }

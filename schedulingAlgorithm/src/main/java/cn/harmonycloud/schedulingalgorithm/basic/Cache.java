@@ -23,8 +23,10 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,15 +34,15 @@ import java.util.stream.Collectors;
 /**
  * 对service, node, pod的缓存
  */
-public class Cache {
+public class Cache implements Cloneable {
     private final static Logger LOGGER = LoggerFactory.getLogger(Cache.class);
 
-    private Map<String, Service> serviceMap;
-    private Map<String, Pod> podMap;
-    private Map<String, Node> nodeMap;
-    private List<Node> nodeList;
-    private Map<String, List<Pod>> nodeMapPodList;
-    private Map<String, NodeForecastData> nodeForecastMap; // key is node IP
+    private HashMap<String, Service> serviceMap;
+    private HashMap<String, Pod> podMap;
+    private HashMap<String, Node> nodeMap;
+    private ArrayList<Node> nodeList;
+    private HashMap<String, List<Pod>> nodeMapPodList;
+    private HashMap<String, NodeForecastData> nodeForecastMap; // key is node IP
 
     public Map<String, Service> getServiceMap() {
         return serviceMap;
@@ -76,10 +78,10 @@ public class Cache {
         LOGGER.info("start fetchCacheData!");
         List<Service> serviceList;
         List<Pod> podList;
-        List<Node> nodeList;
+        ArrayList<Node> nodeList;
         serviceList = (List<Service>) (Object) fetchOne(GlobalSetting.URI_GET_SERVICE, Service[].class);
         podList = (List<Pod>) (Object) fetchOne(GlobalSetting.URI_GET_POD, Pod[].class);
-        nodeList = (List<Node>) (Object) fetchOne(GlobalSetting.URI_GET_NODE, Node[].class);
+        nodeList = (ArrayList<Node>) (Object) fetchOne(GlobalSetting.URI_GET_NODE, Node[].class);
 
         serviceMap = new HashMap<>();
         if (serviceList != null) {
@@ -204,8 +206,8 @@ public class Cache {
         }
     }
 
-    private Map<String, NodeForecastData> fetchNodeForecast() {
-        Map<String, NodeForecastData> map = new HashMap<>();
+    private HashMap<String, NodeForecastData> fetchNodeForecast() {
+        HashMap<String, NodeForecastData> map = new HashMap<>();
         try {
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -281,6 +283,14 @@ public class Cache {
         Node node = nodeMap.get(host);
         node.setCpuUsage(node.getCpuUsage() + (isAdd ? 1 : -1) * pod.getCpuRequest());
         node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest());
+        // 更新node下端口列表
+        for (ContainerPort cp : pod.getWantPorts()) {
+            String protocol = cp.getProtocol();
+            if (protocol == null || protocol.isEmpty()) {
+                protocol = Constants.PROTOCOL_TCP;
+            }
+            node.getUsedPorts().put(cp.getContainerPort().toString(), protocol);
+        }
         // 更新node下pod列表，nodeMapPodList
         if (isAdd) {
             if (nodeMapPodList.containsKey(host)) {
@@ -299,5 +309,27 @@ public class Cache {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Cache clone() {
+        Cache result;
+        try {
+            result = (Cache) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+        result.serviceMap = (HashMap<String, Service>) serviceMap.clone();
+        result.podMap = (HashMap<String, Pod>) podMap.clone();
+        result.nodeMap = (HashMap<String, Node>) nodeMap.clone();
+        result.nodeList = (ArrayList<Node>) nodeList.clone();
+        result.nodeMapPodList = (HashMap<String, List<Pod>>) nodeMapPodList.clone();
+        result.nodeMapPodList.forEach((key, value) -> {
+            List<Pod> newColl = value == null ? new ArrayList<>() : new ArrayList<>(value);
+            result.nodeMapPodList.put(key, newColl);
+        });
+        result.nodeForecastMap = (HashMap<String, NodeForecastData>) nodeForecastMap.clone();
+        return result;
     }
 }
