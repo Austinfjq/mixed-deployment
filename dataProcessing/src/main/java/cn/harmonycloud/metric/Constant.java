@@ -5,6 +5,7 @@ import cn.harmonycloud.tools.LoadConfig;
 import java.io.InputStream;
 
 public class Constant {
+    public static String K8S_MASTER_URL;
     public static String K8S_MASTER;
     public static String URL_HOST;
     public static String URL_PORT;
@@ -22,6 +23,6 @@ public class Constant {
     }
 
     public static void main(String[] args) {
-        System.out.println(Constant.K8S_MASTER);
+        System.out.println(Constant.K8S_MASTER_URL);
     }
 }

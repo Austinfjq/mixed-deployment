@@ -112,7 +112,8 @@ public class GetPodData {
                     Map<String, String> temp = new HashMap<>();
                     for (ContainerPort cp : c.getPorts()) {
                         temp.clear();
-                        temp.put("containerPort", cp.getContainerPort().toString());
+                        temp.put("containerPort", String.valueOf(cp.getContainerPort()));
+                        temp.put("hostPort", String.valueOf(cp.getHostPort()));
                         temp.put("hostIP", cp.getHostIP());
                         temp.put("protocol", cp.getProtocol());
                         portList.add(temp.toString());
