@@ -12,10 +12,14 @@ public class Constant {
     public static String STEP_TIME;
     public static String PROMETHEUS_HOST;
     public static String PROMETHEUS_PORT;
+    public static String PROMETHEUS_NODE_CONFIG;
+    public static String PROMETHEUS_POD_CONFIG;
+    public static String PROMETHEUS_SERVICE_CONFIG;
 
     static {
         try {
-            String propertiesFilePath = "dataProcessing.properties";
+//            String propertiesFilePath = "dataProcessing.properties";
+            String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
             LoadConfig.load(Constant.class, propertiesFilePath);
         } catch (Exception e) {
             System.out.println("Properties file error!");
