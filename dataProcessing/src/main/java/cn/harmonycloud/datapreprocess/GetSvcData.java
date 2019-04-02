@@ -18,6 +18,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.harmonycloud.metric.Constant.PROMETHEUS_NODE_CONFIG;
 import static cn.harmonycloud.metric.Constant.PROMETHEUS_SERVICE_CONFIG;
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
@@ -136,7 +137,9 @@ public class GetSvcData {
 
 
         Metric configFile = new Metric();
-        configFile.init(PROMETHEUS_SERVICE_CONFIG);
+        String propertiesFilePath = System.getProperty("user.dir") + PROMETHEUS_SERVICE_CONFIG;
+
+        configFile.init(propertiesFilePath);
 
         String hostIp = configFile.getHostIp();
         String port = configFile.getPort();

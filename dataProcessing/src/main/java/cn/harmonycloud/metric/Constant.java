@@ -19,7 +19,7 @@ public class Constant {
     static {
         try {
 //            String propertiesFilePath = "dataProcessing.properties";
-            String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
+            String propertiesFilePath = System.getProperty("user.dir") + "/config/dataProcessing.properties";
             LoadConfig.load(Constant.class, propertiesFilePath);
         } catch (Exception e) {
             System.out.println("Properties file error!");
@@ -27,6 +27,6 @@ public class Constant {
     }
 
     public static void main(String[] args) {
-        System.out.println(Constant.K8S_MASTER_URL);
+        System.out.println(Constant.STEP_TIME);
     }
 }

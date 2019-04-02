@@ -1,8 +1,6 @@
 package cn.harmonycloud.metric;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +74,8 @@ public class Metric {
     public void init(String configFile) {
         Properties pps = new Properties();
         try {
-            InputStream inputStream = ClassLoader.getSystemResourceAsStream(configFile);
+//            InputStream inputStream = ClassLoader.getSystemResourceAsStream(configFile);
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(configFile));
             pps.load(inputStream);
 
             queryNum = Integer.parseInt(pps.getProperty("queryNum"));

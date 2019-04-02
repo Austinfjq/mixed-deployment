@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.harmonycloud.metric.Constant.PROMETHEUS_NODE_CONFIG;
 import static cn.harmonycloud.metric.Constant.PROMETHEUS_POD_CONFIG;
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
@@ -211,7 +212,9 @@ public class GetPodData {
         initFromApi(podList);
 
         Metric configFile = new Metric();
-        configFile.init(PROMETHEUS_POD_CONFIG);
+        String propertiesFilePath = System.getProperty("user.dir") + PROMETHEUS_POD_CONFIG;
+
+        configFile.init(propertiesFilePath);
 
         String hostIp = configFile.getHostIp();
         String port = configFile.getPort();

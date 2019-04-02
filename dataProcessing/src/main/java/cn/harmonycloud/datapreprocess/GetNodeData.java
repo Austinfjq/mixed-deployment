@@ -84,7 +84,10 @@ public class GetNodeData {
         initFromApi(nodeList);
 
         Metric configFile = new Metric();
-        configFile.init(PROMETHEUS_NODE_CONFIG);
+
+        String propertiesFilePath = System.getProperty("user.dir") + PROMETHEUS_NODE_CONFIG;
+
+        configFile.init(propertiesFilePath);
 
         String hostIp = configFile.getHostIp();
         String port = configFile.getPort();
