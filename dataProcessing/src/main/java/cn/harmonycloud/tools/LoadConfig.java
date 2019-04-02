@@ -1,5 +1,6 @@
 package cn.harmonycloud.tools;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -10,7 +11,8 @@ public class LoadConfig {
     public static void load(Class<?> configClass, String file) {
         try {
             Properties props = new Properties();
-            try (InputStream inputStream = ClassLoader.getSystemResourceAsStream(file)) {
+//            try (InputStream inputStream = ClassLoader.getSystemResourceAsStream(file)) {
+            try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
                 props.load(inputStream);
             }
             for (Field field : configClass.getDeclaredFields()) {

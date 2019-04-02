@@ -34,11 +34,4 @@ CREATE TABLE `forecastcell`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
--- ----------------------------
--- Records of forecastcell
--- ----------------------------
-INSERT INTO `forecastcell` VALUES (1, 0, 'a', 'cpuUsage', 10, 2, 'model1', 'params1', '2019-01-01');
-INSERT INTO `forecastcell` VALUES (2, 1, 'b', 'cpuUsage', 8, 1, 'model2', 'params2', '2019-01-19');
-INSERT INTO `forecastcell` VALUES (3, 0, 'c', 'cpuUsage', 6, 5, 'model3', 'params3', '2019-01-23');
-
 SET FOREIGN_KEY_CHECKS = 1;

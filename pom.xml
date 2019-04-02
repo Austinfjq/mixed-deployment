@@ -14,23 +14,23 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>data-center</module>
-        <module>loadForecasting</module>
-        <module>common</module>
+        <!--<module>data-center</module>-->
+        <!--<module>loadForecasting</module>-->
+        <!--<module>common</module>-->
         <module>dataProcessing</module>
-        <module>resourcePortrait</module>
-        <module>scenarioAnalysis</module>
-        <module>schedulingAlgorithm</module>
-        <module>evaluateSystem</module>
-        <module>dispatchingExecution</module>
-        <module>common</module>
-        <module>schedulingAlgorithm</module>
-        <module>resourcePortrait</module>
-        <module>loadForecasting</module>
-        <module>dataProcessing</module>
-        <module>evaluateSystem</module>
-        <module>dispatchingExecution</module>
-        <module>scenarioAnalysis</module>
+        <!--<module>resourcePortrait</module>-->
+        <!--<module>scenarioAnalysis</module>-->
+        <!--<module>schedulingAlgorithm</module>-->
+        <!--<module>evaluateSystem</module>-->
+        <!--<module>dispatchingExecution</module>-->
+        <!--<module>common</module>-->
+        <!--<module>schedulingAlgorithm</module>-->
+        <!--<module>resourcePortrait</module>-->
+        <!--<module>loadForecasting</module>-->
+        <!--<module>dataProcessing</module>-->
+        <!--<module>evaluateSystem</module>-->
+        <!--<module>dispatchingExecution</module>-->
+        <!--<module>scenarioAnalysis</module>-->
     </modules>
 
 
