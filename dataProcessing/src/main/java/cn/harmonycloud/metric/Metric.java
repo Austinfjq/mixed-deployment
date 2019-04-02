@@ -76,6 +76,7 @@ public class Metric {
         try {
 //            InputStream inputStream = ClassLoader.getSystemResourceAsStream(configFile);
             InputStream inputStream = new BufferedInputStream(new FileInputStream(configFile));
+            System.out.println("loadfile:"+configFile);
             pps.load(inputStream);
 
             queryNum = Integer.parseInt(pps.getProperty("queryNum"));
