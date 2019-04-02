@@ -206,7 +206,7 @@ public class Cache implements Cloneable {
         }
     }
 
-    private HashMap<String, NodeForecastData> fetchNodeForecast() {
+    HashMap<String, NodeForecastData> fetchNodeForecast() {
         HashMap<String, NodeForecastData> map = new HashMap<>();
         try {
             Calendar calendar = Calendar.getInstance();
@@ -233,7 +233,7 @@ public class Cache implements Cloneable {
         return map;
     }
 
-    private <T> List<Object> fetchOne(String uri, Class<T> clazz) {
+    <T> List<Object> fetchOne(String uri, Class<T> clazz) {
         List<Object> result = new ArrayList<>();
         String jsonStr = null;
         try {
@@ -289,7 +289,7 @@ public class Cache implements Cloneable {
             if (protocol == null || protocol.isEmpty()) {
                 protocol = Constants.PROTOCOL_TCP;
             }
-            node.getUsedPorts().put(cp.getContainerPort().toString(), protocol);
+            node.getUsedPorts().put(cp.getHostPort().toString(), protocol);
         }
         // 更新node下pod列表，nodeMapPodList
         if (isAdd) {
@@ -315,21 +315,27 @@ public class Cache implements Cloneable {
     @Override
     public Cache clone() {
         Cache result;
+//        String jsonString = gson.toJson(this);
+//        return gson.fromJson(jsonString, Cache.class);
         try {
             result = (Cache) super.clone();
+
+            result.serviceMap = (HashMap<String, Service>) serviceMap.clone();
+            result.serviceMap.forEach((key, value) -> result.serviceMap.put(key, value.clone()));
+
+            result.podMap = (HashMap<String, Pod>) podMap.clone();
+
+            result.nodeMap = (HashMap<String, Node>) nodeMap.clone();
+            result.nodeMap.forEach((key, value) -> result.nodeMap.put(key, value.clone()));
+            result.nodeList = new ArrayList<>(nodeMap.values());
+
+            result.nodeMapPodList = (HashMap<String, List<Pod>>) nodeMapPodList.clone();
+            result.nodeMapPodList.forEach((key, value) -> result.nodeMapPodList.put(key, new ArrayList<>(value)));
+
+//            result.nodeForecastMap = (HashMap<String, NodeForecastData>) nodeForecastMap.clone();
         } catch (CloneNotSupportedException e) {
             return null;
         }
-        result.serviceMap = (HashMap<String, Service>) serviceMap.clone();
-        result.podMap = (HashMap<String, Pod>) podMap.clone();
-        result.nodeMap = (HashMap<String, Node>) nodeMap.clone();
-        result.nodeList = (ArrayList<Node>) nodeList.clone();
-        result.nodeMapPodList = (HashMap<String, List<Pod>>) nodeMapPodList.clone();
-        result.nodeMapPodList.forEach((key, value) -> {
-            List<Pod> newColl = value == null ? new ArrayList<>() : new ArrayList<>(value);
-            result.nodeMapPodList.put(key, newColl);
-        });
-        result.nodeForecastMap = (HashMap<String, NodeForecastData>) nodeForecastMap.clone();
         return result;
     }
 }

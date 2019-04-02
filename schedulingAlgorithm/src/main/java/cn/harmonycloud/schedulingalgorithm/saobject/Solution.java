@@ -153,7 +153,7 @@ public class Solution {
         return scores.get(1).getScore() - scores.get(0).getScore();
     }
 
-    public int getScore(Cache cache) {
+    public int getSimpleSumScore(Cache cache) {
         Cache tmp = cache.clone();
         if (score == null) {
             int sum = 0;

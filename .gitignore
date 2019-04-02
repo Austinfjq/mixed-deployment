@@ -10,3 +10,5 @@ appLogs/
 # Intellij project files
 *.iml
 .idea/
+
+schedulingAlgorithm/src/main/resources/data

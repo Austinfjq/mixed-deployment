@@ -1,11 +1,14 @@
 package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 import cn.harmonycloud.schedulingalgorithm.affinity.Taint;
+import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Node {
+public class Node implements Cloneable {
     /**
      * unix时间
      */
@@ -281,5 +284,18 @@ public class Node {
 
     public void setAllocatableVolumesCount(Double allocatableVolumesCount) {
         this.allocatableVolumesCount = allocatableVolumesCount;
+    }
+
+    @Override
+    public Node clone() {
+        try {
+            Node n = (Node) super.clone();
+            n.setLabels(n.getLabels() == null ? null : new HashMap<>(n.getLabels()));
+            n.setUsedPorts(n.getUsedPorts() == null ? null : new HashMap<>(n.getUsedPorts()));
+            n.setImageStates(n.getImageStates() == null ? null : new HashMap<>(n.getImageStates()));
+            return n;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 }

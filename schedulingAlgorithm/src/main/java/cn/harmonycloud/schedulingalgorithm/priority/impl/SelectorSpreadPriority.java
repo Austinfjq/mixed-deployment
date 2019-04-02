@@ -94,9 +94,9 @@ public class SelectorSpreadPriority implements PriorityRule {
             double fScore = GlobalSetting.PRIORITY_MAX_SCORE;
             if (maxCountByNodeName > 0) {
                 if (operation == Constants.OPERATION_ADD) {
-                    fScore = (maxCountByNodeName - mapResult.get(i)) / (double) maxCountByNodeName;
+                    fScore *= (maxCountByNodeName - mapResult.get(i)) / (double) maxCountByNodeName;
                 } else {
-                    fScore = mapResult.get(i) / (double) maxCountByNodeName;
+                    fScore *= mapResult.get(i) / (double) maxCountByNodeName;
                 }
             }
             if (haveZones) {

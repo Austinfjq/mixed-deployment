@@ -2,9 +2,13 @@ package cn.harmonycloud.schedulingalgorithm.dataobject;
 
 public class ContainerPort {
     /**
-     * hostPort 需要用到
+     * containerPort 不需要用到
      */
     private Integer containerPort;
+    /**
+     * hostPort 不需要用到
+     */
+    private Integer hostPort;
     /**
      * protocol 需要用到
      */
@@ -20,6 +24,14 @@ public class ContainerPort {
 
     public void setContainerPort(Integer containerPort) {
         this.containerPort = containerPort;
+    }
+
+    public Integer getHostPort() {
+        return hostPort;
+    }
+
+    public void setHostPort(Integer hostPort) {
+        this.hostPort = hostPort;
     }
 
     public String getProtocol() {

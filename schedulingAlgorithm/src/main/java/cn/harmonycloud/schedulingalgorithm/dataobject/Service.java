@@ -3,7 +3,7 @@ package cn.harmonycloud.schedulingalgorithm.dataobject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Service {
+public class Service implements Cloneable {
     /**
      * for pods to be scheduled
      */
@@ -257,5 +257,16 @@ public class Service {
 
     public void setResponseTime(String responseTime) {
         this.responseTime = responseTime;
+    }
+
+    @Override
+    public Service clone() {
+        try {
+            Service s = (Service) super.clone();
+            s.setPodList((ArrayList<String>) ((ArrayList<String>) (s.getPodList())).clone());
+            return s;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 }

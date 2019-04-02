@@ -16,7 +16,7 @@ public class PodFitsHostPortsPredicate implements PredicateRule {
         Map<String, String> existingPorts = node.getUsedPorts();
         if (wantPorts != null) {
             for (ContainerPort wp : wantPorts) {
-                if (checkConflict(existingPorts, wp.getHostIP(), wp.getProtocol(), wp.getContainerPort())) {
+                if (checkConflict(existingPorts, wp.getHostIP(), wp.getProtocol(), wp.getHostPort())) {
                     return false;
                 }
             }

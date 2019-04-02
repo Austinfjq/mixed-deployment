@@ -26,7 +26,7 @@ public class GreedyScheduler implements Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(GreedyScheduler.class);
 
     private GreedyAlgorithm greedyAlgorithm = new DefaultGreedyAlgorithm();
-    private Cache cache = new Cache();
+    Cache cache = new Cache();
 
     /**
      * 每轮调度从待调度队列取出调度请求列表，在此执行调度

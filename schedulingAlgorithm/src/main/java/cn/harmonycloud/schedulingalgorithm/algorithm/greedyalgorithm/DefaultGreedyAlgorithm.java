@@ -172,10 +172,12 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
             }
         });
     }
-    
+
     @Override
     public List<HostPriority> priorities(Pod pod, List<Node> nodes, Cache cache) {
-        LOGGER.info("start priorities!");
+        if (GlobalSetting.LOG_DETAIL) {
+            LOGGER.info("start priorities!");
+        }
         List<HostPriority> result = new ArrayList<>();
         // 分别处理各个优选规则，优选规则大概只有10个
         List<PriorityRuleConfig> configs = pod.getOperation().equals(Constants.OPERATION_DELETE) ? priorityRuleConfigsOnDelete : priorityRuleConfigs;
