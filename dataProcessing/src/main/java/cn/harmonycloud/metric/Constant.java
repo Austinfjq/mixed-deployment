@@ -12,14 +12,15 @@ public class Constant {
     public static String STEP_TIME;
     public static String PROMETHEUS_HOST;
     public static String PROMETHEUS_PORT;
-    public static String PROMETHEUS_NODE_CONFIG;
-    public static String PROMETHEUS_POD_CONFIG;
-    public static String PROMETHEUS_SERVICE_CONFIG;
+    public static String PROMETHEUS_NODE_CONFIG_PATH;
+    public static String PROMETHEUS_POD_CONFIG_PATH;
+    public static String PROMETHEUS_SERVICE_CONFIG_PATH;
 
     static {
         try {
 //            String propertiesFilePath = "dataProcessing.properties";
-            String propertiesFilePath = System.getProperty("user.dir") + "/config/dataProcessing.properties";
+
+            String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
             LoadConfig.load(Constant.class, propertiesFilePath);
         } catch (Exception e) {
             System.out.println("Properties file error!");
@@ -27,6 +28,6 @@ public class Constant {
     }
 
     public static void main(String[] args) {
-        System.out.println(Constant.STEP_TIME);
+        System.out.println(Constant.K8S_MASTER_URL);
     }
 }

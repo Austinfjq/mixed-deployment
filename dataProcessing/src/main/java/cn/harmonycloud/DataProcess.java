@@ -23,10 +23,6 @@ public class DataProcess {
             @Override
             public void run() {
                 //要执行的操作
-
-//                System.out.println(Write2ES.run(GetNodeData.run(), "nodes"));
-//                System.out.println(Write2ES.run(GetPodData.run(), "pods"));
-//                System.out.println(Write2ES.run(GetSvcData.run(), "services"));
                 Write2ES.run(GetNodeData.run(), "nodes");
                 Write2ES.run(GetPodData.run(), "pods");
                 Write2ES.run(GetSvcData.run(), "services");

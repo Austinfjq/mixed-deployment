@@ -16,7 +16,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 
 import java.util.*;
 
-import static cn.harmonycloud.metric.Constant.PROMETHEUS_NODE_CONFIG;
+import static cn.harmonycloud.metric.Constant.PROMETHEUS_NODE_CONFIG_PATH;
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
@@ -85,9 +85,7 @@ public class GetNodeData {
 
         Metric configFile = new Metric();
 
-        String propertiesFilePath = System.getProperty("user.dir") + PROMETHEUS_NODE_CONFIG;
-
-        configFile.init(propertiesFilePath);
+        configFile.init(PROMETHEUS_NODE_CONFIG_PATH);
 
         String hostIp = configFile.getHostIp();
         String port = configFile.getPort();
@@ -189,7 +187,6 @@ public class GetNodeData {
             }
 
         }
-
         return nodeList;
     }
 
