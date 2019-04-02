@@ -23,7 +23,7 @@ public class Constant {
             String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
             LoadConfig.load(Constant.class, propertiesFilePath);
         } catch (Exception e) {
-            System.out.println("Properties file error!");
+            System.out.println("Properties file error!"+e);
         }
     }
 

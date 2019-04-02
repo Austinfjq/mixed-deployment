@@ -12,8 +12,11 @@ public class LoadConfig {
         try {
             Properties props = new Properties();
 //            try (InputStream inputStream = ClassLoader.getSystemResourceAsStream(file)) {
+            System.out.println("loadfile:"+file);
             try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
                 props.load(inputStream);
+            }catch (Exception e){
+                throw new RuntimeException("Error loading file: " + e, e);
             }
             for (Field field : configClass.getDeclaredFields()) {
                 if (Modifier.isStatic(field.getModifiers())) {
