@@ -17,7 +17,7 @@
         <!--<module>data-center</module>-->
         <!--<module>loadForecasting</module>-->
         <!--<module>common</module>-->
-        <module>dataProcessing</module>
+        <!--<module>dataProcessing</module>-->
         <!--<module>resourcePortrait</module>-->
         <!--<module>scenarioAnalysis</module>-->
         <!--<module>schedulingAlgorithm</module>-->
