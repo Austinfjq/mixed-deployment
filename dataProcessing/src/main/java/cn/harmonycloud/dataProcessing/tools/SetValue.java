@@ -1,14 +1,9 @@
-package cn.harmonycloud.tools;
+package cn.harmonycloud.dataProcessing.tools;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-/**
- * @Author: changliu
- * @Date: 2018/12/22 19:31
- * @Description:
- */
 public class SetValue {
     public static void run(Object item, String parmName, String parmValue) {
         try {

@@ -1,4 +1,4 @@
-package cn.harmonycloud.metric;
+package cn.harmonycloud.dataProcessing.metric;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -75,7 +75,6 @@ public class Metric {
         Properties pps = new Properties();
         try {
 //            InputStream inputStream = ClassLoader.getSystemResourceAsStream(configFile);
-            System.out.println("loadfile:"+configFile);
             InputStream inputStream = new BufferedInputStream(new FileInputStream(configFile));
             pps.load(inputStream);
 

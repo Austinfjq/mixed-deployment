@@ -1,14 +1,9 @@
-package cn.harmonycloud.tools;
+package cn.harmonycloud.dataProcessing.tools;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-/**
- * @Author: changliu
- * @Date: 2018/12/22 19:04
- * @Description:
- */
 public class ReadUrl {
     public static String read(String urlString) throws Exception {
         BufferedReader reader = null;

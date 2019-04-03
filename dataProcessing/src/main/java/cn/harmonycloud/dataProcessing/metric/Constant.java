@@ -1,8 +1,6 @@
-package cn.harmonycloud.metric;
+package cn.harmonycloud.dataProcessing.metric;
 
-import cn.harmonycloud.tools.LoadConfig;
-
-import java.io.InputStream;
+import cn.harmonycloud.dataProcessing.tools.LoadConfig;
 
 public class Constant {
     public static String K8S_MASTER_URL;
@@ -18,12 +16,12 @@ public class Constant {
 
     static {
         try {
-//            String propertiesFilePath = "dataProcessing.properties";
+//            String propertiesFilePath = "C:/Users/chang/Downloads/CO-LOCATION/mixed-deployment/dataProcessing/src/main/resources/dataProcessing.properties";
 
             String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
             LoadConfig.load(Constant.class, propertiesFilePath);
         } catch (Exception e) {
-            System.out.println("Properties file error!"+e);
+            System.out.println("Properties file error!");
         }
     }
 
