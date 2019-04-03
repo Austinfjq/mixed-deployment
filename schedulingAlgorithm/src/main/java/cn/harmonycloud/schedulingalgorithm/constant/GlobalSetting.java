@@ -37,7 +37,7 @@ public class GlobalSetting {
 
     static {
         try {
-            String propertiesFilePath = "/usr/local/scheduling-algorithm/schedulingAlgorithm.properties";
+            String propertiesFilePath = "/usr/local/scheduling-algorithm/config/schedulingAlgorithm.properties";
             ConfigLoader.load(GlobalSetting.class, propertiesFilePath);
         } catch (Exception e) {
             LOGGER.error("Properties file error!", e);
