@@ -19,8 +19,8 @@ public class Constant {
 
     static {
         try {
-            String propertiesFilePath = "C:/Users/chang/Downloads/CO-LOCATION/mixed-deployment/schedulingController/src/main/resources/schedulingController.properties";
-//            String propertiesFilePath = "/usr/local/scheduling-controller/config/schedulingController.properties";
+//            String propertiesFilePath = "C:/Users/chang/Downloads/CO-LOCATION/mixed-deployment/schedulingController/src/main/resources/schedulingController.properties";
+            String propertiesFilePath = "/usr/local/scheduling-controller/config/schedulingController.properties";
             LoadConstant.load(Constant.class,propertiesFilePath);
         } catch (Exception e) {
             System.out.println("Properties file error!");
