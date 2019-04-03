@@ -22,7 +22,7 @@ public class InternalSelector implements Selector {
             String value = entry.getValue();
             Requirement r = new Requirement();
             r.setKey(label);
-            r.setOperator(SelectOperation.Equals);
+            r.setOperatorObject(SelectOperation.Equals);
             r.setStrValues(new String[]{value});
             requirements.add(r);
         }
@@ -54,7 +54,7 @@ public class InternalSelector implements Selector {
     }
 
     private boolean matches(Requirement r, Map<String, String> ls) {
-        switch (r.getOperator()) {
+        switch (r.getOperatorObject()) {
             case In:
             case Equals:
             case DoubleEquals:
@@ -82,8 +82,8 @@ public class InternalSelector implements Selector {
                     return false;
                 }
                 int rValue = Integer.valueOf(r.getStrValues()[0]);
-                return (r.getOperator() == SelectOperation.GreaterThan && lsValue > rValue)
-                        || (r.getOperator() == SelectOperation.LessThan && lsValue < rValue);
+                return (r.getOperatorObject() == SelectOperation.GreaterThan && lsValue > rValue)
+                        || (r.getOperatorObject() == SelectOperation.LessThan && lsValue < rValue);
             default:
                 return false;
         }

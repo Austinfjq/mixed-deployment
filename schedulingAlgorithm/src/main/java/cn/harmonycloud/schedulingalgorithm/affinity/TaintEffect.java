@@ -18,4 +18,16 @@ public enum TaintEffect {
     public String getEffect() {
         return effect;
     }
+
+    public static TaintEffect getEffectObject(String o) {
+        if (TaintEffectNoSchedule.effect.equals(o)) {
+            return TaintEffectNoSchedule;
+        } else if (TaintEffectPreferNoSchedule.effect.equals(o)) {
+            return TaintEffectPreferNoSchedule;
+        } else if (TaintEffectNoExecute.effect.equals(o)) {
+            return TaintEffectNoExecute;
+        } else {
+            return null;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
+import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorOperator;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelector;
@@ -136,17 +137,17 @@ public class RuleUtil {
     }
 
     private static boolean toleratesTaint(Toleration toleration, Taint taint) {
-        if (Objects.equals(toleration.getEffect(), taint.getEffect())) {
+        if (Objects.equals(toleration.getEffect(), taint.getEffectObject())) {
             return false;
         }
         if (Objects.equals(toleration.getKey(), taint.getKey())) {
             return false;
         }
-        if (toleration.getOperator() == null) {
+        if (toleration.getOperatorObject() == null) {
             // operator == null 当作 operator == TolerationOperator.Equal
             return Objects.equals(toleration.getValue(), taint.getValue());
         }
-        switch (toleration.getOperator()) {
+        switch (toleration.getOperatorObject()) {
             case Equal:
                 return Objects.equals(toleration.getValue(), taint.getValue());
             case Exists:
@@ -205,7 +206,7 @@ public class RuleUtil {
         }
         for (LabelSelectorRequirement expr : ps.getMatchExpressions()) {
             SelectOperation op;
-            switch (LabelSelectorOperator.valueOf(expr.getOperator())) {
+            switch (expr.getOperatorObject()) {
                 case LabelSelectorOpIn:
                     op = SelectOperation.In;
                     break;
@@ -281,7 +282,20 @@ public class RuleUtil {
         }
         List<Selector> selectors = new ArrayList<>();
         for (NodeSelectorRequirement expr : nsm) {
-            switch (expr.getOperator()) {
+//            if (NodeSelectorOperator.NodeSelectorOpIn.equals(expr.getOperator())) {
+//                if (expr.getValues() == null || expr.getValues().length != 1) {
+//                    return null;
+//                }
+//                selectors.add(oneTermEqualSelector(expr.getKey(), expr.getValues()[0]));
+//            } else if (NodeSelectorOperator.NodeSelectorOpNotIn.equals(expr.getOperator())) {
+//                if (expr.getValues() == null || expr.getValues().length != 1) {
+//                    return null;
+//                }
+//                selectors.add(oneTermNotEqualSelector(expr.getKey(), expr.getValues()[0]));
+//            } else {
+//                return null;
+//            }
+            switch (expr.getOperatorObject()) {
                 case NodeSelectorOpIn:
                     if (expr.getValues() == null || expr.getValues().length != 1) {
                         return null;

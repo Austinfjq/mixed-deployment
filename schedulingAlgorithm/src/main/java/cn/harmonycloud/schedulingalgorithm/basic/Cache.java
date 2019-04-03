@@ -130,11 +130,7 @@ public class Cache implements Cloneable {
         // URI_GET_NODE_FORECAST接口增加了clusterMasterIP维度，此处还未做筛选，但NodeLoadForecastPriority效果不佳，放弃维护
 //        nodeForecastMap = fetchNodeForecast();
 
-        if (nodeList instanceof ArrayList) {
-            this.nodeList = (ArrayList<Node>) nodeList;
-        } else {
-            this.nodeList = new ArrayList<>(nodeList);
-        }
+        this.nodeList = (ArrayList<Node>) nodeList;
     }
 
     private void readAffinity(Pod pod) {
@@ -160,7 +156,7 @@ public class Cache implements Cloneable {
 
     private void readTaints(Node node) {
         String taintsStr = node.getTaints();
-        Taint[] taints = gson.fromJson(taintsStr, Taint[].class);
+        Taint[] taints = gson.fromJson(DOUtils.k8sObjectToJson(taintsStr), Taint[].class);
         node.setTaintsArray(taints);
     }
 

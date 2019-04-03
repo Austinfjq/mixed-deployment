@@ -1,6 +1,8 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
 import cn.harmonycloud.schedulingalgorithm.affinity.Affinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.NodeAffinity;
+import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.PodAntiAffinity;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
@@ -24,13 +26,6 @@ public class DOUtils {
 
     public static String getPodFullName(String podName, String namespace) {
         return podName + NAME_SPLIT + namespace;
-    }
-
-    public static void main(String[] args) {
-        // 测试k8sObjectToJson()
-        String s = "Affinity(nodeAffinity=null, podAffinity=null, podAntiAffinity=PodAntiAffinity(preferredDuringSchedulingIgnoredDuringExecution=[WeightedPodAffinityTerm(podAffinityTerm=PodAffinityTerm(labelSelector=LabelSelector(matchExpressions=[LabelSelectorRequirement(key=app, operator=In, values=[group-schedule], additionalProperties={})], matchLabels=null, additionalProperties={}), namespaces=[cbl], topologyKey=kubernetes.io/hostname, additionalProperties={}), weight=50, additionalProperties={}), WeightedPodAffinityTerm(podAffinityTerm=PodAffinityTerm(labelSelector=LabelSelector(matchExpressions=[LabelSelectorRequirement(key=app, operator=In, values=[group-schedule], additionalProperties={})], matchLabels=null, additionalProperties={}), namespaces=[cbl], topologyKey=harmonycloud.cn/group, additionalProperties={}), weight=50, additionalProperties={})], requiredDuringSchedulingIgnoredDuringExecution=[], additionalProperties={}), additionalProperties={})";
-        s = DOUtils.k8sObjectToJson(s);
-        Affinity affinity = new Gson().fromJson(s, Affinity.class);
     }
 
     /**
@@ -70,8 +65,10 @@ public class DOUtils {
                         int end2 = sb.indexOf("]", j + 1);
                         int end = end1 < end2 ? end1 : end2;
                         if (end2 != j + 1 && !isNumber(sb.substring(j + 1, end))) {
-                            sb.insert(j + 1, '\"');
-                            sb.insert(last2 + 1, '\"');
+                            if (j + 1 != last2) {
+                                sb.insert(j + 1, '\"');
+                                sb.insert(last2 + 1, '\"');
+                            }
                             for (int k = j + 1; k < last2; k++) {
                                 if (sb.charAt(k) == ',') {
                                     sb.insert(k, "\"");

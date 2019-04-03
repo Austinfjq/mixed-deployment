@@ -3,13 +3,13 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 import java.util.List;
 
 public class NodeSelector {
-    private NodeSelectorTerm[] NodeSelectorTerms;
+    private NodeSelectorTerm[] nodeSelectorTerms;
 
     public NodeSelectorTerm[] getNodeSelectorTerms() {
-        return NodeSelectorTerms;
+        return nodeSelectorTerms;
     }
 
     public void setNodeSelectorTerms(NodeSelectorTerm[] nodeSelectorTerms) {
-        NodeSelectorTerms = nodeSelectorTerms;
+        this.nodeSelectorTerms = nodeSelectorTerms;
     }
 }

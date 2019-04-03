@@ -1,6 +1,7 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
 import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
+import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorOperator;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.Requirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.SelectOperation;
@@ -16,8 +17,21 @@ public class SelectorUtil {
         }
         Selector selector = new InternalSelector();
         for (NodeSelectorRequirement expr : nsm) {
-            SelectOperation op;
-            switch (expr.getOperator()) {
+            SelectOperation op = null;
+//            if (NodeSelectorOperator.NodeSelectorOpIn.equals(expr.getOperator())) {
+//                op = SelectOperation.In;
+//            } else if (NodeSelectorOperator.NodeSelectorOpNotIn.equals(expr.getOperator())) {
+//                op = SelectOperation.NotIn;
+//            } else if (NodeSelectorOperator.NodeSelectorOpExists.equals(expr.getOperator())) {
+//                op = SelectOperation.Exists;
+//            } else if (NodeSelectorOperator.NodeSelectorOpDoesNotExist.equals(expr.getOperator())) {
+//                op = SelectOperation.DoesNotExist;
+//            } else if (NodeSelectorOperator.NodeSelectorOpGt.equals(expr.getOperator())) {
+//                op = SelectOperation.GreaterThan;
+//            } else if (NodeSelectorOperator.NodeSelectorOpLt.equals(expr.getOperator())) {
+//                op = SelectOperation.LessThan;
+//            }
+            switch (expr.getOperatorObject()) {
                 case NodeSelectorOpIn:
                     op = SelectOperation.In;
                     break;
@@ -84,7 +98,7 @@ public class SelectorUtil {
         }
         Requirement requirement = new Requirement();
         requirement.setKey(key);
-        requirement.setOperator(op);
+        requirement.setOperatorObject(op);
         requirement.setStrValues(values);
         return requirement;
     }

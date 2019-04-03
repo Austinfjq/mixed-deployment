@@ -2,8 +2,8 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 
 public class LabelSelectorRequirement {
     private String key;
-
-    private String operator;//LabelSelectorOperator
+    private String operator;
+    private LabelSelectorOperator operatorObject;
     private String[] values;
 
     public String getKey() {
@@ -28,5 +28,16 @@ public class LabelSelectorRequirement {
 
     public void setValues(String[] values) {
         this.values = values;
+    }
+
+    public LabelSelectorOperator getOperatorObject() {
+        if (operatorObject == null && operator != null) {
+            operatorObject = LabelSelectorOperator.getOperatorObject(operator);
+        }
+        return operatorObject;
+    }
+
+    public void setOperatorObject(LabelSelectorOperator operatorObject) {
+        this.operatorObject = operatorObject;
     }
 }

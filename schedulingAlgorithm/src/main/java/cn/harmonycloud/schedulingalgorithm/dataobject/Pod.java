@@ -153,6 +153,12 @@ public class Pod {
     public Pod() {
     }
 
+    public Pod(int operation, String namespace, String serviceName) {
+        this.operation = operation;
+        this.namespace = namespace;
+        this.serviceName = serviceName;
+    }
+
     public Pod(int operation, String namespace, String serviceName, String clusterMasterIP) {
         this.operation = operation;
         this.namespace = namespace;

@@ -2,9 +2,11 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 
 public class Toleration {
     private String key;
-    private TolerationOperator operator;
+    private String operator;
+    private TolerationOperator operatorObject;
     private String value;
-    private TaintEffect effect;
+    private String effect;
+    private TaintEffect effectObject;
 
     public String getKey() {
         return key;
@@ -14,12 +16,23 @@ public class Toleration {
         this.key = key;
     }
 
-    public TolerationOperator getOperator() {
+    public String getOperator() {
         return operator;
     }
 
-    public void setOperator(TolerationOperator operator) {
+    public void setOperator(String operator) {
         this.operator = operator;
+    }
+
+    public TolerationOperator getOperatorObject() {
+        if (operatorObject == null && operator != null) {
+            operatorObject = TolerationOperator.getOperatorObject(operator);
+        }
+        return operatorObject;
+    }
+
+    public void setOperatorObject(TolerationOperator operatorObject) {
+        this.operatorObject = operatorObject;
     }
 
     public String getValue() {
@@ -30,11 +43,22 @@ public class Toleration {
         this.value = value;
     }
 
-    public TaintEffect getEffect() {
+    public String getEffect() {
         return effect;
     }
 
-    public void setEffect(TaintEffect effect) {
+    public void setEffect(String effect) {
         this.effect = effect;
+    }
+
+    public TaintEffect getEffectObject() {
+        if (effectObject == null && effect != null) {
+            effectObject = TaintEffect.getEffectObject(effect);
+        }
+        return effectObject;
+    }
+
+    public void setEffectObject(TaintEffect effectObject) {
+        this.effectObject = effectObject;
     }
 }

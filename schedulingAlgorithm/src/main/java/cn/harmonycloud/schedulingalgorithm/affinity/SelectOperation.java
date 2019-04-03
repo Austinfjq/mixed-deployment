@@ -20,4 +20,28 @@ public enum SelectOperation {
     public String toString() {
         return select;
     }
+
+    public static SelectOperation getOperatorObject(String o) {
+        if (DoesNotExist.select.equals(o)) {
+            return DoesNotExist;
+        } else if (Equals.select.equals(o)) {
+            return Equals;
+        } else if (DoubleEquals.select.equals(o)) {
+            return DoubleEquals;
+        } else if (In.select.equals(o)) {
+            return In;
+        } else if (NotEquals.select.equals(o)) {
+            return NotEquals;
+        } else if (NotIn.select.equals(o)) {
+            return NotIn;
+        } else if (Exists.select.equals(o)) {
+            return Exists;
+        } else if (GreaterThan.select.equals(o)) {
+            return GreaterThan;
+        } else if (LessThan.select.equals(o)) {
+            return LessThan;
+        } else {
+            return null;
+        }
+    }
 }

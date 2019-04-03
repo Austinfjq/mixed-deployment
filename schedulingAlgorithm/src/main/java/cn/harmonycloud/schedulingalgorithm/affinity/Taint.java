@@ -3,7 +3,9 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 public class Taint {
     private String key;
     private String value;
-    private TaintEffect effect;
+    private String effect;
+    private TaintEffect effectObject;
+
     public String getKey() {
         return key;
     }
@@ -20,11 +22,22 @@ public class Taint {
         this.value = value;
     }
 
-    public TaintEffect getEffect() {
+    public String getEffect() {
         return effect;
     }
 
-    public void setEffect(TaintEffect effect) {
+    public void setEffect(String effect) {
         this.effect = effect;
+    }
+
+    public TaintEffect getEffectObject() {
+        if (effectObject == null && effect != null) {
+            effectObject = TaintEffect.getEffectObject(effect);
+        }
+        return effectObject;
+    }
+
+    public void setEffectObject(TaintEffect effectObject) {
+        this.effectObject = effectObject;
     }
 }

@@ -22,8 +22,8 @@ public class PodToleratesNodeTaintsPredicate implements PredicateRule {
         List<Toleration> tolerations = Arrays.asList(pod.getToleration());
         List<Taint> taints = Arrays.asList(node.getTaintsArray());
         // t.Effect == v1.TaintEffectNoSchedule || t.Effect == v1.TaintEffectNoExecute
-        return taints.stream().filter(t -> t.getEffect() == TaintEffect.TaintEffectNoSchedule
-                || t.getEffect() == TaintEffect.TaintEffectNoExecute)
+        return taints.stream().filter(t -> t.getEffectObject() == TaintEffect.TaintEffectNoSchedule
+                || t.getEffectObject() == TaintEffect.TaintEffectNoExecute)
                 .allMatch(taint -> RuleUtil.tolerationsTolerateTaint(tolerations, taint));
     }
 }

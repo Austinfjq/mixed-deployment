@@ -40,13 +40,13 @@ public class TaintTolerationPriority implements PriorityRule {
     }
 
     private List<Toleration> getAllTolerationPreferNoSchedule(List<Toleration> tolerations) {
-        return tolerations.stream().filter(t -> t.getEffect() == null || t.getEffect().getEffect().isEmpty() || t.getEffect() == TaintEffect.TaintEffectPreferNoSchedule).collect(Collectors.toList());
+        return tolerations.stream().filter(t -> t.getEffect() == null || t.getEffectObject().getEffect().isEmpty() || t.getEffectObject() == TaintEffect.TaintEffectPreferNoSchedule).collect(Collectors.toList());
     }
 
     private int countIntolerableTaintsPreferNoSchedule(List<Taint> taints, List<Toleration> tolerations) {
         int intolerableTaints = 0;
         for (Taint taint : taints) {
-            if (taint.getEffect() != TaintEffect.TaintEffectPreferNoSchedule) {
+            if (taint.getEffectObject() != TaintEffect.TaintEffectPreferNoSchedule) {
                 continue;
             }
             if (RuleUtil.tolerationsTolerateTaint(tolerations, taint)) {

@@ -2,7 +2,8 @@ package cn.harmonycloud.schedulingalgorithm.affinity;
 
 public class NodeSelectorRequirement {
     private String key;
-    private NodeSelectorOperator operator;
+    private String operator;
+    private NodeSelectorOperator operatorObject;
     private String[] values;
 
     public String getKey() {
@@ -13,12 +14,24 @@ public class NodeSelectorRequirement {
         this.key = key;
     }
 
-    public NodeSelectorOperator getOperator() {
+    public String getOperator() {
         return operator;
     }
 
-    public void setOperator(NodeSelectorOperator operator) {
+    public void setOperator(String operator) {
         this.operator = operator;
+    }
+
+    public NodeSelectorOperator getOperatorObject() {
+        // deal with: String operator
+        if (operatorObject == null && operator !=null) {
+            operatorObject = NodeSelectorOperator.getOperatorObject(operator);
+        }
+        return operatorObject;
+    }
+
+    public void setOperatorObject(NodeSelectorOperator operatorObject) {
+        this.operatorObject = operatorObject;
     }
 
     public String[] getValues() {
