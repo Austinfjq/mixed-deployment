@@ -7,6 +7,8 @@ import cn.harmonycloud.dataProcessing.metric.Constant;
 import cn.harmonycloud.dataProcessing.tools.Write2ES;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,12 +20,13 @@ import java.util.TimerTask;
 
 @SpringBootApplication
 public class DataProcessingApplication {
-    public static Integer cacheTime = Integer.parseInt(Constant.STEP_TIME);
-    //延迟时间，时间单位为毫秒
-    public static Integer delay = 0;
 
-    public static void run() {
+    @EventListener(ApplicationReadyEvent.class)
+    public void run() {
 
+        Integer cacheTime = Integer.parseInt(Constant.STEP_TIME);
+        //延迟时间，时间单位为毫秒
+        Integer delay = 0;
         //执行时间，时间单位为毫秒
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -38,10 +41,11 @@ public class DataProcessingApplication {
         }, delay, cacheTime);
     }
 
+
     public static void main(String[] args) {
 
         SpringApplication.run(DataProcessingApplication.class, args);
-        run();
+
     }
 
 }
