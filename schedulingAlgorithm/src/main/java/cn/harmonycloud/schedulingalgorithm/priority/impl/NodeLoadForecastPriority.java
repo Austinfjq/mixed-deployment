@@ -22,6 +22,10 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
 
     @Override
     public Integer priority(Pod pod, Node node, Cache cache) {
+        // 已弃用
+        if (true) {
+            return 0;
+        }
         // now Request resource: nodeInfo.RequestedResource().MilliCPU, and mem
         // next period resource: from node load forecast, format: cpu(0~1.0), mem(xMB)
         // score = (cpu now - cpu next) * weightA + (mem now - mem next) * weightB.

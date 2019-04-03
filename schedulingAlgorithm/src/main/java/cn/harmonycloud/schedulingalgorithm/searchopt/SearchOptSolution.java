@@ -1,12 +1,12 @@
-package cn.harmonycloud.schedulingalgorithm.saobject;
+package cn.harmonycloud.schedulingalgorithm.searchopt;
 
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
+import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithm;
+import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithmIgnoreResourcePriority;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
-import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.priority.PriorityRuleConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +20,9 @@ import java.util.stream.Collectors;
  * 搜索优化算法中的解
  * 暂未支持多线程
  */
-public class Solution {
+public class SearchOptSolution {
     private static final DefaultGreedyAlgorithm defaultGreedyAlgorithm = new DefaultGreedyAlgorithm();
+    private static final GreedyAlgorithmIgnoreResourcePriority greedyAlgorithmIgnoreResourcePriority = new GreedyAlgorithmIgnoreResourcePriority();
     private static final Random random = new Random();
     /**
      * 待调度的pods
@@ -31,10 +32,6 @@ public class Solution {
      * 为每个pod分配的节点的名字
      */
     private List<String> hosts;
-    /**
-     * 解的评分
-     */
-    private Integer score;
     /**
      * 本解中分配节点发生变化的pod的index
      * 如果是初始解，indexOfChange==null
@@ -48,7 +45,7 @@ public class Solution {
      */
     private Cache cacheBeforeChange;
 
-    public Solution(Cache cacheBeforeChange, List<Pod> pods, List<String> hosts, Integer indexOfChange) {
+    public SearchOptSolution(Cache cacheBeforeChange, List<Pod> pods, List<String> hosts, Integer indexOfChange) {
         this.cacheBeforeChange = cacheBeforeChange;
         this.pods = pods;
         this.hosts = hosts;
@@ -58,17 +55,20 @@ public class Solution {
     /**
      * 生成初始解
      */
-    public static Solution getInitialSolution(Cache cache, List<Pod> pods) {
+    public static SearchOptSolution getInitialSolution(Cache cache, List<Pod> pods) {
         // 为pod随机生成符合predicate rules的可行解
         List<String> hosts = new ArrayList<>();
         // 使用隔离的新缓存
         Cache laterCache = cache.clone();
         for (Pod pod : pods) {
             String host = getRandomNode(pod, laterCache);
+            if (host == null) {
+                return null;
+            }
             laterCache.updateCache(pod, host);
             hosts.add(host);
         }
-        return new Solution(null, pods, hosts, null);
+        return new SearchOptSolution(null, pods, hosts, null);
     }
 
     private static String getRandomNode(Pod pod, Cache cache) {
@@ -112,11 +112,11 @@ public class Solution {
     }
 
     /**
-     * Solution 给随机一个pod，随机换一个node
+     * SearchOptSolution 给随机一个pod，随机换一个node
      *
      * @return 邻近解，它的hosts可能与this.hosts相同
      */
-    public Solution neighbour(Cache initialCache) {
+    public SearchOptSolution neighbour(Cache initialCache) {
         int randomInt = random.nextInt(pods.size());
         // 重新生成缓存
         Cache cache = initialCache.clone();
@@ -130,7 +130,7 @@ public class Solution {
         // 修改节点列表，生成解
         List<String> neighbour = new ArrayList<>(this.hosts);
         neighbour.set(randomInt, node);
-        return new Solution(cache, pods, neighbour, randomInt);
+        return new SearchOptSolution(cache, pods, neighbour, randomInt);
     }
 
     /**
@@ -142,7 +142,7 @@ public class Solution {
      * @param newS 新变异后的解
      * @return 得分差 newScore - oldScore
      */
-    public static int getDeltaScore(Solution oldS, Solution newS) {
+    public static int getDeltaScore(SearchOptSolution oldS, SearchOptSolution newS) {
         Cache cache = newS.cacheBeforeChange;
         int indexOfChange = newS.indexOfChange;
         Pod pod = newS.pods.get(indexOfChange);
@@ -153,19 +153,40 @@ public class Solution {
         return scores.get(1).getScore() - scores.get(0).getScore();
     }
 
+    @Deprecated
     public int getSimpleSumScore(Cache cache) {
+        return getScoreByGreedyAlgorithm(cache, defaultGreedyAlgorithm);
+    }
+
+    public int getScoreWithFinalResource(Cache cache) {
+        int scoreIgnoreResource = getScoreByGreedyAlgorithm(cache, greedyAlgorithmIgnoreResourcePriority);
+        int resourceScore;
         Cache tmp = cache.clone();
-        if (score == null) {
-            int sum = 0;
-            for (int i = 0; i < pods.size(); i++) {
-                Pod pod = pods.get(i);
-                Node[] node = new Node[]{tmp.getNodeMap().get(hosts.get(i))};
-                sum += defaultGreedyAlgorithm.priorities(pod, Arrays.asList(node), tmp).get(0).getScore();
+        for (int i = 0; i < pods.size(); i++) {
+            Pod pod = pods.get(i);
+            if (i < pods.size() - 1) {
                 tmp.updateCache(pod, hosts.get(i));
             }
-            score = sum;
         }
-        return score;
+        Pod pod = pods.get(pods.size() - 1);
+        Node[] node = new Node[]{tmp.getNodeMap().get(hosts.get(pods.size() - 1))};
+        resourceScore = greedyAlgorithmIgnoreResourcePriority.getIgnoredPriorityRuleConfigs().stream()
+                .filter(config -> !config.getWeight().equals(0))
+                .mapToInt(config -> config.getPriorityRule().priority(pod, Arrays.asList(node), tmp).get(0) * config.getWeight())
+                .sum();
+        return scoreIgnoreResource + resourceScore * pods.size();
+    }
+
+    private int getScoreByGreedyAlgorithm(Cache cache, GreedyAlgorithm ga) {
+        Cache tmp = cache.clone();
+        int sum = 0;
+        for (int i = 0; i < pods.size(); i++) {
+            Pod pod = pods.get(i);
+            Node[] node = new Node[]{tmp.getNodeMap().get(hosts.get(i))};
+            sum += ga.priorities(pod, Arrays.asList(node), tmp).get(0).getScore();
+            tmp.updateCache(pod, hosts.get(i));
+        }
+        return sum;
     }
 
     public List<String> getHosts() {

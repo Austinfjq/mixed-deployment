@@ -132,6 +132,11 @@ public class Pod {
     private Toleration[] toleration;
 
     /**
+     * 属于哪个集群
+     */
+    private String clusterMasterIP;
+
+    /**
      * 不需要的数据
      */
     private String locateNodeIP;
@@ -148,10 +153,19 @@ public class Pod {
     public Pod() {
     }
 
-    public Pod(int operation, String namespace, String serviceName) {
+    public Pod(int operation, String namespace, String serviceName, String clusterMasterIP) {
         this.operation = operation;
         this.namespace = namespace;
         this.serviceName = serviceName;
+        this.clusterMasterIP = clusterMasterIP;
+    }
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
     }
 
     public Integer getOperation() {

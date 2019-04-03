@@ -84,12 +84,24 @@ public class Service implements Cloneable {
      * 服务网络响应时间
      */
     private String responseTime;
+    /**
+     * 属于哪个集群
+     */
+    private String clusterMasterIP;
 
     /**
      * 不需要的数据
      */
     private String[] key;
     private String nodePort;
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
+    }
 
     public String[] getKey() {
         return key;

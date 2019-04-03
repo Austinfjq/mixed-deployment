@@ -21,12 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GreedyScheduler implements Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(GreedyScheduler.class);
 
     private GreedyAlgorithm greedyAlgorithm = new DefaultGreedyAlgorithm();
-    Cache cache = new Cache();
+    MultiClusterCache multiClusterCache = new MultiClusterCache();
+    Cache cache;
 
     /**
      * 每轮调度从待调度队列取出调度请求列表，在此执行调度
@@ -38,23 +40,29 @@ public class GreedyScheduler implements Scheduler {
         LOGGER.info("start schedule!");
         try {
             // 1. 更新缓存监控数据
-            cache.fetchCacheData();
-            // 2. 获取应用画像信息
-            cache.getPortrait(schedulingRequests);
-            // 3. 预排序
-            List<Pod> sortedPods = greedyAlgorithm.presort(schedulingRequests, cache);
-            // 4. 逐个处理待调度pod
-            for (int i = 0; i < sortedPods.size(); i++) {
-                HostPriority host;
-                // 调度本轮最后一个pod后，不需再更新缓存
-                if (i == sortedPods.size() - 1) {
-                    host = scheduleOne(sortedPods.get(i), false);
-                } else {
-                    host = scheduleOne(sortedPods.get(i), true);
+            multiClusterCache.fetchMultiCacheData();
+            // 2. 调度请求pod按不同的集群分组处理
+            Map<String, List<Pod>> group = schedulingRequests.stream().collect(Collectors.groupingBy(Pod::getClusterMasterIP));
+            group.forEach((clusterMasterIP, requests) -> {
+                // 3. 取出对应的集群缓存
+                cache = multiClusterCache.get(clusterMasterIP);
+                // 4. 获取应用画像信息
+                cache.getPortrait(requests);
+                // 5. 预排序
+                List<Pod> sortedPods = greedyAlgorithm.presort(requests, cache);
+                // 6. 逐个处理待调度pod
+                for (int i = 0; i < sortedPods.size(); i++) {
+                    HostPriority host;
+                    // 7. 调度。本轮最后一个pod后，不需再更新缓存
+                    if (i == sortedPods.size() - 1) {
+                        host = scheduleOne(sortedPods.get(i), false);
+                    } else {
+                        host = scheduleOne(sortedPods.get(i), true);
+                    }
+                    // 9. 调用调度执行器，只发送一个host
+                    ExecuteUtil.scheduleExecute(sortedPods.get(i), host, cache);
                 }
-                // 调用调度执行器，只发送一个host
-                ExecuteUtil.scheduleExecute(sortedPods.get(i), host, cache);
-            }
+            });
         } catch (Exception e) {
             LOGGER.debug("schedule Exception:");
             e.printStackTrace();
@@ -63,17 +71,17 @@ public class GreedyScheduler implements Scheduler {
 
     public HostPriority scheduleOne(Pod pod, boolean ifUpdateCache) {
         LOGGER.info("start scheduleOne! operation=" + pod.getOperation() + ", servicename=" + pod.getServiceName(), ", namespace=" + pod.getNamespace());
-        // 预选
+        // 1. 预选
         List<Node> predicatedNodes = greedyAlgorithm.predicates(pod, cache);
         if (predicatedNodes.isEmpty()) {
             LOGGER.warn("Cannot find any node to schedule this pod. " + "serviceName=" + pod.getServiceName() + ",namespace=" + pod.getNamespace());
             return null;
         }
-        // 优选
+        // 2. 优选
         List<HostPriority> hostPriorityList = greedyAlgorithm.priorities(pod, predicatedNodes, cache);
-        // 挑选节点
+        // 3. 挑选节点
         HostPriority selectedHost = greedyAlgorithm.selectHost(hostPriorityList, cache);
-        // 修改缓存
+        // 4. 修改缓存
         if (ifUpdateCache) {
             cache.updateCache(pod, selectedHost.getHostname());
         }

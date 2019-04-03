@@ -42,15 +42,15 @@ import java.util.stream.Collectors;
 public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultGreedyAlgorithm.class);
 
-    private PresortRule presortRule;
+    protected PresortRule presortRule;
 
-    private List<PredicateRule> predicateRules;
-    private List<PredicateRule> predicateRulesOnDelete;
+    protected List<PredicateRule> predicateRules;
+    protected List<PredicateRule> predicateRulesOnDelete;
 
-    private List<PriorityRuleConfig> priorityRuleConfigs;
-    private List<PriorityRuleConfig> priorityRuleConfigsOnDelete;
+    protected List<PriorityRuleConfig> priorityRuleConfigs;
+    protected List<PriorityRuleConfig> priorityRuleConfigsOnDelete;
 
-    private SelectHostRule selectHostRule;
+    protected SelectHostRule selectHostRule;
 
     public DefaultGreedyAlgorithm() {
         /*
@@ -89,14 +89,14 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
 //        弃用priorityRuleConfigs.add(new PriorityRuleConfig(new ImageLocalityPriority(), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_ADD), 1));
         priorityRuleConfigs.add(new PriorityRuleConfig(new InterPodAffinityPriority(), 1));
-        priorityRuleConfigs.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_ADD), 1));
+//        弃用priorityRuleConfigs.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_ADD), 1));
 
         priorityRuleConfigsOnDelete = new ArrayList<>();
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new RequestedPriority(Constants.OPERATION_DELETE), 1));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new BalancedResourceAllocationPriority(Constants.OPERATION_DELETE), 1));
 //        弃用priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodePreferAvoidPodsPriority(Constants.OPERATION_DELETE), 10000));
         priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new SelectorSpreadPriority(Constants.OPERATION_DELETE), 1));
-        priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_DELETE), 1));
+//        弃用priorityRuleConfigsOnDelete.add(new PriorityRuleConfig(new NodeLoadForecastPriority(Constants.OPERATION_DELETE), 1));
 
         /*
         host选择策略
@@ -161,7 +161,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         return rules.stream().allMatch(rule -> {
             try {
                 boolean res = rule.predicate(pod, node, cache);
-                if (!res) {
+                if (!res && GlobalSetting.LOG_DETAIL) {
                     LOGGER.info(node.getNodeName() + " predicate false for " + DOUtils.getServiceFullName(pod) + " in " + RuleUtil.getLastName(rule.toString()));
                 }
                 return res;

@@ -8,6 +8,7 @@ public class SchedulePod {
     private String namespace;
     private String serviceName;
     private Integer number;
+    private String clusterMasterIP;
 
     public Integer getOperation() {
         return operation;
@@ -39,5 +40,13 @@ public class SchedulePod {
 
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
     }
 }

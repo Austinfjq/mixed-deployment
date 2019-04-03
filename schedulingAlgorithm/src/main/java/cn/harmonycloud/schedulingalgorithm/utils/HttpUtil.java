@@ -1,5 +1,6 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
+import com.google.gson.Gson;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -12,15 +13,20 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class HttpUtil {
+    private final static Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
+    private static Gson gson = new Gson();
 
     public static String get(String uri) {
         return get(uri, new HashMap<>());
@@ -87,5 +93,24 @@ public class HttpUtil {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public static <T> List<Object> getAndReadClass(String uri, Class<T> clazz) {
+        List<Object> result = new ArrayList<>();
+        String jsonStr = null;
+        try {
+            jsonStr = HttpUtil.get(uri);
+        } catch (Exception e) {
+            LOGGER.debug("Http request fail:\"" + uri + "\"");
+            e.printStackTrace();
+        }
+        try {
+            Object[] objects = (Object[]) gson.fromJson(jsonStr, clazz);
+            Collections.addAll(result, objects);
+        } catch (Exception e) {
+            LOGGER.debug("Data format error:");
+            e.printStackTrace();
+        }
+        return result;
     }
 }

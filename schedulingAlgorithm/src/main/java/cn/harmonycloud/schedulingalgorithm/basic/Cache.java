@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +42,7 @@ public class Cache implements Cloneable {
     private HashMap<String, Service> serviceMap;
     private HashMap<String, Pod> podMap;
     private HashMap<String, Node> nodeMap;
-    private ArrayList<Node> nodeList;
+    private List<Node> nodeList;
     private HashMap<String, List<Pod>> nodeMapPodList;
     private HashMap<String, NodeForecastData> nodeForecastMap; // key is node IP
 
@@ -74,52 +76,65 @@ public class Cache implements Cloneable {
      * 每轮调度开始时调用，获取数据，覆盖上一轮的旧数据
      */
     @SuppressWarnings("unchecked")
-    public void fetchCacheData() {
-        LOGGER.info("start fetchCacheData!");
-        List<Service> serviceList;
-        List<Pod> podList;
-        ArrayList<Node> nodeList;
-        serviceList = (List<Service>) (Object) fetchOne(GlobalSetting.URI_GET_SERVICE, Service[].class);
-        podList = (List<Pod>) (Object) fetchOne(GlobalSetting.URI_GET_POD, Pod[].class);
-        nodeList = (ArrayList<Node>) (Object) fetchOne(GlobalSetting.URI_GET_NODE, Node[].class);
+    public void fetchSingleCacheData() {
+        LOGGER.info("start fetchSingleCacheData!");
+        List<Service> serviceList = (List<Service>) (Object) fetchOne(GlobalSetting.URI_GET_SERVICE, Service[].class);
+        List<Pod> podList = (List<Pod>) (Object) fetchOne(GlobalSetting.URI_GET_POD, Pod[].class);
+        List<Node> nodeList = (List<Node>) (Object) fetchOne(GlobalSetting.URI_GET_NODE, Node[].class);
+
+        overWriteCache(serviceList, podList, nodeList);
+    }
+
+    void overWriteCache(List<Service> serviceList, List<Pod> podList, List<Node> nodeList) {
+        if (serviceList == null) {
+            serviceList = new ArrayList<>();
+        }
+        if (podList == null) {
+            podList = new ArrayList<>();
+        }
+        if (nodeList == null) {
+            nodeList = new ArrayList<>();
+        }
 
         serviceMap = new HashMap<>();
-        if (serviceList != null) {
-            serviceList.forEach(s -> serviceMap.put(DOUtils.getServiceFullName(s), s));
-        }
+        serviceList.forEach(s -> serviceMap.put(DOUtils.getServiceFullName(s), s));
+
         podMap = new HashMap<>();
         nodeMapPodList = new HashMap<>();
-        if (podList != null) {
-            podList.forEach(p -> {
-                podMap.put(DOUtils.getPodFullName(p), p);
-                if (nodeMapPodList.containsKey(p.getNodeName())) {
-                    nodeMapPodList.get(p.getNodeName()).add(p);
-                } else {
-                    List<Pod> li = new ArrayList<>();
-                    li.add(p);
-                    nodeMapPodList.put(p.getNodeName(), li);
-                }
-                // 转换Affinity格式
-                readAffinity(p);
-                // 监控数据已提供
-//                Service service = serviceMap.get(DOUtils.getServiceFullName(p));
-//                if (service.getPodList() == null) {
-//                    service.setPodList(new ArrayList<>());
-//                }
-//                service.getPodList().add(DOUtils.getPodFullName(p));
-            });
-        }
+        podList.forEach(p -> {
+            podMap.put(DOUtils.getPodFullName(p), p);
+            if (nodeMapPodList.containsKey(p.getNodeName())) {
+                nodeMapPodList.get(p.getNodeName()).add(p);
+            } else {
+                List<Pod> li = new ArrayList<>();
+                li.add(p);
+                nodeMapPodList.put(p.getNodeName(), li);
+            }
+            // 转换Affinity格式
+            readAffinity(p);
+            // 监控数据已提供
+//            Service service = serviceMap.get(DOUtils.getServiceFullName(p));
+//            if (service.getPodList() == null) {
+//                service.setPodList(new ArrayList<>());
+//            }
+//            service.getPodList().add(DOUtils.getPodFullName(p));
+        });
         nodeMap = new HashMap<>();
+
         nodeForecastMap = new HashMap<>();
-        if (nodeList != null) {
-            nodeList.forEach(n -> {
-                nodeMap.put(n.getNodeName(), n);
-                // 转换taints格式
-                readTaints(n);
-            });
-            nodeForecastMap = fetchNodeForecast();
+        nodeList.forEach(n -> {
+            nodeMap.put(n.getNodeName(), n);
+            // 转换taints格式
+            readTaints(n);
+        });
+        // URI_GET_NODE_FORECAST接口增加了clusterMasterIP维度，此处还未做筛选，但NodeLoadForecastPriority效果不佳，放弃维护
+//        nodeForecastMap = fetchNodeForecast();
+
+        if (nodeList instanceof ArrayList) {
+            this.nodeList = (ArrayList<Node>) nodeList;
+        } else {
+            this.nodeList = new ArrayList<>(nodeList);
         }
-        this.nodeList = nodeList;
     }
 
     private void readAffinity(Pod pod) {
@@ -206,6 +221,7 @@ public class Cache implements Cloneable {
         }
     }
 
+    @Deprecated
     HashMap<String, NodeForecastData> fetchNodeForecast() {
         HashMap<String, NodeForecastData> map = new HashMap<>();
         try {
@@ -234,22 +250,7 @@ public class Cache implements Cloneable {
     }
 
     <T> List<Object> fetchOne(String uri, Class<T> clazz) {
-        List<Object> result = new ArrayList<>();
-        String jsonStr = null;
-        try {
-            jsonStr = HttpUtil.get(uri);
-        } catch (Exception e) {
-            LOGGER.debug("Http request fail:\"" + uri + "\"");
-            e.printStackTrace();
-        }
-        try {
-            Object[] objects = (Object[]) gson.fromJson(jsonStr, clazz);
-            Collections.addAll(result, objects);
-        } catch (Exception e) {
-            LOGGER.debug("Data format error:");
-            e.printStackTrace();
-        }
-        return result;
+        return HttpUtil.getAndReadClass(uri, clazz);
     }
 
     /**
@@ -285,11 +286,16 @@ public class Cache implements Cloneable {
         node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest());
         // 更新node下端口列表
         for (ContainerPort cp : pod.getWantPorts()) {
-            String protocol = cp.getProtocol();
-            if (protocol == null || protocol.isEmpty()) {
-                protocol = Constants.PROTOCOL_TCP;
+            if (cp != null) {
+                if (cp.getHostPort() == null || cp.getHostPort() <= 0 || cp.getHostPort() >= 65536) {
+                    continue;
+                }
+                String protocol = cp.getProtocol();
+                if (protocol == null || protocol.isEmpty()) {
+                    protocol = Constants.PROTOCOL_TCP;
+                }
+                node.getUsedPorts().put(cp.getHostPort().toString(), protocol);
             }
-            node.getUsedPorts().put(cp.getHostPort().toString(), protocol);
         }
         // 更新node下pod列表，nodeMapPodList
         if (isAdd) {

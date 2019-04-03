@@ -49,7 +49,7 @@ public class SchedulingAlgorithmController {
                     sp.setNumber(1);
                 }
                 for (int i = 0; i < sp.getNumber(); i++) {
-                    Pod pod = new Pod(sp.getOperation(), sp.getNamespace(), sp.getServiceName());
+                    Pod pod = new Pod(sp.getOperation(), sp.getNamespace(), sp.getServiceName(), sp.getClusterMasterIP());
                     podList.add(pod);
                 }
             }

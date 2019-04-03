@@ -102,6 +102,19 @@ public class Node implements Cloneable {
      */
     private Double allocatableVolumesCount;
 
+    /**
+     * 属于哪个集群
+     */
+    private String clusterMasterIP;
+
+    public String getClusterMasterIP() {
+        return clusterMasterIP;
+    }
+
+    public void setClusterMasterIP(String clusterMasterIP) {
+        this.clusterMasterIP = clusterMasterIP;
+    }
+
     public String getTime() {
         return time;
     }
