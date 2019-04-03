@@ -50,7 +50,7 @@ public class NodeDAO {
     public static String getForecastNode(String startTime, String endTime) {
 
         String params="id=node"+"&startTime="+startTime+"&endTime="+endTime;
-        String url = "http://" + Constant.HOST + ":" + Constant.PORT + "/forecast/forecastValues";
+        String url = "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/forecast/forecastValues";
 
         return sendGet(url,params);
     }
@@ -67,7 +67,7 @@ public class NodeDAO {
     }
 
     public static List<NowNode> getNowNodeList() {
-        String servicesStr = sendGet("http://"+ Constant.HOST+":"+Constant.PORT+"/nowNode","");
+        String servicesStr = sendGet("http://"+ Constant.URL_HOST+":"+Constant.URL_PORT+"/nowNode","");
 
         if (null == servicesStr) {
             System.out.println("get now node data failed!");

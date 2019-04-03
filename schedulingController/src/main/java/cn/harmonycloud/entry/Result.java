@@ -1,5 +1,7 @@
 package cn.harmonycloud.entry;
 
+import cn.harmonycloud.tools.Constant;
+
 import java.util.Date;
 
 public class Result {
@@ -7,6 +9,7 @@ public class Result {
     public String namespace;
     public String serviceName;
     public String number;
+    public String clusterMasterIP;
 
     public Result() {
     }
@@ -16,6 +19,7 @@ public class Result {
         this.namespace = namespace;
         this.serviceName = serviceName;
         this.number = number;
+        this.clusterMasterIP= Constant.K8S_MASTER;
     }
 
     public Integer getOperation() {

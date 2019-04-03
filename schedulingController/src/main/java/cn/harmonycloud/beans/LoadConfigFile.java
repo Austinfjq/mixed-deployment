@@ -6,7 +6,9 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
@@ -22,9 +24,10 @@ public class LoadConfigFile {
 
         try {
             SAXReader reader = new SAXReader();
-//            URL fileURL = LoadConfigFile.class.getClass().getResource("config.xml");
+//            URL fileURL = LoadConfigFile.class.getClass().getResource("strategyConfig.xml");
 //            System.out.println(fileURL);
-            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FIME_NAME);
+//            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FIME_PATH);
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(CONFIG_FIME_PATH));
             Document document = reader.read(inputStream);
 
             Element root = document.getRootElement();

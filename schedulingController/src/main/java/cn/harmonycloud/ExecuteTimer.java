@@ -19,8 +19,8 @@ public class ExecuteTimer {
 
         for (Config cfg : configList) {
 
-            long daySpan = 24 * 60 * 60 * 1000;
-//            long daySpan = 1000;
+//            long daySpan = 24 * 60 * 60 * 1000;
+            long daySpan = 1000;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + cfg.getTime());
 
             try {

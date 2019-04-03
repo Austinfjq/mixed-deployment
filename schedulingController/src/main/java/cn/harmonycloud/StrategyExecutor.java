@@ -12,10 +12,6 @@ import cn.harmonycloud.tools.HttpSend;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 import static java.lang.Math.abs;
@@ -39,8 +35,6 @@ public class StrategyExecutor {
         this.offlineNum = offlineNum;
 
     }
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(StrategyExecutor.class);
 
 
     public static ArrayList<Result> getResults(int onlineNum, int offlineNum) {
@@ -109,14 +103,12 @@ public class StrategyExecutor {
         String returnValue = JSON.toJSONString(getResults(onlineNum, offlineNum), WriteMapNullValue,
                 WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
 
-
-        LOGGER.info("StrategyExecutor return value: " + returnValue);
         Date nowTime = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(df.format(nowTime));
         System.out.println(returnValue);
 
-        HttpSend.sendPost("POST", "http://" + Constant.HOST + ":" + Constant.PORT2 + "/" + "schedulepod", returnValue);
+        HttpSend.sendPost("POST", "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT2 + "/" + "schedulepod", returnValue);
     }
 
 }

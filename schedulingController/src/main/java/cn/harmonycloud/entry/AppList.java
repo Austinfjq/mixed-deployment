@@ -5,10 +5,12 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
-import static cn.harmonycloud.tools.Constant.CONFIG_FIME_NAME;
+import static cn.harmonycloud.tools.Constant.CONFIG_FIME_PATH;
 import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
 
@@ -39,9 +41,10 @@ public class AppList {
 
         try {
             SAXReader reader = new SAXReader();
-//            URL fileURL = LoadConfigFile.class.getClass().getResource("config.xml");
+//            URL fileURL = LoadConfigFile.class.getClass().getResource("strategyConfig.xml");
 //            System.out.println(fileURL);
-            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FIME_NAME);
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(CONFIG_FIME_PATH));
+//            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FIME_PATH);
             Document document = reader.read(inputStream);
 
             Element root = document.getRootElement();

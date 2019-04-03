@@ -29,13 +29,13 @@ public class ServiceDAO {
     public static String getForecastService(String startTime, String endTime) {
 
         String params="id=service"+"&startTime="+startTime+"&endTime="+endTime;
-        String url = "http://" + Constant.HOST + ":" + Constant.PORT + "/forecast/forecastValues";
+        String url = "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/forecast/forecastValues";
 
         return sendGet(url,params);
     }
 
     public static List<NowService> getNowServiceList() {
-        String servicesStr = sendGet("http://" + Constant.HOST + ":" + Constant.PORT + "/nowService", "");
+        String servicesStr = sendGet("http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/nowService", "");
 
         if (null == servicesStr) {
             System.out.println("get now service data failed!");

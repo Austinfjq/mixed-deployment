@@ -31,6 +31,7 @@
         <!--<module>evaluateSystem</module>-->
         <!--<module>dispatchingExecution</module>-->
         <!--<module>scenarioAnalysis</module>-->
+         <module>schedulingController</module>
     </modules>
 
 
