@@ -72,10 +72,20 @@ class FakeCache extends Cache {
     public void getPortrait(List<Pod> pods) {
         super.getPortrait(pods);
         // 修改资源请求量 fake data
-        pods.forEach(p -> {
-            p.setCpuRequest(random.nextDouble() * 4 * 0.1);
-            p.setMemRequest(random.nextDouble() * 7.6E9 * 0.1);
-        });
+        for (int i = 0; i < pods.size(); i++) {
+            Pod p = pods.get(i);
+            if (i % 2 == 0) {
+                p.setCpuRequest(random.nextDouble() * 4 * 0.7);
+                p.setMemRequest(random.nextDouble() * 7.6E9 * 0.01);
+            } else if (i % 2 == 1) {
+                p.setCpuRequest(random.nextDouble() * 4 * 0.01);
+                p.setMemRequest(random.nextDouble() * 7.6E9 * 0.7);
+            }
+//            else {
+//                p.setCpuRequest(random.nextDouble() * 4 * 0.5);
+//                p.setMemRequest(random.nextDouble() * 7.6E9 * 0.5);
+//            }
+        }
     }
 
     @Override

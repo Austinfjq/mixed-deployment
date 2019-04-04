@@ -3,6 +3,7 @@ package cn.harmonycloud.schedulingalgorithm.searchopt;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithmIgnoreResourcePriority;
+import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithmOnlyResourcePriority;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
@@ -14,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class SearchOptSolution {
     private static final DefaultGreedyAlgorithm defaultGreedyAlgorithm = new DefaultGreedyAlgorithm();
     private static final GreedyAlgorithmIgnoreResourcePriority greedyAlgorithmIgnoreResourcePriority = new GreedyAlgorithmIgnoreResourcePriority();
+    private static final GreedyAlgorithmOnlyResourcePriority greedyAlgorithmOnlyResourcePriority = new GreedyAlgorithmOnlyResourcePriority();
     private static final Random random = new Random();
     /**
      * 待调度的pods
@@ -83,6 +84,9 @@ public class SearchOptSolution {
                 // 随机生成节点，避开之前生成过的失败节点
                 randomNode = cache.getNodeList().get(random.nextInt(nodeNum));
                 tryTimes++;
+                if (tryTimes > nodeNum) {
+                    break;
+                }
             }
             // 测试预选规则
             boolean predicateResult = defaultGreedyAlgorithm.runAllPredicates(pod, randomNode, cache);
@@ -177,6 +181,7 @@ public class SearchOptSolution {
         // Normalize
         resourceScore = resourceScore * pods.size() / tmp.getNodeList().size();
         return scoreIgnoreResource + (int) resourceScore;
+//        return (int) resourceScore;
     }
 
     private int getScoreByGreedyAlgorithm(Cache cache, GreedyAlgorithm ga) {

@@ -28,22 +28,22 @@ public class AnnealingScheduler implements Scheduler {
         showCacheResource();
         GlobalSetting.LOG_DETAIL = false;
         List<Pod> podList = new ArrayList<>();
-        for (int i = 0; i < 5 * 5; i++) {
-            podList.add(new Pod(1, "wordpress", "wordpress-mysql"));
-        }
-        for (int i = 0; i < 5 * 5; i++) {
+//        for (int i = 0; i < 5; i++) {
+//            podList.add(new Pod(1, "wordpress", "wordpress-mysql"));
+//        }
+        for (int i = 0; i < 10; i++) {
             podList.add(new Pod(1, "wordpress", "wordpress-wp"));
         }
         Scheduler scheduler = new AnnealingScheduler();
         scheduler.schedule(podList);
         if (runManyTimes) {
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 20; i++) {
                 Scheduler scheduler1 = new AnnealingScheduler();
                 scheduler1.schedule(podList);
             }
             LOGGER.info("improvementList=" + improvementList);
-            LOGGER.info("improvement=" + improvementList.stream().mapToDouble(Double::doubleValue).average().orElse(-9999D));
-            LOGGER.info("UseBothImprovement=" + improvementList.stream().mapToDouble(Double::doubleValue).map(d -> d < 0 ? 0 : d).average().orElse(-9999D));
+            LOGGER.info("improvement=" + improvementList.stream().mapToDouble(Double::doubleValue).average().orElse(-9999D) * 100 + "%");
+            LOGGER.info("UseBothImprovement=" + improvementList.stream().mapToDouble(Double::doubleValue).map(d -> d < 0 ? 0 : d).average().orElse(-9999D) * 100 + "%");
             LOGGER.info("good=" + good + ",bad=" + bad);
         }
     }
@@ -153,7 +153,6 @@ public class AnnealingScheduler implements Scheduler {
         }
         return new SearchOptSolution(null, sortedPods, hosts, -1);
     }
-
 
     /**
      * 退火速度 0<rate<1
