@@ -2,6 +2,7 @@ package cn.harmonycloud;
 
 import cn.harmonycloud.beans.LoadConfigFile;
 import cn.harmonycloud.entry.Config;
+import cn.harmonycloud.tools.Constant;
 import cn.harmonycloud.tools.Write2ES;
 
 import java.text.SimpleDateFormat;
@@ -19,8 +20,7 @@ public class ExecuteTimer {
 
         for (Config cfg : configList) {
 
-//            long daySpan = 24 * 60 * 60 * 1000;
-            long daySpan = 1000;
+            long daySpan = Constant.TIME_STEP;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + cfg.getTime());
 
             try {

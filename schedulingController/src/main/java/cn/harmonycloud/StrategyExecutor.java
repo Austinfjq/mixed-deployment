@@ -108,7 +108,7 @@ public class StrategyExecutor {
         System.out.println(df.format(nowTime));
         System.out.println(returnValue);
 
-        HttpSend.sendPost("POST", "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT2 + "/" + "schedulepod", returnValue);
+        HttpSend.sendPost("POST", "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/" + "schedulepod", returnValue);
     }
 
 }

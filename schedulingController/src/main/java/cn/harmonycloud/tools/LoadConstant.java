@@ -1,18 +1,21 @@
 package cn.harmonycloud.tools;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Properties;
 
+import static cn.harmonycloud.tools.Constant.CONFIG_FILE_PATH;
+
 public class LoadConstant {
     public static void load(Class<?> configClass, String file) {
         try {
             Properties props = new Properties();
 //            try (InputStream inputStream = ClassLoader.getSystemResourceAsStream(file)) {
-            try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+            try (InputStream inputStream = new FileInputStream(new File(file));) {
                 props.load(inputStream);
             }
             for (Field field : configClass.getDeclaredFields()) {
@@ -47,6 +50,9 @@ public class LoadConstant {
         }
         if (type == double.class) {
             return Double.parseDouble(value);
+        }
+        if (type == long.class) {
+            return Long.parseLong(value);
         }
         throw new IllegalArgumentException("Unknown configuration value type: " + type.getName());
     }

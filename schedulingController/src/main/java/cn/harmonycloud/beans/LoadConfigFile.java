@@ -24,10 +24,9 @@ public class LoadConfigFile {
 
         try {
             SAXReader reader = new SAXReader();
-//            URL fileURL = LoadConfigFile.class.getClass().getResource("strategyConfig.xml");
-//            System.out.println(fileURL);
-//            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FIME_PATH);
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(CONFIG_FIME_PATH));
+
+//            InputStream inputStream = ClassLoader.getSystemResourceAsStream(CONFIG_FILE_PATH);
+            InputStream inputStream = new FileInputStream(new File(CONFIG_FILE_PATH));
             Document document = reader.read(inputStream);
 
             Element root = document.getRootElement();
