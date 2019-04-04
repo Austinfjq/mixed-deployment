@@ -1,7 +1,12 @@
 package cn.harmonycloud.schedulingalgorithm.basic;
 
+import cn.harmonycloud.schedulingalgorithm.constant.Constants;
 import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
+import cn.harmonycloud.schedulingalgorithm.dataobject.ContainerPort;
 import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
+import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
+import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +16,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 class FakeCache extends Cache {
     private final static Logger LOGGER = LoggerFactory.getLogger(FakeCache.class);
     private static Gson gson = new Gson();
+    private static Random random = new Random();
 
     private String nowService;
     private String nowNode;
@@ -57,6 +66,16 @@ class FakeCache extends Cache {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Override
+    public void getPortrait(List<Pod> pods) {
+        super.getPortrait(pods);
+        // 修改资源请求量 fake data
+        pods.forEach(p -> {
+            p.setCpuRequest(random.nextDouble() * 4 * 0.1);
+            p.setMemRequest(random.nextDouble() * 7.6E9 * 0.1);
+        });
     }
 
     @Override

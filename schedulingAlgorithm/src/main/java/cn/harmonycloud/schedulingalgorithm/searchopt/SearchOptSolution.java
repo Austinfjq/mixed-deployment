@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -160,21 +161,22 @@ public class SearchOptSolution {
 
     public int getScoreWithFinalResource(Cache cache) {
         int scoreIgnoreResource = getScoreByGreedyAlgorithm(cache, greedyAlgorithmIgnoreResourcePriority);
-        int resourceScore;
         Cache tmp = cache.clone();
         for (int i = 0; i < pods.size(); i++) {
             Pod pod = pods.get(i);
-            if (i < pods.size() - 1) {
-                tmp.updateCache(pod, hosts.get(i));
-            }
+            tmp.updateCache(pod, hosts.get(i));
         }
-        Pod pod = pods.get(pods.size() - 1);
-        Node[] node = new Node[]{tmp.getNodeMap().get(hosts.get(pods.size() - 1))};
-        resourceScore = greedyAlgorithmIgnoreResourcePriority.getIgnoredPriorityRuleConfigs().stream()
+        Pod emptyPod = new Pod(1, null, null);
+        emptyPod.setCpuRequest(0D);
+        emptyPod.setMemRequest(0D);
+        List<Node> nodes = tmp.getNodeList();
+        long resourceScore = greedyAlgorithmIgnoreResourcePriority.getIgnoredPriorityRuleConfigs().stream()
                 .filter(config -> !config.getWeight().equals(0))
-                .mapToInt(config -> config.getPriorityRule().priority(pod, Arrays.asList(node), tmp).get(0) * config.getWeight())
+                .mapToLong(config -> config.getWeight() * config.getPriorityRule().priority(emptyPod, nodes, tmp).stream().mapToLong(Integer::longValue).sum())
                 .sum();
-        return scoreIgnoreResource + resourceScore * pods.size();
+        // Normalize
+        resourceScore = resourceScore * pods.size() / tmp.getNodeList().size();
+        return scoreIgnoreResource + (int) resourceScore;
     }
 
     private int getScoreByGreedyAlgorithm(Cache cache, GreedyAlgorithm ga) {
