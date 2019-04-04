@@ -40,7 +40,7 @@ public class HttpClientUtil {
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
     private static String URL = StringUtil.combineUrl(Config.DB_SERVER+":8080/management");
 
-    public static String httpGet(Map<String,String> paramMap) throws KeyManagementException, NoSuchAlgorithmException {
+    public static String httpGet(Map<String,String> paramMap)  {
         List<NameValuePair> paramList = new ArrayList<>();
         for (Map.Entry<String,String> entry : paramMap.entrySet()){
             paramList.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
@@ -51,7 +51,6 @@ public class HttpClientUtil {
         HttpGet httpget = null;
         String result = null;
         try {
-            System.out.println("URL:"+URL);
             uriBuilder = new URIBuilder(URL);
             uriBuilder.setParameters(paramList);
 //            System.out.println("uri:"+uriBuilder.build().toString());
@@ -63,6 +62,7 @@ public class HttpClientUtil {
             LOGGER.debug("Protocal is not available!");
             e.printStackTrace();
         } catch (URISyntaxException e) {
+            LOGGER.debug("URI["+URL+"] syntax is error!");
             e.printStackTrace();
         }catch (IOException e) {
             LOGGER.debug("There is something wrong with IO");

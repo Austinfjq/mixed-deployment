@@ -1,7 +1,7 @@
 package cn.harmonycloud.interfaces;
 
-import cn.harmonycloud.implementation.CreatePodCallable;
-import cn.harmonycloud.implementation.DeletePodCallable;
+import cn.harmonycloud.controller.PodController;
+import cn.harmonycloud.thread.DeletePodCallable;
 import cn.harmonycloud.utils.ThreadPoolUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,18 +18,18 @@ public class DispatchInterfaces {
     private final static Logger LOGGER = LoggerFactory.getLogger(DispatchInterfaces.class);
     //createPod
     @RequestMapping("/createPod")
-    public boolean createPod(String namespace,String servicename,String nodeList) throws ExecutionException, InterruptedException {
+    public boolean createPod(String masterIp,String namespace,String servicename,String nodeList) throws ExecutionException, InterruptedException {
         LOGGER.info("#######Create a Pod#######");
-        CreatePodCallable createPodCallable = new CreatePodCallable(namespace,servicename,nodeList);
-        Future<Boolean> result = ThreadPoolUtils.getInstance().submit(createPodCallable);
-        return result.get().booleanValue();
+        boolean result = PodController.createPodController(masterIp,namespace,servicename,nodeList);
+//        Future<Boolean> result = ;
+        return result;
     }
 
     //deletePod
     @RequestMapping("/deletePod")
-    public boolean deletePod(String namespace,String servicename,String podname) throws ExecutionException, InterruptedException {
+    public boolean deletePod(String masterIp,String namespace,String servicename,String podname) throws ExecutionException, InterruptedException {
         LOGGER.info("#######Delete a Pod#######");
-        DeletePodCallable deletePodCallable = new DeletePodCallable(namespace,servicename,podname);
+        DeletePodCallable deletePodCallable = new DeletePodCallable(masterIp,namespace,servicename,podname);
         Future<Boolean> result = ThreadPoolUtils.getInstance().submit(deletePodCallable);
         return result.get().booleanValue();
     }

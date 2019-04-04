@@ -1,8 +1,8 @@
-package cn.harmonycloud.implementation;
+package cn.harmonycloud.thread;
 
+import cn.harmonycloud.kubernetesDAO.PodsDAO;
 import cn.harmonycloud.reference.Reference;
 import cn.harmonycloud.utils.OwnTypes;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +13,13 @@ import java.util.concurrent.Callable;
 
 public class DeletePodCallable implements Callable<Boolean> {
     private final static Logger LOGGER = LoggerFactory.getLogger(DeletePodCallable.class);
-
+    private String masterIp;
     private String servicename;
     private String namepsace;
     private String podName;
 
-    public DeletePodCallable(String namespace,String servicename,String podname){
+    public DeletePodCallable(String masterIp,String namespace,String servicename,String podname){
+        this.masterIp = masterIp;
         this.namepsace = namespace;
         this.servicename = servicename;
         this.podName = podname;
@@ -26,9 +27,9 @@ public class DeletePodCallable implements Callable<Boolean> {
     @Override
     public Boolean call() throws KeyManagementException, NoSuchAlgorithmException {
         //Owner
-        JSONObject owner = Reference.getOwnerOfPod(namepsace,servicename);
+        JSONObject owner = Reference.getOwnerOfPod(masterIp,namepsace,servicename);
         //delete pod
-        PodsImplementation.deletePod(namepsace,podName);
+        PodsDAO.deletePod(masterIp,namepsace,podName);
         //subtract replicas
         OwnTypes ownertype = null;
         switch (owner.get("resourceKind").toString()){
@@ -40,7 +41,7 @@ public class DeletePodCallable implements Callable<Boolean> {
                 LOGGER.info("ownertype["+owner.get("ownerType").toString()+"] is unknown!");
                 break;
         }
-        PodsImplementation.subtractReplicas(namepsace,ownertype,owner.getString("resourceName"));
+        PodsDAO.subtractReplicas(masterIp,namepsace,ownertype,owner.getString("resourceName"));
         return true;
     }
 }

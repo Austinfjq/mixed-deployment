@@ -20,19 +20,20 @@ public class RuleSpec implements KubernetesResource {
     private NodeInfo[] nodes = null;
 
     //    public RuleSpec(){}
-    public RuleSpec(String namespace,JSONObject owner,JSONArray nodeList){
-        switch (owner.get("resourceKind").toString()){
-            case "Deployment":ownerType = "deployment";break;
-            case "Replicaset":ownerType = "replicaSet";break;
-            case "Statefulset":ownerType = "statefulSet";break;
-            case "Daemonset":ownerType = "deamonSet";break;
-            default:
-                System.out.println("ownerType["+owner.get("ownerType").toString()+"] is unknown!");
-                break;
-        }
-        ownerName = owner.getString("resourceName");
+    public RuleSpec(String namespace,String ownerType,String ownerName,JSONArray nodeList,int replicas){
+//        switch (ownerType){
+//            case "Deployment":ownerType = "deployment";break;
+//            case "Replicaset":ownerType = "replicaSet";break;
+//            case "Statefulset":ownerType = "statefulSet";break;
+//            case "Daemonset":ownerType = "deamonSet";break;
+//            default:
+//                System.out.println("ownerType["+ownerType+"] is unknown!");
+//                break;
+//        }
+        this.ownerType = ownerType;
+        this.ownerName = ownerName;
         this.namespace = namespace;
-        this.replicas = 1;
+        this.replicas = replicas;
 
         LOGGER.info("NodeList:"+nodeList);
         int index = 0;

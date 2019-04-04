@@ -17,21 +17,22 @@ import java.util.Map;
  */
 public class Reference {
     private final static Logger LOGGER = LoggerFactory.getLogger(Reference.class);
-    public static JSONObject getOwnerOfPod(String namespace,String serviceName) throws NoSuchAlgorithmException, KeyManagementException {
+    public static JSONObject getOwnerOfPod(String masterIp,String namespace,String serviceName)  {
         Map<String,String> paramMap = new HashMap<>();
+        paramMap.put("masterIp",masterIp);
         paramMap.put("namespace",namespace);
         paramMap.put("serviceName", serviceName);
 
-        String result = HttpClientUtil.httpGet(paramMap);
-        LOGGER.info("Get Owner information["+result+"]");
+        String result = null;
+        result = HttpClientUtil.httpGet(paramMap);
         if(result == null){
-            LOGGER.debug("Result is null");
+            LOGGER.debug("Owner information is null");
             return null;
         }
         return  JSON.parseObject(result);
     }
     public static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException {
-        JSONObject data = getOwnerOfPod("wordpress","wordpress-wp");
+        JSONObject data = getOwnerOfPod("","wordpress","wordpress-wp");
         System.out.println("ResourceKing:"+data.getString("resourceKind"));
         System.out.println("ResourceName:"+data.getString("resourceName"));
     }
