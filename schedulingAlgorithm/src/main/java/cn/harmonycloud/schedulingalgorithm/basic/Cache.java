@@ -322,19 +322,19 @@ public class Cache implements Cloneable {
         try {
             result = (Cache) super.clone();
 
-            result.serviceMap = (HashMap<String, Service>) serviceMap.clone();
+            result.serviceMap = (HashMap<String, Service>) this.serviceMap.clone();
             result.serviceMap.forEach((key, value) -> result.serviceMap.put(key, value.clone()));
 
-            result.podMap = (HashMap<String, Pod>) podMap.clone();
+            result.podMap = (HashMap<String, Pod>) this.podMap.clone();
 
-            result.nodeMap = (HashMap<String, Node>) nodeMap.clone();
+            result.nodeMap = (HashMap<String, Node>) this.nodeMap.clone();
             result.nodeMap.forEach((key, value) -> result.nodeMap.put(key, value.clone()));
-            result.nodeList = new ArrayList<>(nodeMap.values());
+            result.nodeList = new ArrayList<>(result.nodeMap.values());
 
-            result.nodeMapPodList = (HashMap<String, List<Pod>>) nodeMapPodList.clone();
+            result.nodeMapPodList = (HashMap<String, List<Pod>>) this.nodeMapPodList.clone();
             result.nodeMapPodList.forEach((key, value) -> result.nodeMapPodList.put(key, new ArrayList<>(value)));
 
-//            result.nodeForecastMap = (HashMap<String, NodeForecastData>) nodeForecastMap.clone();
+//            result.nodeForecastMap = (HashMap<String, NodeForecastData>) this.nodeForecastMap.clone();
         } catch (CloneNotSupportedException e) {
             return null;
         }

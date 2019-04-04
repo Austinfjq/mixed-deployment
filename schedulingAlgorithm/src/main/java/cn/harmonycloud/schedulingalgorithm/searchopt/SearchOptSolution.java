@@ -3,6 +3,7 @@ package cn.harmonycloud.schedulingalgorithm.searchopt;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.DefaultGreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithm;
 import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithmIgnoreResourcePriority;
+import cn.harmonycloud.schedulingalgorithm.algorithm.greedyalgorithm.GreedyAlgorithmOnlyResourcePriority;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.dataobject.HostPriority;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class SearchOptSolution {
     private static final DefaultGreedyAlgorithm defaultGreedyAlgorithm = new DefaultGreedyAlgorithm();
     private static final GreedyAlgorithmIgnoreResourcePriority greedyAlgorithmIgnoreResourcePriority = new GreedyAlgorithmIgnoreResourcePriority();
+    private static final GreedyAlgorithmOnlyResourcePriority greedyAlgorithmOnlyResourcePriority = new GreedyAlgorithmOnlyResourcePriority();
     private static final Random random = new Random();
     /**
      * 待调度的pods
@@ -82,6 +84,9 @@ public class SearchOptSolution {
                 // 随机生成节点，避开之前生成过的失败节点
                 randomNode = cache.getNodeList().get(random.nextInt(nodeNum));
                 tryTimes++;
+                if (tryTimes > nodeNum) {
+                    break;
+                }
             }
             // 测试预选规则
             boolean predicateResult = defaultGreedyAlgorithm.runAllPredicates(pod, randomNode, cache);
@@ -160,21 +165,23 @@ public class SearchOptSolution {
 
     public int getScoreWithFinalResource(Cache cache) {
         int scoreIgnoreResource = getScoreByGreedyAlgorithm(cache, greedyAlgorithmIgnoreResourcePriority);
-        int resourceScore;
         Cache tmp = cache.clone();
         for (int i = 0; i < pods.size(); i++) {
             Pod pod = pods.get(i);
-            if (i < pods.size() - 1) {
-                tmp.updateCache(pod, hosts.get(i));
-            }
+            tmp.updateCache(pod, hosts.get(i));
         }
-        Pod pod = pods.get(pods.size() - 1);
-        Node[] node = new Node[]{tmp.getNodeMap().get(hosts.get(pods.size() - 1))};
-        resourceScore = greedyAlgorithmIgnoreResourcePriority.getIgnoredPriorityRuleConfigs().stream()
+        Pod emptyPod = new Pod(1, null, null);
+        emptyPod.setCpuRequest(0D);
+        emptyPod.setMemRequest(0D);
+        List<Node> nodes = tmp.getNodeList();
+        long resourceScore = greedyAlgorithmIgnoreResourcePriority.getIgnoredPriorityRuleConfigs().stream()
                 .filter(config -> !config.getWeight().equals(0))
-                .mapToInt(config -> config.getPriorityRule().priority(pod, Arrays.asList(node), tmp).get(0) * config.getWeight())
+                .mapToLong(config -> config.getWeight() * config.getPriorityRule().priority(emptyPod, nodes, tmp).stream().mapToLong(Integer::longValue).sum())
                 .sum();
-        return scoreIgnoreResource + resourceScore * pods.size();
+        // Normalize
+        resourceScore = resourceScore * pods.size() / tmp.getNodeList().size();
+        return scoreIgnoreResource + (int) resourceScore;
+//        return (int) resourceScore;
     }
 
     private int getScoreByGreedyAlgorithm(Cache cache, GreedyAlgorithm ga) {
