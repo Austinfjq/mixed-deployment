@@ -137,7 +137,10 @@ public class RuleUtil {
     }
 
     private static boolean toleratesTaint(Toleration toleration, Taint taint) {
-        if (Objects.equals(toleration.getEffect(), taint.getEffectObject())) {
+        if (taint == null) {
+            return true;
+        }
+        if (Objects.equals(toleration.getEffect(), taint.getEffectObject().getEffect())) {
             return false;
         }
         if (Objects.equals(toleration.getKey(), taint.getKey())) {
