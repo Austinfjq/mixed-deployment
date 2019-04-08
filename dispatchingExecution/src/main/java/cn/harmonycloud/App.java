@@ -16,8 +16,6 @@ public class App
     private final static Logger LOGGER = LoggerFactory.getLogger(App.class);
     public static void main(String[] args) {
         LOGGER.info("Dispatching execution is running");
-//        Config config = new Config();
-//        config.readConfigFile();
         SpringApplication.run(App.class, args);
     }
 }

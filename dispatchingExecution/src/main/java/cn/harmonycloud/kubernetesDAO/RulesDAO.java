@@ -31,7 +31,7 @@ import java.util.List;
 public class RulesDAO {
     private final static Logger LOGGER = LoggerFactory.getLogger(RulesDAO.class);
     //createRule func
-    public static boolean createRule(String masterIp,Rule rule){
+    public static void createRule(String masterIp,Rule rule){
         CustomResourceDefinitionList ruleDefinitionList = K8sClient.getInstance(masterIp).customResourceDefinitions().list();
         CustomResourceDefinition ruleDefinition = new CustomResourceDefinition();
         for (CustomResourceDefinition e: ruleDefinitionList.getItems()){
@@ -40,12 +40,12 @@ public class RulesDAO {
                 break;
             }
         }
-        LOGGER.info(ruleDefinition.toString());
+        //LOGGER.info(ruleDefinition.toString());
         if (ruleDefinition != null && ruleDefinition.getMetadata() != null){
-            LOGGER.info("Found Rule CRD:"+ruleDefinition.getMetadata().getSelfLink());
+            LOGGER.info("Found Rule CRD:"+ruleDefinition.getMetadata().getName());
         }else{
             ruleDefinition = new CustomResourceDefinitionBuilder().withKind("CustomResourceDefinition").
-                    withApiVersion("apiextensions.k8s.io/v1beta1").
+                    withApiVersion("apiextensions/v1beta1").
                     withNewMetadata().withName("rules.crd.k8s.io").endMetadata().
                     withNewSpec().withGroup("crd.k8s.io").withVersion("v1").withScope("Namespaced").
                     withNewNames().withKind("Rule").withShortNames("").withPlural("rules").endNames().endSpec().
@@ -54,13 +54,13 @@ public class RulesDAO {
         NonNamespaceOperation<Rule, RuleList, DoneableRule, Resource<Rule, DoneableRule>> ruleClient = K8sClient.getInstance(masterIp).customResources(ruleDefinition, Rule.class, RuleList.class, DoneableRule.class);
         if (ruleClient == null){
             LOGGER.debug("RuleClient is null");
-            return false;
+            return ;
         }
-        rule.getSpec().setOwnerType("deployment");
+        //rule.getSpec().setOwnerType("deployment");
         Rule result = ruleClient.create(rule);
 
-        LOGGER.info("Create Rule{Rule.Name["+rule.getMetadata().getName()+"],Rule.Namespace["+rule.getMetadata().getNamespace()+"]} Successfully!");
-        return true;
+        LOGGER.info("Create Rule{Rule.Name["+result.getMetadata().getName()+"],Rule.Namespace["+result.getMetadata().getNamespace()+"]} Successfully!");
+        //return true;
     }
 
     public static void main(String[] args){

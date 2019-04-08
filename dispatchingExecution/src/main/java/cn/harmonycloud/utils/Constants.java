@@ -16,7 +16,7 @@ public class Constants {
     public final static String NAME_PREFIX = "rule-";
 
     //RuleDefinition
-    public final static String RULE_API_VERSION = "apiextensions/v1beta1";
+    public final static String RULE_API_VERSION = "apiextensions/v1beta1";//被这里坑过
     public final static String RULE_KIND = "CustomResourceDefinition";
     public final static String RULE_NAME = "rules.crd.k8s.io";
 }

@@ -21,15 +21,6 @@ public class RuleSpec implements KubernetesResource {
 
     //    public RuleSpec(){}
     public RuleSpec(String namespace,String ownerType,String ownerName,JSONArray nodeList,int replicas){
-//        switch (ownerType){
-//            case "Deployment":ownerType = "deployment";break;
-//            case "Replicaset":ownerType = "replicaSet";break;
-//            case "Statefulset":ownerType = "statefulSet";break;
-//            case "Daemonset":ownerType = "deamonSet";break;
-//            default:
-//                System.out.println("ownerType["+ownerType+"] is unknown!");
-//                break;
-//        }
         this.ownerType = ownerType;
         this.ownerName = ownerName;
         this.namespace = namespace;
