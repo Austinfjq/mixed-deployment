@@ -764,7 +764,7 @@ public class ServiceDataDao implements IServiceDataDao {
     }
 
     @Override
-    public Map<String, Object> getManagement(String namespace, String serviceName) {
+    public Map<String, Object> getManagement(String namespace, String serviceName, String clusterMasterIP) {
         //{
         //	"query":{
         //		"bool":{
@@ -774,13 +774,13 @@ public class ServiceDataDao implements IServiceDataDao {
         //			]
         //		}
         //	},
-        //	"_source":["resourceKind","resourceType"]
+        //	"_source":["resourceKind","resourceType","clusterMasterIP"]
         //}
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("namespace",namespace));
         boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
-        String[] includes = {"resourceKind","resourceName"};
+        String[] includes = {"resourceKind","resourceName","clusterMasterIP"};
         FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQueryBuilder)

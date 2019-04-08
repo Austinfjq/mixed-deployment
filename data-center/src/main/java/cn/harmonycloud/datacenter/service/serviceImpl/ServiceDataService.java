@@ -114,7 +114,7 @@ public class ServiceDataService implements IServiceDataService {
     }
 
     @Override
-    public Map<String, Object> getManagement(String namespace, String serviceName) {
-        return serviceDataDao.getManagement(namespace,serviceName);
+    public Map<String, Object> getManagement(String namespace, String serviceName, String clusterMasterIP) {
+        return serviceDataDao.getManagement(namespace,serviceName,clusterMasterIP);
     }
 }

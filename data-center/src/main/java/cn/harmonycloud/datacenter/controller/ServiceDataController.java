@@ -260,7 +260,8 @@ public class ServiceDataController {
      */
     @GetMapping("/management")
     public Map<String,Object> getManagement(@RequestParam("namespace") String namespace,
-                                            @RequestParam("serviceName") String serviceName){
-        return serviceDataService.getManagement(namespace,serviceName);
+                                            @RequestParam("serviceName") String serviceName,
+                                            @RequestParam("clusterMasterIP") String clusterMasterIP){
+        return serviceDataService.getManagement(namespace,serviceName,clusterMasterIP);
     }
 }
