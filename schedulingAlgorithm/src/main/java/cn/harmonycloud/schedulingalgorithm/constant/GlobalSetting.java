@@ -37,7 +37,10 @@ public class GlobalSetting {
 
     static {
         try {
+            // 生产环境运行配置
             String propertiesFilePath = "/usr/local/scheduling-algorithm/config/schedulingAlgorithm.properties";
+            // 本地运行配置
+//            String propertiesFilePath = "schedulingAlgorithm/src/main/resources/schedulingAlgorithm.properties.default";
             ConfigLoader.load(GlobalSetting.class, propertiesFilePath);
         } catch (Exception e) {
             LOGGER.error("Properties file error!", e);

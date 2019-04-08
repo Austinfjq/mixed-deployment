@@ -28,7 +28,7 @@ public class ExecuteUtil {
             List<NameValuePair> paramList = new ArrayList<>();
             paramList.add(new BasicNameValuePair("namespace", pod.getNamespace()));
             paramList.add(new BasicNameValuePair("servicename", pod.getServiceName()));
-            paramList.add(new BasicNameValuePair("clusterMasterIP", pod.getClusterMasterIP()));
+            paramList.add(new BasicNameValuePair("masterIp", pod.getClusterMasterIP()));
             String uri;
             if (pod.getOperation() == Constants.OPERATION_ADD) {
                 JSONArray jsonArray = new JSONArray();
