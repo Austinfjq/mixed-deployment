@@ -31,8 +31,7 @@ public class GeneticScheduler implements Scheduler {
     }
 
     private SearchOptSolution genetic(List<Pod> pods) {
-        return null;
         // TODO
-        // 1.
+        return null;
     }
 }

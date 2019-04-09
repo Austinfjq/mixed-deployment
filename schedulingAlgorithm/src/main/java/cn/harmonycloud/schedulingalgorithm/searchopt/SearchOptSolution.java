@@ -11,8 +11,11 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,10 +61,10 @@ public class SearchOptSolution {
      * 生成初始解
      */
     public static SearchOptSolution getInitialSolution(Cache cache, List<Pod> pods) {
-        // 为pod随机生成符合predicate rules的可行解
-        List<String> hosts = new ArrayList<>();
         // 使用隔离的新缓存
         Cache laterCache = cache.clone();
+        // 为pod随机生成符合predicate rules的可行解
+        List<String> hosts = new ArrayList<>();
         for (Pod pod : pods) {
             String host = getRandomNode(pod, laterCache);
             if (host == null) {
@@ -70,6 +73,27 @@ public class SearchOptSolution {
             laterCache.updateCache(pod, host);
             hosts.add(host);
         }
+        return new SearchOptSolution(null, pods, hosts, null);
+    }
+
+    public static SearchOptSolution getInitialShuffleSolution(Cache cache, List<Pod> pods) {
+        // 使用隔离的新缓存
+        Cache laterCache = cache.clone();
+        // 为pod随机生成符合predicate rules的可行解，随机改变调度的顺序
+        List<Pod> shuffledPods = new ArrayList<>(pods);
+        Collections.shuffle(shuffledPods);
+        Map<Pod, String> map = new HashMap<>();
+        for (Pod pod : shuffledPods) {
+            String host = getRandomNode(pod, laterCache);
+            if (host == null) {
+                return null;
+            }
+            laterCache.updateCache(pod, host);
+            map.put(pod, host);
+        }
+        // 仍按原来的顺序放置hosts
+        List<String> hosts = new ArrayList<>();
+        pods.forEach(p -> hosts.add(map.get(p)));
         return new SearchOptSolution(null, pods, hosts, null);
     }
 
