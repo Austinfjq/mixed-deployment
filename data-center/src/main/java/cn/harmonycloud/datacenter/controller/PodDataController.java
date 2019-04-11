@@ -1,14 +1,11 @@
 package cn.harmonycloud.datacenter.controller;
 
 import cn.harmonycloud.datacenter.entity.es.PodData;
-import cn.harmonycloud.datacenter.entity.es.ServiceData;
+import cn.harmonycloud.datacenter.entity.es.SearchPod;
 import cn.harmonycloud.datacenter.service.IPodDataService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -80,7 +77,29 @@ public class PodDataController {
      */
     @GetMapping("/nowPod")
     public List<PodData> getNowServices(){
-
         return podDataService.getNowServices();
+    }
+    @PostMapping("/node/service/pods")
+    public Map<String, String> getNowServices(@RequestBody List<SearchPod> searchPod){
+        Map<String, String> responseMap = new HashMap<>();
+        SearchPod pdd=new SearchPod();
+        for(SearchPod pd:searchPod)
+            pdd=pd;
+        String clusterIp= pdd.getClusterIp();
+        String namespace=pdd.getNamespace();
+        String serviceName=pdd.getServiceName();
+        String hostName=pdd.getHostName();
+        System.out.println(pdd.toString() + "1\n");
+        List<PodData> pod=podDataService.getNowServices();
+        for(PodData pd:pod)
+        {
+            if(pd.getClusterMasterIP().equals(clusterIp)&&
+            pd.getNamespace().equals(namespace)&&pd.getServiceName().equals(serviceName)
+            &&pd.getNodeName().equals(hostName))
+            {
+                responseMap.put("podName",pd.getPodName());
+            }
+        }
+        return responseMap;
     }
 }
