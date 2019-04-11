@@ -6,6 +6,15 @@ public class SearchPod {
     private String serviceName;
     private String hostName;
 
+    public double getRequestNums() {
+        return requestNums;
+    }
+
+    public void setRequestNums(double requestNums) {
+        this.requestNums = requestNums;
+    }
+
+    private double requestNums;
     public String getClusterIp() {
         return clusterIp;
     }

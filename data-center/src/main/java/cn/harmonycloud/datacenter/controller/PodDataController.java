@@ -89,17 +89,61 @@ public class PodDataController {
         String namespace=pdd.getNamespace();
         String serviceName=pdd.getServiceName();
         String hostName=pdd.getHostName();
-        System.out.println(pdd.toString() + "1\n");
         List<PodData> pod=podDataService.getNowServices();
         for(PodData pd:pod)
         {
-            if(pd.getClusterMasterIP().equals(clusterIp)&&
-            pd.getNamespace().equals(namespace)&&pd.getServiceName().equals(serviceName)
-            &&pd.getNodeName().equals(hostName))
+            if(clusterIp.equals(pd.getClusterMasterIP())&&
+                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName())
+            &&hostName.equals(pd.getNodeName()))
             {
                 responseMap.put("podName",pd.getPodName());
             }
         }
+        return responseMap;
+    }
+    @PostMapping("/service/podNums")
+    public Map<String, Integer> getPodNums(@RequestBody List<SearchPod> searchPod){
+        Map<String, Integer> responseMap = new HashMap<>();
+        SearchPod pdd=new SearchPod();
+        for(SearchPod pd:searchPod)
+            pdd=pd;
+        String clusterIp= pdd.getClusterIp();
+        String namespace=pdd.getNamespace();
+        String serviceName=pdd.getServiceName();
+        List<PodData> pod=podDataService.getNowServices();
+        Integer ins=0;
+        for(PodData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP())&&
+                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName()))
+            {
+                ins++;
+            }
+        }
+        responseMap.put("podNums",ins);
+        return responseMap;
+    }
+    @PostMapping("/service/requestPodNums")
+    public Map<String, Integer> getRequestPodNums(@RequestBody List<SearchPod> searchPod){
+        Map<String, Integer> responseMap = new HashMap<>();
+        SearchPod pdd=new SearchPod();
+        for(SearchPod pd:searchPod)
+            pdd=pd;
+        String clusterIp= pdd.getClusterIp();
+        String namespace=pdd.getNamespace();
+        String serviceName=pdd.getServiceName();
+        double requestNums=pdd.getRequestNums();
+        List<PodData> pod=podDataService.getNowServices();
+        Integer ins=0;
+        for(PodData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP())&&requestNums==pd.getResponseBytes()&&
+                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName()))
+            {
+                ins++;
+            }
+        }
+        responseMap.put("podNums",ins);
         return responseMap;
     }
 }

@@ -2,6 +2,7 @@ package cn.harmonycloud.datacenter.controller;
 
 import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
+import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
 import com.google.common.collect.Lists;
@@ -263,5 +264,27 @@ public class ServiceDataController {
                                             @RequestParam("serviceName") String serviceName,
                                             @RequestParam("clusterMasterIP") String clusterMasterIP){
         return serviceDataService.getManagement(namespace,serviceName,clusterMasterIP);
+    }
+    @GetMapping("/service/onlineServices")
+    public List<services> getService(@RequestParam("clusterIp") String clusterIp)
+    {
+        String newStr = clusterIp.substring(1, clusterIp.length()-1);
+        List<ServiceData> pod=serviceDataService.getNowServices();
+        List<services> serviceNodes=new ArrayList<services>();
+        for(ServiceData pd:pod)
+        {
+            //System.out.println(newStr + "1\n");
+            //System.out.println(pd.getClusterMasterIP() + "2\n");
+            if(newStr.equals(pd.getClusterMasterIP()))
+            {
+                services sn=new services();
+                sn.setClusterIp(pd.getClusterMasterIP());
+                sn.setServiceName(pd.getServiceName());
+                sn.setNamespace(pd.getNamespace());
+                sn.setServiceType(pd.getServiceType());
+                serviceNodes.add(sn);
+            }
+        }
+        return serviceNodes;
     }
 }

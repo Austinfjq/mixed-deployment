@@ -2,6 +2,7 @@ package cn.harmonycloud.datacenter.controller;
 
 
 import cn.harmonycloud.datacenter.entity.es.NodeData;
+import cn.harmonycloud.datacenter.entity.es.SearchNode;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,5 +92,24 @@ public class NodeDataController {
     @GetMapping("/nowNode")
     public List<NodeData> getNowNodes(){
         return nodeDataService.getNowNodes();
+    }
+    @GetMapping("/node/nodes")
+    public List<SearchNode> getNodes(@RequestParam("clusterIp") String clusterIp)
+    {
+        String newStr = clusterIp.substring(1, clusterIp.length()-1);
+        List<NodeData> pod=nodeDataService.getNowNodes();
+        List<SearchNode> searchNodes=new ArrayList<SearchNode>();
+        for(NodeData pd:pod)
+        {
+
+            if(newStr.equals(pd.getClusterMasterIP()))
+            {
+                SearchNode sn=new SearchNode();
+                sn.setClusterIp(pd.getClusterMasterIP());
+                sn.setHostName(pd.getNodeName());
+                searchNodes.add(sn);
+            }
+        }
+        return searchNodes;
     }
 }
