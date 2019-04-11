@@ -155,6 +155,7 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public boolean runAllPredicates(Pod pod, Node node, Cache cache) {
         // 分别处理各个预选规则，预选规则大概只有10个，规则判断不会很耗时
         List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
