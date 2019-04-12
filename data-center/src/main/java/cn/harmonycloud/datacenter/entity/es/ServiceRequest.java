@@ -1,22 +1,15 @@
 package cn.harmonycloud.datacenter.entity.es;
 
-public class SearchPod {
+import java.util.Calendar;
+import java.util.Date;
+
+public class ServiceRequest {
     private String clusterIp;
     private String namespace;
     private String serviceName;
-    private String hostName;
     private String startTime;
     private String endTime;
 
-    public double getRequestNums() {
-        return requestNums;
-    }
-
-    public void setRequestNums(double requestNums) {
-        this.requestNums = requestNums;
-    }
-
-    private double requestNums;
     public String getClusterIp() {
         return clusterIp;
     }
@@ -41,14 +34,6 @@ public class SearchPod {
         this.serviceName = serviceName;
     }
 
-    public String getHostName() {
-        return hostName;
-    }
-
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
     public String getStartTime() {
         return startTime;
     }
@@ -64,13 +49,36 @@ public class SearchPod {
     public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
+
     @Override
     public String toString() {
-        return "SearchPod{" +
+        return "ServiceRequest{" +
                 "clusterIp='" + clusterIp + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", serviceName='" + serviceName + '\'' +
-                ", hostName='" + hostName + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
                 '}';
+    }
+    public static boolean isEffectiveDate(Date nowTime, Date startTime, Date endTime) {
+        if (nowTime.getTime() == startTime.getTime()
+                || nowTime.getTime() == endTime.getTime()) {
+            return true;
+        }
+
+        Calendar date = Calendar.getInstance();
+        date.setTime(nowTime);
+
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(startTime);
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        if (date.after(begin) && date.before(end)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

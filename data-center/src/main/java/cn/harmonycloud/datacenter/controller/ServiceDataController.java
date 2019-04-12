@@ -2,6 +2,7 @@ package cn.harmonycloud.datacenter.controller;
 
 import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
+import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
@@ -9,6 +10,7 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -286,5 +288,87 @@ public class ServiceDataController {
             }
         }
         return serviceNodes;
+    }
+    @PostMapping("/service/lastPeriodMaxRequestNums")
+    public Map<String,Integer> getServiceRequsetNums(@RequestBody List<ServiceRequest> serviceRequests)
+    {
+        List<ServiceData> pod=serviceDataService.getNowServices();
+        Map<String, Integer> responseMap = new HashMap<>();
+        ServiceRequest pdd=new ServiceRequest();
+        for(ServiceRequest sr:serviceRequests)
+            pdd=sr;
+        Date startTime=new Date();
+        Date endTime=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startTime = df.parse(pdd.getStartTime());
+            endTime=df.parse(pdd.getEndTime());
+        }
+        catch (ParseException e)
+        {
+            System.out.println("字符串转日期失败1\n");
+        }
+        Integer ins=0;
+        for(ServiceData pd:pod)
+        {
+            //System.out.println(newStr + "1\n");
+            //System.out.println(pd.getClusterMasterIP() + "2\n");
+            Date nowTime=new Date();
+            try
+            {
+                nowTime = df.parse(pdd.getStartTime());
+            }
+            catch (ParseException e)
+            {
+                System.out.println("字符串转日期失败2\n");
+            }
+            if(ServiceRequest.isEffectiveDate(nowTime,startTime,endTime))
+            {
+                ins++;
+            }
+        }
+        responseMap.put("lastPeriodMaxRequestNums",ins);
+        return responseMap;
+    }
+    @PostMapping("/service/nextPeriodMaxRequestNums")
+    public Map<String,Integer> getServicePRequsetNums(@RequestBody List<ServiceRequest> serviceRequests)
+    {
+        List<ServiceData> pod=serviceDataService.getNowServices();
+        Map<String, Integer> responseMap = new HashMap<>();
+        ServiceRequest pdd=new ServiceRequest();
+        for(ServiceRequest sr:serviceRequests)
+            pdd=sr;
+        Date startTime=new Date();
+        Date endTime=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startTime = df.parse(pdd.getStartTime());
+            endTime=df.parse(pdd.getEndTime());
+        }
+        catch (ParseException e)
+        {
+            System.out.println("字符串转日期失败1\n");
+        }
+        Integer ins=0;
+        for(ServiceData pd:pod)
+        {
+            //System.out.println(newStr + "1\n");
+            //System.out.println(pd.getClusterMasterIP() + "2\n");
+            Date nowTime=new Date();
+            try
+            {
+                nowTime = df.parse(pdd.getStartTime());
+            }
+            catch (ParseException e)
+            {
+                System.out.println("字符串转日期失败2\n");
+            }
+            if(ServiceRequest.isEffectiveDate(nowTime,startTime,endTime))
+            {
+                ins++;
+            }
+        }
+        responseMap.put("lastPeriodMaxRequestNums",ins);
+        return responseMap;
     }
 }
