@@ -23,7 +23,6 @@ public class ServiceTaskThreadExecutor implements Runnable{
         if (forecastCell == null) {
             return;
         }
-
         DataSet dataSet = DeriveData.Set(forecastCell);
         dataSet.setPeriodsPerYear(forecastCell.getNumberOfPerPeriod());
 

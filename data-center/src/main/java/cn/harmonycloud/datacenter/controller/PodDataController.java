@@ -79,16 +79,15 @@ public class PodDataController {
     public List<PodData> getNowServices(){
         return podDataService.getNowServices();
     }
-    @PostMapping("/node/service/pods")
-    public Map<String, String> getNowServices(@RequestBody List<SearchPod> searchPod){
+    @GetMapping("/node/service/pods")
+    public Map<String, String> getNowServices(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("hostName") String hostName){
         Map<String, String> responseMap = new HashMap<>();
         SearchPod pdd=new SearchPod();
-        for(SearchPod pd:searchPod)
-            pdd=pd;
-        String clusterIp= pdd.getClusterIp();
-        String namespace=pdd.getNamespace();
-        String serviceName=pdd.getServiceName();
-        String hostName=pdd.getHostName();
+        pdd.setClusterIp(clusterIp);
+        pdd.setNamespace(namespace);
+        pdd.setServiceName(serviceName);
+        pdd.setHostName(hostName);
         List<PodData> pod=podDataService.getNowServices();
         for(PodData pd:pod)
         {
@@ -101,15 +100,14 @@ public class PodDataController {
         }
         return responseMap;
     }
-    @PostMapping("/service/podNums")
-    public Map<String, Integer> getPodNums(@RequestBody List<SearchPod> searchPod){
+    @GetMapping("/service/podNums")
+    public Map<String, Integer> getPodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName){
         Map<String, Integer> responseMap = new HashMap<>();
         SearchPod pdd=new SearchPod();
-        for(SearchPod pd:searchPod)
-            pdd=pd;
-        String clusterIp= pdd.getClusterIp();
-        String namespace=pdd.getNamespace();
-        String serviceName=pdd.getServiceName();
+        pdd.setClusterIp(clusterIp);
+        pdd.setNamespace(namespace);
+        pdd.setServiceName(serviceName);
         List<PodData> pod=podDataService.getNowServices();
         Integer ins=0;
         for(PodData pd:pod)
@@ -123,16 +121,15 @@ public class PodDataController {
         responseMap.put("podNums",ins);
         return responseMap;
     }
-    @PostMapping("/service/requestPodNums")
-    public Map<String, Integer> getRequestPodNums(@RequestBody List<SearchPod> searchPod){
+    @GetMapping("/service/requestPodNums")
+    public Map<String, Integer> getRequestPodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("requestNums") Double requestNums){
         Map<String, Integer> responseMap = new HashMap<>();
         SearchPod pdd=new SearchPod();
-        for(SearchPod pd:searchPod)
-            pdd=pd;
-        String clusterIp= pdd.getClusterIp();
-        String namespace=pdd.getNamespace();
-        String serviceName=pdd.getServiceName();
-        double requestNums=pdd.getRequestNums();
+        pdd.setClusterIp(clusterIp);
+        pdd.setNamespace(namespace);
+        pdd.setServiceName(serviceName);
+        pdd.setRequestNums(requestNums);
         List<PodData> pod=podDataService.getNowServices();
         Integer ins=0;
         for(PodData pd:pod)

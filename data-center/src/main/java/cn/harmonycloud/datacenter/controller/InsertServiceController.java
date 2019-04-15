@@ -3,13 +3,12 @@ package cn.harmonycloud.datacenter.controller;
 import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.service.test.serviceImpl.InsertService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,8 +22,8 @@ public class InsertServiceController {
         insertService = this;
         serverHandler.healthDataService = this.healthDataService;
     }*/
-    @RequestMapping(value = "/service", method = RequestMethod.POST)
-    public Map<String, Object> insert(@RequestBody List<services> list)
+    @RequestMapping(value = "/service", method = RequestMethod.PUT)
+/*    public Map<String, Object> insert(@RequestBody List<services> list)
     {
         Map<String, Object> responseMap = new HashMap<>();
         if(list.size() > 0)
@@ -45,8 +44,8 @@ public class InsertServiceController {
             }
         }
         return responseMap;
-    }
- /*   public Map<String, Object> insert(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+    }*/
+    public Map<String, Object> insert(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
     , @RequestParam("serviceName") String serviceName, @RequestParam("serviceType") String serviceType)
     {
         services ser=new services();
@@ -55,6 +54,7 @@ public class InsertServiceController {
         ser.setServiceName(serviceName);
         ser.setServiceType(serviceType);
         System.out.println(ser.toString()+"1\n");
+        ser.setServiceId(UUID.randomUUID().toString());
         Integer i=new Integer(insertService.insertService(ser));
         Map<String, Object> responseMap = new HashMap<>();
         if(i==1){
@@ -63,7 +63,7 @@ public class InsertServiceController {
             responseMap.put("isSucceed",false);
         }
         return responseMap;
-    }*/
+    }
 /*    public services insert(@RequestBody services ser)
     {
         System.out.println(ser.toString()+"1\n");

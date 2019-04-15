@@ -166,12 +166,12 @@ public class ServiceDataController {
      * @param clusterIP
      * @return
      */
-    @GetMapping("/service/podNums")
+/*    @GetMapping("/service/podNums")
     public Map<String,Object> getPodNums(@RequestParam("namespace") String namespace,
                                          @RequestParam("serviceName") String serviceName,
                                          @RequestParam("clusterIP") String clusterIP){
         return serviceDataService.getPodNums(namespace,serviceName,clusterIP);
-    }
+    }*/
 
     /**
      * 获取指定service的实时网络IO流量
@@ -289,20 +289,24 @@ public class ServiceDataController {
         }
         return serviceNodes;
     }
-    @PostMapping("/service/lastPeriodMaxRequestNums")
-    public Map<String,Integer> getServiceRequsetNums(@RequestBody List<ServiceRequest> serviceRequests)
+    @GetMapping("/service/lastPeriodMaxRequestNums")
+    public Map<String,Integer> getServiceRequsetNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime)
     {
         List<ServiceData> pod=serviceDataService.getNowServices();
         Map<String, Integer> responseMap = new HashMap<>();
-        ServiceRequest pdd=new ServiceRequest();
-        for(ServiceRequest sr:serviceRequests)
-            pdd=sr;
-        Date startTime=new Date();
-        Date endTime=new Date();
+        ServiceRequest serviceRequests=new ServiceRequest();
+        serviceRequests.setClusterIp(clusterIp);
+        serviceRequests.setNamespace(namespace);
+        serviceRequests.setServiceName(serviceName);
+        serviceRequests.setStartTime(startTime);
+        serviceRequests.setEndTime(endTime);
+        Date startTimes=new Date();
+        Date endTimes=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            startTime = df.parse(pdd.getStartTime());
-            endTime=df.parse(pdd.getEndTime());
+            startTimes = df.parse(serviceRequests.getStartTime());
+            endTimes=df.parse(serviceRequests.getEndTime());
         }
         catch (ParseException e)
         {
@@ -316,13 +320,13 @@ public class ServiceDataController {
             Date nowTime=new Date();
             try
             {
-                nowTime = df.parse(pdd.getStartTime());
+                nowTime = df.parse(serviceRequests.getStartTime());
             }
             catch (ParseException e)
             {
                 System.out.println("字符串转日期失败2\n");
             }
-            if(ServiceRequest.isEffectiveDate(nowTime,startTime,endTime))
+            if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
             {
                 ins++;
             }
@@ -330,20 +334,24 @@ public class ServiceDataController {
         responseMap.put("lastPeriodMaxRequestNums",ins);
         return responseMap;
     }
-    @PostMapping("/service/nextPeriodMaxRequestNums")
-    public Map<String,Integer> getServicePRequsetNums(@RequestBody List<ServiceRequest> serviceRequests)
+    @GetMapping("/service/nextPeriodMaxRequestNums")
+    public Map<String,Integer> getServicePRequsetNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime)
     {
         List<ServiceData> pod=serviceDataService.getNowServices();
         Map<String, Integer> responseMap = new HashMap<>();
-        ServiceRequest pdd=new ServiceRequest();
-        for(ServiceRequest sr:serviceRequests)
-            pdd=sr;
-        Date startTime=new Date();
-        Date endTime=new Date();
+        ServiceRequest serviceRequests=new ServiceRequest();
+        serviceRequests.setClusterIp(clusterIp);
+        serviceRequests.setNamespace(namespace);
+        serviceRequests.setServiceName(serviceName);
+        serviceRequests.setStartTime(startTime);
+        serviceRequests.setEndTime(endTime);
+        Date startTimes=new Date();
+        Date endTimes=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            startTime = df.parse(pdd.getStartTime());
-            endTime=df.parse(pdd.getEndTime());
+            startTimes = df.parse(serviceRequests.getStartTime());
+            endTimes=df.parse(serviceRequests.getEndTime());
         }
         catch (ParseException e)
         {
@@ -357,13 +365,13 @@ public class ServiceDataController {
             Date nowTime=new Date();
             try
             {
-                nowTime = df.parse(pdd.getStartTime());
+                nowTime = df.parse(serviceRequests.getStartTime());
             }
             catch (ParseException e)
             {
                 System.out.println("字符串转日期失败2\n");
             }
-            if(ServiceRequest.isEffectiveDate(nowTime,startTime,endTime))
+            if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
             {
                 ins++;
             }

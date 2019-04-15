@@ -98,13 +98,13 @@ public class NodeDataController {
     @GetMapping("/node/nodes")
     public List<SearchNode> getNodes(@RequestParam("clusterIp") String clusterIp)
     {
-        String newStr = clusterIp.substring(1, clusterIp.length()-1);
+        //String newStr = clusterIp.substring(1, clusterIp.length()-1);
         List<NodeData> pod=nodeDataService.getNowNodes();
         List<SearchNode> searchNodes=new ArrayList<SearchNode>();
         for(NodeData pd:pod)
         {
 
-            if(newStr.equals(pd.getClusterMasterIP()))
+            if(clusterIp.equals(pd.getClusterMasterIP()))
             {
                 SearchNode sn=new SearchNode();
                 sn.setClusterIp(pd.getClusterMasterIP());
@@ -146,20 +146,24 @@ public class NodeDataController {
         responseMap.put("memTotal",ins);
         return responseMap;
     }
-    @PostMapping("/node/lastPeriodMaxCpuUsage")
-    public Map<String, Double> getNodeMaxCpu(@RequestBody List<ServiceRequest> serviceRequest){
+    @GetMapping("/node/lastPeriodMaxCpuUsage")
+    public Map<String, Double> getNodeMaxCpu(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
         Map<String, Double> responseMap = new HashMap<>();
         List<NodeData> pod=nodeDataService.getNowNodes();
         double ins=0;
         ServiceRequest serviceRequests=new ServiceRequest();
-        for(ServiceRequest sr:serviceRequest)
-            serviceRequests=sr;
-        Date startTime=new Date();
-        Date endTime=new Date();
+        serviceRequests.setClusterIp(clusterIp);
+        serviceRequests.setNamespace(namespace);
+        serviceRequests.setServiceName(serviceName);
+        serviceRequests.setStartTime(startTime);
+        serviceRequests.setEndTime(endTime);
+        Date startTimes=new Date();
+        Date endTimes=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            startTime = df.parse(serviceRequests.getStartTime());
-            endTime=df.parse(serviceRequests.getEndTime());
+            startTimes = df.parse(serviceRequests.getStartTime());
+            endTimes=df.parse(serviceRequests.getEndTime());
         }
         catch (ParseException e)
         {
@@ -179,7 +183,7 @@ public class NodeDataController {
                 {
                     System.out.println("字符串转日期失败2\n");
                 }
-                if(ServiceRequest.isEffectiveDate(nowTime,startTime,endTime))
+                if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
                 {
                     double te=pd.getCpuUsage();
                     if(te>ins) ins=te;
@@ -189,20 +193,24 @@ public class NodeDataController {
         responseMap.put("lastPeriodMaxCpuUsage",ins);
         return responseMap;
     }
-    @PostMapping("/node/lastPeriodMaxMemUsage")
-    public Map<String, Double> getNodeMaxMem(@RequestBody List<ServiceRequest> serviceRequest){
+    @GetMapping("/node/lastPeriodMaxMemUsage")
+    public Map<String, Double> getNodeMaxMem(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
         Map<String, Double> responseMap = new HashMap<>();
         List<NodeData> pod=nodeDataService.getNowNodes();
         double ins=0;
         ServiceRequest serviceRequests=new ServiceRequest();
-        for(ServiceRequest sr:serviceRequest)
-            serviceRequests=sr;
-        Date startTime=new Date();
-        Date endTime=new Date();
+        serviceRequests.setClusterIp(clusterIp);
+        serviceRequests.setNamespace(namespace);
+        serviceRequests.setServiceName(serviceName);
+        serviceRequests.setStartTime(startTime);
+        serviceRequests.setEndTime(endTime);
+        Date startTimes=new Date();
+        Date endTimes=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            startTime = df.parse(serviceRequests.getStartTime());
-            endTime=df.parse(serviceRequests.getEndTime());
+            startTimes = df.parse(serviceRequests.getStartTime());
+            endTimes=df.parse(serviceRequests.getEndTime());
         }
         catch (ParseException e)
         {
@@ -222,7 +230,7 @@ public class NodeDataController {
                 {
                     System.out.println("字符串转日期失败2\n");
                 }
-                if(ServiceRequest.isEffectiveDate(nowTime,startTime,endTime))
+                if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
                 {
                     double te=pd.getMemUsage();
                     if(te>ins) ins=te;
