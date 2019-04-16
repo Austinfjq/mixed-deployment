@@ -1,74 +1,53 @@
 package cn.harmonycloud.dao;
 
-import cn.harmonycloud.beans.HttpClientResult;
-import cn.harmonycloud.entry.ForecastService;
-import cn.harmonycloud.entry.NowService;
-import cn.harmonycloud.tools.Constant;
-import com.alibaba.fastjson.JSON;
+
+import cn.harmonycloud.beans.Service;
 
 import java.util.List;
 
-import static cn.harmonycloud.tools.HttpSend.sendGet;
-import static com.alibaba.fastjson.serializer.SerializerFeature.*;
-import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
+public interface ServiceDAO {
 
-public class ServiceDAO {
+    boolean addService(Service service);
 
-    public ServiceDAO() {
-    }
+    List<Service> getAllOnlineService(String masterIp);
 
-    private static class HolderClass {
-        private final static ServiceDAO instance = new ServiceDAO();
-    }
-
-    public static ServiceDAO getInstance() {
-        return ServiceDAO.HolderClass.instance;
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某服务当前Pod实例数
+     * @Date 15:03 2019/4/10
+     * @Param
+     * @return
+     **/
+    int getServicePodNums(String masterIp, String namespace, String serviceName);
 
 
-    public static String getForecastService(String startTime, String endTime) {
-
-        String params="id=service"+"&startTime="+startTime+"&endTime="+endTime;
-        String url = "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/forecast/forecastValues";
-
-        return sendGet(url,params);
-    }
-
-    public static List<NowService> getNowServiceList() {
-        String servicesStr = sendGet("http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/nowService", "");
-
-        if (null == servicesStr) {
-            System.out.println("get now service data failed!");
-            return null;
-        }
-
-        List<NowService> list = JSON.parseArray(servicesStr, NowService.class);
-
-        return list;
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //根据请求量，获取服务对应所需的Pod实例数
+     * @Date 15:04 2019/4/10
+     * @Param
+     * @return
+     **/
+    int getServiceRequestPodNums(String masterIp, String namespace, String serviceName, double requestNums);
 
 
-    public static List<ForecastService> getForecastServiceList() {
-        String servicesStr = getForecastService("2019-03-04%2017:00:00", "2019-03-04%2018:00:00");
-
-        if (null == servicesStr) {
-            System.out.println("get forecast service data failed!");
-            return null;
-        }
-
-        List<ForecastService> list = JSON.parseArray(servicesStr, ForecastService.class);
-
-        return list;
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个服务过去一个调控周期的请求量最大值
+     * @Date 15:08 2019/4/10
+     * @Param
+     * @return
+     **/
+    double getLastPeriodMaxRequestNums(String masterIp, String namespace, String serviceName, String startTime, String endTime);
 
 
-    public static void main(String[] args) {
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个服务将来一个调控周期的请求量最大值
+     * @Date 15:09 2019/4/10
+     * @Param
+     * @return
+     **/
+    double getNextPeriodMaxRequestNums(String masterIp, String namespace, String serviceName, String startTime, String endTime);
 
-        String returnValue = JSON.toJSONString(getNowServiceList(), WriteMapNullValue,
-                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
-        System.out.println(returnValue);
-
-//        System.out.println(String.valueOf(getPodNumberByServiceLoad("online","wordpress",56)));
-
-    }
 }

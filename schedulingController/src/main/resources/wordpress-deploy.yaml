@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: wyz
+  labels:
+    app: wordpress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wordpress
+      daemon: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        daemon: frontend
+        service_attribute: online
+    spec:
+      containers:
+      - image: 172.22.242.82/onlineshop/wordpress:4.9.8-apache
+        # wordpress:4.9.8-apache
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: wordpress-mysql
+        - name: WORDPRESS_DB_PASSWORD
+          value: "123456"
+        - name: WORDPRESS_CONFIG_EXTRA
+          value: "define('WPLANG', 'zh_CN');"
+        ports:
+        - containerPort: 80
+          name: wordpress
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "0.5"
+          limits:
+            memory: "2Gi"
+            cpu: "2"

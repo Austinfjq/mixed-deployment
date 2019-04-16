@@ -1,88 +1,64 @@
 package cn.harmonycloud.dao;
 
-import cn.harmonycloud.beans.HttpClientResult;
-import cn.harmonycloud.entry.ForecastNode;
-import cn.harmonycloud.entry.NowNode;
-import cn.harmonycloud.tools.Constant;
 
-import com.alibaba.fastjson.JSON;
+import cn.harmonycloud.beans.Node;
 
 import java.util.List;
 
-import static cn.harmonycloud.tools.HttpSend.sendGet;
-import static com.alibaba.fastjson.serializer.SerializerFeature.*;
-import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
+public interface NodeDAO {
 
-public class NodeDAO {
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个节点上某个服务的所有Pod实例
+     * @Date 17:59 2019/4/10
+     * @Param
+     * @return
+     **/
+    List<String> getPodNameListOfHost(String clusterIp, String namespace, String serviceName, String hostName);
 
-    public NodeDAO() {
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个集群中所有的工作节点
+     * @Date 10:08 2019/4/11
+     * @Param
+     * @return
+     **/
+    List<Node> getNodeList(String clusterIp);
 
-    private static class HolderClass {
-        private final static NodeDAO instance = new NodeDAO();
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取节点CPU总量
+     * @Date 10:08 2019/4/11
+     * @Param
+     * @return 核为单位
+     **/
+    double getNodeCpuTotal(String clusterIp, String hostName);
 
-    public static NodeDAO getInstance() {
-        return HolderClass.instance;
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取节点内存总量
+     * @Date 10:08 2019/4/11
+     * @Param
+     * @return M为单位
+     **/
+    double getNodeMemTotal(String clusterIp, String hostName);
 
-//    public static String getForecastNode(String startTime,String endTime) {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("startTime", startTime);
-//        params.put("endTime", endTime);
-//        params.put("id", "node");
-//        String url = "http://"+ Constant.HOST+":"+Constant.PORT+"/forecast/forecastValues";
-//        HttpClientResult httpClientResult = null;
-//        try {
-//            httpClientResult = HttpClientUtils.doGet(url);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-//            System.out.println("get index data failed!");
-//            return null;
-//        }
-//
-//        return httpClientResult.getContent();
-//    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个节点过去一个调控周期的cpu利用率最大值
+     * @Date 15:08 2019/4/10
+     * @Param
+     * @return
+     **/
+    double getLastPeriodMaxCpuUsage(String masterIp, String hostName, String startTime, String endTime);
 
-    public static String getForecastNode(String startTime, String endTime) {
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个节点过去一个调控周期的内存利用率最大值
+     * @Date 15:08 2019/4/10
+     * @Param
+     * @return
+     **/
+    double getLastPeriodMaxMemUsage(String masterIp, String hostName, String startTime, String endTime);
 
-        String params="id=node"+"&startTime="+startTime+"&endTime="+endTime;
-        String url = "http://" + Constant.URL_HOST + ":" + Constant.URL_PORT + "/forecast/forecastValues";
-
-        return sendGet(url,params);
-    }
-
-    public static List<ForecastNode> getForecastNodeList() {
-        String servicesStr = getForecastNode("2019-03-04%2017:00:00","2019-03-04%2018:00:00");
-
-        if (null == servicesStr) {
-            System.out.println("get forecast node data failed!");
-            return null;
-        }
-        List<ForecastNode> list = JSON.parseArray(servicesStr, ForecastNode.class);
-        return list;
-    }
-
-    public static List<NowNode> getNowNodeList() {
-        String servicesStr = sendGet("http://"+ Constant.URL_HOST+":"+Constant.URL_PORT+"/nowNode","");
-
-        if (null == servicesStr) {
-            System.out.println("get now node data failed!");
-            return null;
-        }
-        List<NowNode> list = JSON.parseArray(servicesStr, NowNode.class);
-        return list;
-    }
-
-    public static void main(String[] args) {
-
-        String returnValue = JSON.toJSONString(getNowNodeList(), WriteMapNullValue,
-                WriteNullNumberAsZero, WriteNullStringAsEmpty, WriteNullListAsEmpty);
-        System.out.println(returnValue);
-//        System.out.println(String.valueOf(getPodNumberByServiceLoad("online","wordpress",56)));
-
-    }
 }
