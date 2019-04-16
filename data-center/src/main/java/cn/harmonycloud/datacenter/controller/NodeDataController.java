@@ -142,27 +142,22 @@ public class NodeDataController {
                 ins+=pd.getAllocatableMem();
             }
         }
+        ins/=1024;
         responseMap.put("memTotal",ins);
         return responseMap;
     }
     @GetMapping("/node/lastPeriodMaxCpuUsage")
-    public Map<String, Double> getNodeMaxCpu(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
-            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
+    public Map<String, Double> getNodeMaxCpu(@RequestParam("clusterIp") String clusterIp
+            , @RequestParam("hostName") String hostName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
         Map<String, Double> responseMap = new HashMap<>();
         List<NodeData> pod=nodeDataService.getNowNodes();
         double ins=0;
-        ServiceRequest serviceRequests=new ServiceRequest();
-        serviceRequests.setClusterIp(clusterIp);
-        serviceRequests.setNamespace(namespace);
-        serviceRequests.setServiceName(serviceName);
-        serviceRequests.setStartTime(startTime);
-        serviceRequests.setEndTime(endTime);
         Date startTimes=new Date();
         Date endTimes=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            startTimes = df.parse(serviceRequests.getStartTime());
-            endTimes=df.parse(serviceRequests.getEndTime());
+            startTimes = df.parse(startTime);
+            endTimes=df.parse(endTime);
         }
         catch (ParseException e)
         {
@@ -170,8 +165,8 @@ public class NodeDataController {
         }
         for(NodeData pd:pod)
         {
-            if(serviceRequests.getClusterIp().equals(pd.getClusterMasterIP())&&
-                    serviceRequests.getServiceName().equals(pd.getNodeName()))
+            if(clusterIp.equals(pd.getClusterMasterIP())&&
+                    hostName.equals(pd.getNodeName()))
             {
                 Date nowTime=new Date();
                 try
@@ -193,23 +188,17 @@ public class NodeDataController {
         return responseMap;
     }
     @GetMapping("/node/lastPeriodMaxMemUsage")
-    public Map<String, Double> getNodeMaxMem(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
-            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
+    public Map<String, Double> getNodeMaxMem(@RequestParam("clusterIp") String clusterIp
+            , @RequestParam("hostName") String hostName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
         Map<String, Double> responseMap = new HashMap<>();
         List<NodeData> pod=nodeDataService.getNowNodes();
         double ins=0;
-        ServiceRequest serviceRequests=new ServiceRequest();
-        serviceRequests.setClusterIp(clusterIp);
-        serviceRequests.setNamespace(namespace);
-        serviceRequests.setServiceName(serviceName);
-        serviceRequests.setStartTime(startTime);
-        serviceRequests.setEndTime(endTime);
         Date startTimes=new Date();
         Date endTimes=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            startTimes = df.parse(serviceRequests.getStartTime());
-            endTimes=df.parse(serviceRequests.getEndTime());
+            startTimes = df.parse(startTime);
+            endTimes=df.parse(endTime);
         }
         catch (ParseException e)
         {
@@ -217,8 +206,8 @@ public class NodeDataController {
         }
         for(NodeData pd:pod)
         {
-            if(serviceRequests.getClusterIp().equals(pd.getClusterMasterIP())&&
-                    serviceRequests.getServiceName().equals(pd.getNodeName()))
+            if(clusterIp.equals(pd.getClusterMasterIP())&&
+                    hostName.equals(pd.getNodeName()))
             {
                 Date nowTime=new Date();
                 try

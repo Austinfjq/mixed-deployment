@@ -270,14 +270,13 @@ public class ServiceDataController {
     @GetMapping("/service/onlineServices")
     public List<services> getService(@RequestParam("clusterIp") String clusterIp)
     {
-        String newStr = clusterIp.substring(1, clusterIp.length()-1);
         List<ServiceData> pod=serviceDataService.getNowServices();
         List<services> serviceNodes=new ArrayList<services>();
         for(ServiceData pd:pod)
         {
             //System.out.println(newStr + "1\n");
             //System.out.println(pd.getClusterMasterIP() + "2\n");
-            if(newStr.equals(pd.getClusterMasterIP()))
+            if(clusterIp.equals(pd.getClusterMasterIP()))
             {
                 services sn=new services();
                 sn.setClusterIp(pd.getClusterMasterIP());

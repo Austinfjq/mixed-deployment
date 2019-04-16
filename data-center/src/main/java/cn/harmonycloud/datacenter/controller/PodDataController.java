@@ -93,9 +93,9 @@ public class PodDataController {
         {
             Map<String, String> responseMap = new HashMap<>();
             //System.out.println(pd.toString()+ "\n");
-            if(clusterIp.equals(pd.getClusterMasterIP())&&
-                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName())
-            &&hostName.equals(pd.getNodeName()))
+            //if(clusterIp.equals(pd.getClusterMasterIP())&&
+            //        namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName())
+            //&&hostName.equals(pd.getNodeName()))
             {
                 responseMap.put("podName",pd.getPodName());
                 map.add(responseMap);

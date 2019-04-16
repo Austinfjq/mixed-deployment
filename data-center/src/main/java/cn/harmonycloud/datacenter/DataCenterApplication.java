@@ -16,8 +16,8 @@ public class DataCenterApplication {
         Properties properties = new Properties();
         InputStream in = null;
         //String path = "./usr/local/data-center/application.properties";
-        //String path = "/root/application/application.properties";
-        String path = "./data-center/application.properties";
+        String path = "/root/application/application.properties";
+        //String path = "./data-center/application.properties";
         //String path = "E:\\mixed-deployment\\data-center";
         if(args.length != 0){//args[0]-->配置文件地址
             in = new FileInputStream(new File(args[0]));
