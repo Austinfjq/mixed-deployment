@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * 暂未支持多线程
  */
 public class SearchOptSolution {
-    private static final DefaultGreedyAlgorithm defaultGreedyAlgorithm = new DefaultGreedyAlgorithm();
+    public static final DefaultGreedyAlgorithm defaultGreedyAlgorithm = new DefaultGreedyAlgorithm();
     private static final GreedyAlgorithmIgnoreResourcePriority greedyAlgorithmIgnoreResourcePriority = new GreedyAlgorithmIgnoreResourcePriority();
     private static final GreedyAlgorithmOnlyResourcePriority greedyAlgorithmOnlyResourcePriority = new GreedyAlgorithmOnlyResourcePriority();
     private static final Random random = new Random();
@@ -79,7 +79,7 @@ public class SearchOptSolution {
     public static SearchOptSolution getInitialShuffleSolution(Cache cache, List<Pod> pods) {
         // 使用隔离的新缓存
         Cache laterCache = cache.clone();
-        // 为pod随机生成符合predicate rules的可行解，随机改变调度的顺序
+        // 为pod随机生成符合predicate rules的可行解，随机改变调度pod的顺序
         List<Pod> shuffledPods = new ArrayList<>(pods);
         Collections.shuffle(shuffledPods);
         Map<Pod, String> map = new HashMap<>();
@@ -222,5 +222,13 @@ public class SearchOptSolution {
 
     public List<String> getHosts() {
         return hosts;
+    }
+
+    public void setHosts(List<String> hosts) {
+        this.hosts = hosts;
+    }
+
+    public List<Pod> getPods() {
+        return pods;
     }
 }

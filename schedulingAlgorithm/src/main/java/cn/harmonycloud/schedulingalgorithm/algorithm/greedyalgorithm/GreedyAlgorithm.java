@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface GreedyAlgorithm {
     List<Pod> presort(List<Pod> pods, Cache cache);
+    boolean runAllPredicates(Pod pod, Node node, Cache cache);
     List<Node> predicates(Pod pod, Cache cache);
     List<HostPriority> priorities(Pod pod, List<Node> nodes, Cache cache);
     HostPriority selectHost(List<HostPriority> hostPriorityList, Cache cache);
