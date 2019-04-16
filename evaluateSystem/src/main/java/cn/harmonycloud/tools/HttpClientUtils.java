@@ -1,6 +1,5 @@
 package cn.harmonycloud.tools;
 
-import cn.harmonycloud.beans.HttpClientResult;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;

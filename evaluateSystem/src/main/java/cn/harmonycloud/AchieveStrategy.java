@@ -1,8 +1,6 @@
 package cn.harmonycloud;
 
-import cn.harmonycloud.strategy.AbstractClusterStrategy;
-import cn.harmonycloud.strategy.AbstractNodeStrategy;
-import cn.harmonycloud.strategy.AbstractServiceStrategy;
+import cn.harmonycloud.beans.EvaluateStrategy;
 import cn.harmonycloud.tools.XMLUtil;
 
 import java.util.List;
@@ -14,39 +12,37 @@ import java.util.List;
  */
 public class AchieveStrategy {
 
-    private static List<AbstractNodeStrategy> abstractNodeStrategies = null;
+    private static List<EvaluateStrategy> nodeStrategies = null;
 
-    private static List<AbstractServiceStrategy> abstractServiceStrategies = null;
+    private static List<EvaluateStrategy> serviceStrategies = null;
 
-    private static List<AbstractClusterStrategy> abstractClusterStrategies = null;
+    private static List<EvaluateStrategy> clusterStrategies = null;
 
 
     public static void inital() {
-        abstractNodeStrategies = XMLUtil.getNodeStrategys();
-        abstractServiceStrategies = XMLUtil.getServiceStrategys();
-        abstractClusterStrategies = XMLUtil.getClusterStrategys();
+        nodeStrategies = XMLUtil.getNodeStrategys();
+        serviceStrategies = XMLUtil.getServiceStrategys();
+        clusterStrategies = XMLUtil.getClusterStrategys();
     }
 
-    public static List<AbstractNodeStrategy> getAbstractNodeStrategies(){
-        if (null == abstractNodeStrategies) {
+    public static List<EvaluateStrategy> getNodeStrategies(){
+        if (null == nodeStrategies) {
             inital();
         }
-        return abstractNodeStrategies;
+        return nodeStrategies;
     }
 
-    public static List<AbstractServiceStrategy> getAbstractServiceStrategies(){
-        if (null == abstractServiceStrategies) {
+    public static List<EvaluateStrategy> getServiceStrategies(){
+        if (null == serviceStrategies) {
             inital();
         }
-        return abstractServiceStrategies;
+        return serviceStrategies;
     }
 
-    public static List<AbstractClusterStrategy> getAbstractClusterStrategies(){
-        if (null == abstractClusterStrategies) {
+    public static List<EvaluateStrategy> getClusterStrategies(){
+        if (null == clusterStrategies) {
             inital();
         }
-        return abstractClusterStrategies;
+        return clusterStrategies;
     }
-
-
 }

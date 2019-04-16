@@ -1,22 +1,16 @@
-package cn.harmonycloud.strategy;
-
-import cn.harmonycloud.beans.NodeLoad;
+package cn.harmonycloud.beans;
 
 /**
  * @author wangyuzhong
  * @date 19-1-21 上午11:07
  * @Despriction
  */
-public abstract class AbstractNodeStrategy {
+public class EvaluateStrategy {
 
     private String name;
     private String className;
-    private double maxValue;
     private boolean status;
     private String description;
-
-    public AbstractNodeStrategy() {
-    }
 
     public String getName() {
         return name;
@@ -32,14 +26,6 @@ public abstract class AbstractNodeStrategy {
 
     public void setClassName(String className) {
         this.className = className;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
     }
 
     public boolean isStatus() {
@@ -60,14 +46,12 @@ public abstract class AbstractNodeStrategy {
 
     @Override
     public String toString() {
-        return "AbstractNodeStrategy{" +
+        return "EvaluateStrategy{" +
                 "name='" + name + '\'' +
                 ", className='" + className + '\'' +
-                ", maxValue=" + maxValue +
                 ", status=" + status +
                 ", description='" + description + '\'' +
                 '}';
     }
 
-    public abstract boolean evaluate(NodeLoad nodeLoad);
 }

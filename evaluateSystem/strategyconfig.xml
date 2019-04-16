@@ -3,23 +3,14 @@
         <strategy>
             <name>nodeCpuStrategy</name>
             <class>cn.harmonycloud.strategy.NodeCpuStrategy</class>
-            <maxValue>0.8</maxValue>
             <status>true</status>
             <description>This is the node cpu evaluate strategy!</description>
         </strategy>
         <strategy>
             <name>nodeMemoryStrategy</name>
             <class>cn.harmonycloud.strategy.NodeMemoryStrategy</class>
-            <maxValue>0.8</maxValue>
             <status>true</status>
             <description>This is the node memory evaluate strategy!</description>
-        </strategy>
-        <strategy>
-            <name>nodeDiskStrategy</name>
-            <class>cn.harmonycloud.strategy.NodeDiskStrategy</class>
-            <maxValue>0.8</maxValue>
-            <status>true</status>
-            <description>This is the node disk evaluate strategy!</description>
         </strategy>
     </node>
 
