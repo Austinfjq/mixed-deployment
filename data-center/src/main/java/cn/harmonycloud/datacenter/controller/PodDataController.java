@@ -80,9 +80,9 @@ public class PodDataController {
         return podDataService.getNowServices();
     }
     @GetMapping("/node/service/pods")
-    public Map<String, String> getNowServices(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+    public List<Map<String, String>> getNowServices(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
             , @RequestParam("serviceName") String serviceName, @RequestParam("hostName") String hostName){
-        Map<String, String> responseMap = new HashMap<>();
+        List<Map<String, String>> map=new ArrayList<Map<String, String>>();
         SearchPod pdd=new SearchPod();
         pdd.setClusterIp(clusterIp);
         pdd.setNamespace(namespace);
@@ -91,14 +91,17 @@ public class PodDataController {
         List<PodData> pod=podDataService.getNowServices();
         for(PodData pd:pod)
         {
+            Map<String, String> responseMap = new HashMap<>();
+            //System.out.println(pd.toString()+ "\n");
             if(clusterIp.equals(pd.getClusterMasterIP())&&
                     namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName())
             &&hostName.equals(pd.getNodeName()))
             {
                 responseMap.put("podName",pd.getPodName());
+                map.add(responseMap);
             }
         }
-        return responseMap;
+        return map;
     }
     @GetMapping("/service/podNums")
     public Map<String, Integer> getPodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace

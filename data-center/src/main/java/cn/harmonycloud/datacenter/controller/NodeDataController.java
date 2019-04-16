@@ -103,7 +103,6 @@ public class NodeDataController {
         List<SearchNode> searchNodes=new ArrayList<SearchNode>();
         for(NodeData pd:pod)
         {
-
             if(clusterIp.equals(pd.getClusterMasterIP()))
             {
                 SearchNode sn=new SearchNode();

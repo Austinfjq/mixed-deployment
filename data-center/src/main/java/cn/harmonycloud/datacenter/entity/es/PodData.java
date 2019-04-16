@@ -405,4 +405,40 @@ public class PodData {
         this.setPodName(key.get(0));
         this.setNamespace(key.get(1));
     }
+
+    @Override
+    public String toString() {
+        return "PodData{" +
+                "id='" + id + '\'' +
+                ", time='" + time + '\'' +
+                ", podName='" + podName + '\'' +
+                ", podIp='" + podIp + '\'' +
+                ", nodeName='" + nodeName + '\'' +
+                ", serviceName='" + serviceName + '\'' +
+                ", namespace='" + namespace + '\'' +
+                ", onlineType='" + onlineType + '\'' +
+                ", resourceKind='" + resourceKind + '\'' +
+                ", resourceName='" + resourceName + '\'' +
+                ", state='" + state + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", imageName='" + imageName + '\'' +
+                ", cpuUsage=" + cpuUsage +
+                ", cpuRequest=" + cpuRequest +
+                ", cpuLimit=" + cpuLimit +
+                ", memUsage=" + memUsage +
+                ", memRequest=" + memRequest +
+                ", memLimit=" + memLimit +
+                ", volumeType='" + volumeType + '\'' +
+                ", volumeUsage=" + volumeUsage +
+                ", readsBytes=" + readsBytes +
+                ", writesBytes=" + writesBytes +
+                ", receiveBytes=" + receiveBytes +
+                ", responseBytes=" + responseBytes +
+                ", locateNodeIP='" + locateNodeIP + '\'' +
+                ", deletionStamp='" + deletionStamp + '\'' +
+                ", ownerReferencesUid='" + ownerReferencesUid + '\'' +
+                ", netErrors=" + netErrors +
+                ", clusterMasterIP='" + clusterMasterIP + '\'' +
+                '}';
+    }
 }
