@@ -5,11 +5,13 @@ import cn.harmonycloud.dao.ServiceDAO;
 import cn.harmonycloud.tools.DataUtil;
 import cn.harmonycloud.tools.HttpClientResult;
 import cn.harmonycloud.tools.HttpClientUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +62,7 @@ public class ServiceDaoImp implements ServiceDAO {
     public List<Service> getAllOnlineService(String masterIp) {
         Map<String,String> params = new HashMap<>();
         params.put("clusterIp", masterIp);
-//        String url = "http://"+ hostIp + ":" + port + "/service/onlineServices";
-        String url = "http://10.10.101.115:8043/service/onlineServices";
+        String url = "http://"+ hostIp + ":" + port + "/service/onlineServices";
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -72,7 +73,26 @@ public class ServiceDaoImp implements ServiceDAO {
             LOGGER.error("get onlineServices data failed!");
             return null;
         }
-        return DataUtil.jsonStringtoListObject(httpClientResult.getContent());
+
+        String serviceListStr = httpClientResult.getContent();
+        List<Service> services = new ArrayList<>();
+
+        JSONArray jsonArray = JSONArray.parseArray(serviceListStr);
+
+        for (int i=0; i<jsonArray.size(); i++) {
+            String clusterIP = jsonArray.getJSONObject(i).getString("masterIp");
+            String namespace = jsonArray.getJSONObject(i).getString("namespace");
+            String serviceName = jsonArray.getJSONObject(i).getString("serviceName");
+            int serviceType = jsonArray.getJSONObject(i).getIntValue("serviceType");
+            Service service = new Service();
+            service.setMasterIp(clusterIP);
+            service.setNamespace(namespace);
+            service.setServiceName(serviceName);
+            service.setServiceType(serviceType);
+            services.add(service);
+        }
+
+        return services;
     }
 
     @Override
@@ -170,22 +190,4 @@ public class ServiceDaoImp implements ServiceDAO {
         return nextPeriodMaxRequestNums;
     }
 
-    public static void main(String[] args) {
-
-        ServiceDaoImp serviceDaoImp = new ServiceDaoImp();
-        String cluterIP = "\"10.10.102.25\"";
-        String namespace = "default";
-        String serviceName = "";
-        double requestNums = 100;
-        String startTime = "2019-04-15 17:34:56";
-        String endTime = "2019-04-15 17:44:56";
-
-
-        //测试getAllOnlineService接口
-//        List<Service> services = serviceDaoImp.getAllOnlineService(cluterIP);
-//
-//        for (Service service1 : services) {
-//            System.out.println(service1.toString());
-//        }
-    }
 }

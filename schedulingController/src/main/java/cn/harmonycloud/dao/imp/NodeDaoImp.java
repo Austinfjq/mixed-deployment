@@ -84,7 +84,21 @@ public class NodeDaoImp implements NodeDAO {
             return null;
         }
 
-        return DataUtil.jsonStringtoListObject(httpClientResult.getContent());
+        String podListStr = httpClientResult.getContent();
+        List<Node> nodes = new ArrayList<>();
+
+        JSONArray jsonArray = JSONArray.parseArray(podListStr);
+
+        for (int i=0; i<jsonArray.size(); i++) {
+            String clusterIP = jsonArray.getJSONObject(i).getString("clusterIp");
+            String hostName = jsonArray.getJSONObject(i).getString("hostName");
+            Node node = new Node();
+            node.setMasterIp(clusterIP);
+            node.setHostName(hostName);
+            nodes.add(node);
+        }
+
+        return nodes;
     }
 
     @Override
@@ -113,8 +127,7 @@ public class NodeDaoImp implements NodeDAO {
         Map<String,String> params = new HashMap<>();
         params.put("clusterIp", clusterIp);
         params.put("hostName", hostName);
-//        String url = "http://"+ hostIp + ":" + port + "/node/memTotal";
-        String url = "http://10.10.101.115:8043/node/memTotal";
+        String url = "http://"+ hostIp + ":" + port + "/node/memTotal";
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -137,8 +150,7 @@ public class NodeDaoImp implements NodeDAO {
         params.put("hostName", hostName);
         params.put("startTime", startTime);
         params.put("endTime", endTime);
-//        String url = "http://"+ hostIp + ":" + port + "/node/lastPeriodMaxCpuUsage";
-        String url = "http://10.10.101.115:8043/node/lastPeriodMaxCpuUsage";
+        String url = "http://"+ hostIp + ":" + port + "/node/lastPeriodMaxCpuUsage";
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -149,7 +161,9 @@ public class NodeDaoImp implements NodeDAO {
             LOGGER.error("get node cpu usage max data failed!");
             return 0;
         }
-        return Double.valueOf(httpClientResult.getContent());
+        JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
+        double lastPeriodMaxCpuUsage = jsonObject.getIntValue("lastPeriodMaxCpuUsage");
+        return lastPeriodMaxCpuUsage;
     }
 
     @Override
@@ -159,8 +173,7 @@ public class NodeDaoImp implements NodeDAO {
         params.put("hostName", hostName);
         params.put("startTime", startTime);
         params.put("endTime", endTime);
-//        String url = "http://"+ hostIp + ":" + port + "/node/lastPeriodMaxMemUsage";
-        String url = "http://10.10.101.115:8043/node/lastPeriodMaxMemUsage";
+        String url = "http://"+ hostIp + ":" + port + "/node/lastPeriodMaxMemUsage";
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -171,38 +184,8 @@ public class NodeDaoImp implements NodeDAO {
             LOGGER.error("get node memory usage max data failed!");
             return 0;
         }
-        return Double.valueOf(httpClientResult.getContent());
-    }
-
-    public static void main(String[] args) {
-        String clusterIp = "10.10.102.25";
-        String namespace = "kube-system";
-        String serviceName = "";
-        String hostName = "10.10.101.65-share";
-        String startTime = "2019-04-15 17:34:56";
-        String endTime = "2019-04-15 17:44:56";
-
-        NodeDaoImp nodeDaoImp = new NodeDaoImp();
-
-
-        //测试getNodeList接口
-//        List<Node> nodes = nodeDaoImp.getNodeList(clusterIp);
-//        for (Node node:nodes) {
-//            System.out.println(node.toString());
-//        }
-
-        //测试getNodeMemTotal接口
-//        double memTotal = nodeDaoImp.getNodeMemTotal(clusterIp,hostName);
-//        System.out.println(memTotal);
-
-        //测试getLastPeriodMaxCpuUsage接口
-//        double cpuMax = nodeDaoImp.getLastPeriodMaxCpuUsage(clusterIp,hostName,startTime,endTime);
-//        System.out.println(cpuMax);
-
-
-        //测试getLastPeriodMaxMemUsage接口
-//        double memMax = nodeDaoImp.getLastPeriodMaxMemUsage(clusterIp,hostName,startTime,endTime);
-//        System.out.println(memMax);
-
+        JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
+        double lastPeriodMaxMemUsage = jsonObject.getIntValue("lastPeriodMaxMemUsage");
+        return lastPeriodMaxMemUsage;
     }
 }
