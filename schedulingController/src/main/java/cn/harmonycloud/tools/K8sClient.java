@@ -28,7 +28,11 @@ public class K8sClient {
     private static String CA_DATA;
 
     public static KubernetesClient createClient(String clusterIP, String port, String namespace) {
-        Config config = new ConfigBuilder().withClientCertData(CERT_DATA).withClientKeyData(KEY_DATA).withCaCertData(CA_DATA).withMasterUrl("https://" + clusterIP +":" + port + "/").withUsername("kubernetes-admin").withNamespace(namespace).build();
+        Config config = new ConfigBuilder()
+                .withOauthToken("330957b867a3462ea457bec41410624b")
+                .withTrustCerts(true)
+                .withMasterUrl("https://" + clusterIP +":" + port + "/")
+                .withNamespace(namespace).build();
         KubernetesClient client = new DefaultKubernetesClient(config);
         if (client == null) {
             LOGGER.error("Create k8s client failed！");
