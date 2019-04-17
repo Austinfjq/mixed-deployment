@@ -45,4 +45,6 @@ public interface IOfflineRegulateControl {
      * @return
      **/
     List<OfflineDilatationStrategy> productOfflineDilatationStrategy(Node node, int regulateNums);
+
+    void process();
 }

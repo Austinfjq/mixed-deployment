@@ -1,7 +1,7 @@
 package cn.harmonycloud.controller;
 
 
-import cn.harmonycloud.service.serviceImp.CreateResourceServiceImp;
+import cn.harmonycloud.service.ICreatResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +24,19 @@ public class AppInitalController {
     private final static Logger LOGGER = LoggerFactory.getLogger(AppInitalController.class);
 
     @Autowired
-    CreateResourceServiceImp iCreatResource;
+    private ICreatResource iCreatResource;
 
     @PostMapping("/yamlFile")
     public boolean initialApp(@RequestParam("masterIP") String masterIP,
-                             @RequestParam("port") String port,
-                             @RequestParam("namespace") String namespace,
-                             @RequestParam("yaml") String yaml) {
-        LOGGER.debug("masterIP="+masterIP+" ,"+
-                "port="+port+" ,"+
-                "namespace="+namespace+" ,"+
-                "yaml="+yaml);
+                              @RequestParam("port") String port,
+                              @RequestParam("namespace") String namespace,
+                              @RequestParam("yaml") String yaml) {
+        LOGGER.debug("masterIP=" + masterIP + " ," +
+                "port=" + port + " ," +
+                "namespace=" + namespace + " ," +
+                "yaml=" + yaml);
 
-        return iCreatResource.createResource(masterIP,port,namespace,yaml);
+        return iCreatResource.createResource(masterIP, port, namespace, yaml);
     }
 
 }

@@ -10,6 +10,9 @@ import cn.harmonycloud.tools.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.List;
 
 /**
  * @classname：OnlineRegulateControlServiceImp
@@ -32,6 +35,9 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
 
     @Autowired
     StrategyDaoImp iStrategyDeal;
+
+    @Value("${ClusterIp}")
+    private String clusterIp;
 
     @Override
     public boolean dealService(Service service) {
@@ -60,30 +66,30 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
         double maxRequestNums = getMaxRequestNums(lastPeriodMaxRequestNums, nextPeriodMaxRequestNums);
 
         int serviceRequestPodNums = serviceDAO.getServiceRequestPodNums(service.getMasterIp(), service.getNamespace(), service.getServiceName(), maxRequestNums);
-        return servicePodNums-serviceRequestPodNums;
+        return servicePodNums - serviceRequestPodNums;
     }
 
     @Override
     public OnlineStrategy productOnlineStrategy(Service service, int regulateNums) {
         if (regulateNums == 0) {
             LOGGER.error("this service is not need regulate!");
-        }else if (regulateNums < 0) {
+        } else if (regulateNums < 0) {
             return iStrategyProduce.produceOnlineDilatationStrategy(service.getMasterIp(), service.getNamespace(), service.getServiceName(), Math.abs(regulateNums));
-        }else {
+        } else {
             return iStrategyProduce.produceOnlineShrinkageStrategy(service.getMasterIp(), service.getNamespace(), service.getServiceName(), Math.abs(regulateNums));
         }
         return null;
     }
 
     double getMaxRequestNums(double lastPeriodMaxRequestNums, double nextPeriodMaxRequestNums) {
-        return lastPeriodMaxRequestNums>=nextPeriodMaxRequestNums?lastPeriodMaxRequestNums:nextPeriodMaxRequestNums;
+        return lastPeriodMaxRequestNums >= nextPeriodMaxRequestNums ? lastPeriodMaxRequestNums : nextPeriodMaxRequestNums;
     }
 
     double getLastPeriodMaxRequestNums(String masterIp, String namespace, String serviceName) {
         String endTime = DateUtil.getCurrentTime();
         String startTime = DateUtil.getLastPeriodTime();
 
-        return serviceDAO.getLastPeriodMaxRequestNums(masterIp,namespace,serviceName,startTime,endTime);
+        return serviceDAO.getLastPeriodMaxRequestNums(masterIp, namespace, serviceName, startTime, endTime);
     }
 
     double getNextPeriodMaxRequestNums(String masterIp, String namespace, String serviceName) {
@@ -93,4 +99,25 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
         return serviceDAO.getNextPeriodMaxRequestNums(masterIp, namespace, serviceName, startTime, endTime);
     }
 
+
+    @Override
+    public void process() {
+        //ServiceDAO serviceDAO = new ServiceDaoImp();
+        System.out.println("clusterIp："+clusterIp);
+        List<Service> services = serviceDAO.getAllOnlineService(clusterIp);
+
+        if (services == null) {
+            LOGGER.error("get all online service failed!");
+            return;
+        }
+
+        if (services.size() == 0) {
+            LOGGER.error("there is no any online service!");
+            return;
+        }
+
+        for (Service service : services) {
+            dealService(service);
+        }
+    }
 }

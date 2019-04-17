@@ -2,9 +2,11 @@ package cn.harmonycloud.service.serviceImp;
 
 import cn.harmonycloud.beans.OnlineStrategy;
 import cn.harmonycloud.beans.Service;
-import cn.harmonycloud.dao.imp.ServiceDaoImp;
-import cn.harmonycloud.dao.imp.StrategyDaoImp;
+import cn.harmonycloud.dao.ServiceDAO;
+import cn.harmonycloud.dao.StrategyDAO;
 import cn.harmonycloud.service.ICreatResource;
+import cn.harmonycloud.service.IResolveYamlFile;
+import cn.harmonycloud.service.IStrategyProduce;
 import cn.harmonycloud.tools.K8sClient;
 import com.alibaba.fastjson.JSONObject;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -27,16 +29,16 @@ import java.io.InputStream;
 public class CreateResourceServiceImp implements ICreatResource {
 
     @Autowired
-    ResolveYamlFileServiceImp iResolveYamlFile;
+    private IResolveYamlFile iResolveYamlFile;
 
     @Autowired
-    ServiceDaoImp serviceDAO;
+    private ServiceDAO serviceDAO;
 
     @Autowired
-    StrategyProduceServiceImp iStrategyProduce;
+    private IStrategyProduce iStrategyProduce;
 
     @Autowired
-    StrategyDaoImp iStrategyDeal;
+    private StrategyDAO iStrategyDeal;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CreateResourceServiceImp.class);
 
@@ -58,10 +60,10 @@ public class CreateResourceServiceImp implements ICreatResource {
             return false;
         }
 
-        Service service = iResolveYamlFile.resolveService(masterIP,jsonObject);
+        Service service = iResolveYamlFile.resolveService(masterIP, jsonObject);
         serviceDAO.addService(service);
 
-        LOGGER.debug("service:"+ service.toString()+" create succeed!");
+        LOGGER.debug("service:" + service.toString() + " create succeed!");
 
         return true;
     }
@@ -82,14 +84,14 @@ public class CreateResourceServiceImp implements ICreatResource {
 
         String name = iResolveYamlFile.getCustomResourceName(jsonObject);
 
-        OnlineStrategy onlineStrategy = iStrategyProduce.produceOnlineDilatationStrategy(masterIP,namespace,name,replicas);
+        OnlineStrategy onlineStrategy = iStrategyProduce.produceOnlineDilatationStrategy(masterIP, namespace, name, replicas);
 
         if (onlineStrategy == null) {
             LOGGER.error("produce onlineStrategy fialed!");
             return false;
         }
 
-        LOGGER.debug("succeed produce onlineStrategy:"+onlineStrategy.toString());
+        LOGGER.debug("succeed produce onlineStrategy:" + onlineStrategy.toString());
 
         boolean strategyDeal = iStrategyDeal.dealOnlineStrategy(onlineStrategy);
 
@@ -101,22 +103,21 @@ public class CreateResourceServiceImp implements ICreatResource {
     }
 
 
-
     /**
+     * @return
      * @Author WANGYUZHONG
      * @Description //部署应用所有的组件
      * @Date 11:47 2019/4/9
      * @Param
-     * @return
      **/
-    public boolean createResource(String masterIP, String port, String namespace,String yaml) {
+    public boolean createResource(String masterIP, String port, String namespace, String yaml) {
 
         KubernetesClient client = K8sClient.createClient(masterIP, port, namespace);
         if (client == null) {
             LOGGER.error("client is null!");
         }
         LOGGER.debug("client create succeed!");
-        return deal(masterIP,client,yaml);
+        return deal(masterIP, client, yaml);
 
     }
 
@@ -127,13 +128,13 @@ public class CreateResourceServiceImp implements ICreatResource {
 
         switch (resouceKind) {
             case "Service":
-                return creatServiceResource(masterIP,client,yaml);
+                return creatServiceResource(masterIP, client, yaml);
             case "Deployment":
-                return creatCustomResource(masterIP,client,yaml);
+                return creatCustomResource(masterIP, client, yaml);
             case "StatefulSet":
-                return creatCustomResource(masterIP,client,yaml);
+                return creatCustomResource(masterIP, client, yaml);
             default:
-                return creatOthersResource(client,yaml);
+                return creatOthersResource(client, yaml);
         }
     }
 
