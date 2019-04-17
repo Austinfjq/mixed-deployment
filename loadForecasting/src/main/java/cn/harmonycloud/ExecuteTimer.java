@@ -1,12 +1,14 @@
 package cn.harmonycloud;
 
+import cn.harmonycloud.tools.PropertyFileUtil;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
  * @author wangyuzhong
  * @date 18-12-5 下午2:40
- * @Despriction
+ * @Despriction 定时任务，周期性对所有需要预测的指标进行预测
  */
 public class ExecuteTimer {
     public static void main(String[] args) {
@@ -20,7 +22,7 @@ public class ExecuteTimer {
 
         Timer timer = new Timer();
         long delay = 0;
-        long intevalPeriod = 120 * 1000;
-        timer.scheduleAtFixedRate(task, delay, intevalPeriod);
+        long intervalPeriod = Long.valueOf(PropertyFileUtil.getValue("PredectPeriod"));
+        timer.scheduleAtFixedRate(task, delay, intervalPeriod);
     }
 }

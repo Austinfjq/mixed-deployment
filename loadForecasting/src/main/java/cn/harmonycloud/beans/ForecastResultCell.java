@@ -1,6 +1,4 @@
-package cn.harmonycloud.entry;
-
-import java.util.Date;
+package cn.harmonycloud.beans;
 
 /**
  * @author wangyuzhong

@@ -1,4 +1,4 @@
-package cn.harmonycloud.entry;
+package cn.harmonycloud.beans;
 
 import java.util.*;
 

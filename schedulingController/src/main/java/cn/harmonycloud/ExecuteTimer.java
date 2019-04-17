@@ -18,7 +18,7 @@ import java.util.TimerTask;
  */
 
 @Component
-@Order(value = 1)
+@Order(value = 2)
 public class ExecuteTimer implements ApplicationRunner {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExecuteTimer.class);

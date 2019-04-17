@@ -1,4 +1,4 @@
-package cn.harmonycloud.entry;
+package cn.harmonycloud.tools;
 
 import java.io.Serializable;
 
