@@ -63,6 +63,7 @@ public class ServiceDaoImp implements ServiceDAO {
         Map<String,String> params = new HashMap<>();
         params.put("clusterIp", masterIp);
         String url = "http://"+ hostIp + ":" + port + "/service/onlineServices";
+//        String url = "http://10.107.249.160:8080/service/onlineServices";
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -188,6 +189,14 @@ public class ServiceDaoImp implements ServiceDAO {
         JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
         double nextPeriodMaxRequestNums = jsonObject.getIntValue("lastPeriodMaxRequestNums");
         return nextPeriodMaxRequestNums;
+    }
+
+    public static void main(String[] args) {
+        ServiceDaoImp serviceDaoImp = new ServiceDaoImp();
+
+        List<Service> services = serviceDaoImp.getAllOnlineService("10.10.102.25");
+
+
     }
 
 }

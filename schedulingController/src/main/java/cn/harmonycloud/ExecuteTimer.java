@@ -36,6 +36,7 @@ public class ExecuteTimer implements ApplicationRunner {
         };
 
         LOGGER.info("start timer task!");
+        LOGGER.info(schedulePeriod+"");
         Timer timer = new Timer();
         long delay = 0;
         long intevalPeriod = schedulePeriod;
