@@ -1,65 +1,27 @@
 package cn.harmonycloud.DAO;
 
-import cn.harmonycloud.beans.HttpClientResult;
-import cn.harmonycloud.beans.NodeLoad;
-import cn.harmonycloud.tools.HttpClientUtils;
-import com.alibaba.fastjson.JSON;
+import cn.harmonycloud.beans.Node;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * @author wangyuzhong
- * @date 19-1-8 下午2:55
- * @Despriction
- */
+public interface NodeDAO {
 
-public class NodeDAO {
-
-    public NodeDAO() {
-    }
-
-    private static class HolderClass {
-        private final static NodeDAO instance = new NodeDAO();
-    }
-
-    public static NodeDAO getInstance() {
-        return HolderClass.instance;
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个集群中所有的工作节点
+     * @Date 10:08 2019/4/11
+     * @Param
+     * @return
+     **/
+    List<Node> getNodeList(String clusterIp);
 
 
-    public static String getNodesMonitorData(String startTime, String endTime) {
-        Map<String,String> params = new HashMap<>();
-        params.put("startTime",startTime);
-        params.put("endTime",endTime);
-        String url = "http://localhost:8080/evaluatesystem/nodes";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doGet(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get index data failed!");
-            return null;
-        }
-
-        return httpClientResult.getContent();
-    }
-
-
-    public static List<NodeLoad> getNodeLoadList(String startTime, String endTime) {
-        String servicesStr = getNodesMonitorData(startTime,endTime);
-
-        if (null == servicesStr) {
-            System.out.println("get service load data failed!");
-            return null;
-        }
-
-        List<NodeLoad> list = JSON.parseArray(servicesStr,NodeLoad.class);
-
-        return list;
-    }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取节点的某个指标最新值
+     * @Date 8:08 2019/4/15
+     * @Param 查询语句
+     * @return 
+     **/
+    double getNodeIndexValue(String queryStr);
 }

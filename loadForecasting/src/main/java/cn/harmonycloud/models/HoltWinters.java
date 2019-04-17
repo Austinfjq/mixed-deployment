@@ -1,10 +1,9 @@
 package cn.harmonycloud.models;
 
 
-import cn.harmonycloud.entry.DataPoint;
-import cn.harmonycloud.entry.DataSet;
-import cn.harmonycloud.examples.DataTranslation;
-import cn.harmonycloud.tools.Constant;
+import cn.harmonycloud.beans.DataPoint;
+import cn.harmonycloud.beans.DataSet;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.Iterator;
 
@@ -15,22 +14,30 @@ import java.util.Iterator;
  */
 public class HoltWinters {
 
+    private static final String ModelName = "HoltWinters";
     private double alpha;
     private double beta;
     private double gamma;
-
     private double initialLevel;
     private double initialTrend;
     private double[] initialSeasonalIndices;
-
     private double[] originalData;
     private DataSet dataPoints;
-
     private boolean initial = false;
 
 
     public HoltWinters(DataSet dataPoints) {
         this.dataPoints = dataPoints;
+        init();
+        findBestParams();
+    }
+
+    public HoltWinters(DataSet dataPoints, double alpha, double beta, double gamma) {
+        this.dataPoints = dataPoints;
+        this.alpha = alpha;
+        this.beta = beta;
+        this.gamma = gamma;
+        init();
     }
 
     public double getAlpha() {
@@ -45,7 +52,7 @@ public class HoltWinters {
         return gamma;
     }
 
-    public void init(DataSet dataPoints) {
+    public void init() {
         if (null == dataPoints) {
             throw new RuntimeException("Data is null!");
         }
@@ -63,29 +70,14 @@ public class HoltWinters {
         initialTrend = calculateInitialTrend(originalData,dataPoints.getPeriodsPerYear());
         initialSeasonalIndices = calculateSeasonalIndices(originalData,dataPoints.getPeriodsPerYear(),dataPoints.size()/dataPoints.getPeriodsPerYear());
 
-        findBestParams();
         initial = true;
-
-    }
-
-    public double[] cal(int m) {
-
-        System.out.println("The best alpha value: " + this.alpha);
-        System.out.println("The best beta value: " + this.beta);
-        System.out.println("The best gamma value: " + this.gamma);
-
-
-        double[] forecast = calculateHoltWinters(m);
-
-        return forecast;
     }
 
     public DataSet forecast(int m) {
         if (!initial) {
-            init(dataPoints);
+            init();
         }
-
-        double[] result = cal(m);
+        double[] result = calculateHoltWinters(m);
 
         DataSet dataSet = new DataSet();
 
@@ -93,7 +85,6 @@ public class HoltWinters {
             DataPoint dataPoint = new DataPoint(result[k],dataPoints.getMaxTime()+(k-dataPoints.size()+1)*dataPoints.getTimeInterval());
             dataSet.add(dataPoint);
         }
-
         return dataSet;
     }
 
@@ -101,13 +92,10 @@ public class HoltWinters {
 
         //St是水平组件值
         double[] St = new double[originalData.length];
-
         //Bt是趋势组件值
         double[] Bt = new double[originalData.length];
-
         //It是季节组件值
         double[] It = new double[originalData.length];
-
         //Ft是预测值
         double[] Ft = new double[originalData.length + m];
 
@@ -200,7 +188,6 @@ public class HoltWinters {
             }
 
         }
-
         return Ft;
     }
 
@@ -224,45 +211,14 @@ public class HoltWinters {
         return sum / (period * period);
     }
 
-
-    public void findBestParams(){
-        double minDiff = Double.MAX_VALUE;
-        for (double alpha = Constant.inital_alpha; alpha<=1.0; alpha=alpha+0.01) {
-            for (double beta = Constant.inital_beta;beta<=1.0; beta=beta+0.01) {
-                for (double gamma = Constant.inital_gamma;gamma<=1.0; gamma=gamma+0.01) {
-                    double diff = 0;
-                    double[] calRes = calculateHoltWinters(alpha,beta,gamma,5);
-                    for (int i=0;i<originalData.length;i++) {
-                        diff+=(Math.pow(calRes[i]-originalData[i],2));
-                    }
-                    double msg = diff/originalData.length;
-                    if (msg<minDiff) {
-                        this.alpha = alpha;
-                        this.beta = beta;
-                        this.gamma = gamma;
-                        minDiff = msg;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * See: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm
-     *
-     * @return - Seasonal Indices.
-     */
     private static double[] calculateSeasonalIndices(double[] y, int period, int seasons) {
 
         //每个季节的平均值
         double[] seasonalAverage = new double[seasons];
-
         //季节初始值
         double[] seasonalIndices = new double[period];
-
         //平均观察值　(实际值/对应季节的平均值)
         double[] averagedObservations = new double[y.length];
-
         //计算每个季节的平均值
         for (int i = 0; i < seasons; i++) {
             for (int j = 0; j < period; j++) {
@@ -289,19 +245,40 @@ public class HoltWinters {
         return seasonalIndices;
     }
 
-
-    public static void main(String[] args) {
-        DataSet dataSet = DataTranslation.getDataFromTxt();
-
-
-
-        HoltWinters holtWinters = new HoltWinters(dataSet);
-
-        DataSet dataSet1 = holtWinters.forecast(7);
-
-        for (DataPoint dataPoint:dataSet1) {
-            System.out.println(dataPoint.toString());
+    public void findBestParams() {
+        double minDiff = Double.MAX_VALUE;
+        for (double alpha = 0; alpha <= 1.0; alpha = alpha+0.01) {
+            for (double beta = 0; beta <= 1.0; beta = beta+0.01) {
+                for (double gamma = 0; gamma <= 1.0; gamma = gamma+0.01) {
+                    double diff = 0;
+                    HoltWinters holtWinters = new HoltWinters(this.dataPoints, alpha, beta, gamma);
+                    double[] calRes = holtWinters.calculateHoltWinters(0);
+                    for (int i = 0; i < originalData.length; i++) {
+                        diff+=(Math.pow(calRes[i]-originalData[i],2));
+                    }
+                    double msg = diff/originalData.length;
+                    if (msg<minDiff) {
+                        this.alpha = alpha;
+                        this.beta = beta;
+                        this.gamma = gamma;
+                        minDiff = msg;
+                    }
+                }
+            }
         }
+    }
 
+
+    public String getParams() {
+        JSONObject jsonObject  = new JSONObject();
+        jsonObject.put("alpha", this.alpha);
+        jsonObject.put("beta", this.beta);
+        jsonObject.put("gamma", this.gamma);
+
+        return jsonObject.toJSONString();
+    }
+
+    public String getModelName() {
+        return ModelName;
     }
 }

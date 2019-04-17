@@ -1,8 +1,17 @@
 package cn.harmonycloud;
 
-import cn.harmonycloud.beans.NodeLoad;
-import cn.harmonycloud.strategy.AbstractNodeStrategy;
+import cn.harmonycloud.DAO.IllHealthyDealDAO;
+import cn.harmonycloud.DAO.NodeDAO;
+import cn.harmonycloud.DAO.imp.NodeDaoImp;
+import cn.harmonycloud.DAO.imp.RegulateIllHealthDaoImp;
+import cn.harmonycloud.beans.EvaluateStrategy;
+import cn.harmonycloud.beans.Node;
+import cn.harmonycloud.tools.PropertyFileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -12,31 +21,57 @@ import java.util.List;
  */
 public class NodeEvaluateTaskThread implements Runnable {
 
-    private List<NodeLoad> nodeLoads;
-
-    public NodeEvaluateTaskThread(List<NodeLoad> nodeLoads) {
-        this.nodeLoads = nodeLoads;
-    }
+    private final static Logger LOGGER = LoggerFactory.getLogger(NodeEvaluateTaskThread.class);
 
     @Override
     public void run() {
-        if (nodeLoads == null) {
-            System.out.println("nodeLoads is null!");
-            return;
+
+        NodeDAO nodeDAO = new NodeDaoImp();
+        List<Node> nodes = nodeDAO.getNodeList(PropertyFileUtil.getValue("ClusterIp"));
+
+        if (null == nodes) {
+            LOGGER.error("get node list failed!");
         }
 
 
-        List<AbstractNodeStrategy> abstractNodeStrategies = AchieveStrategy.getAbstractNodeStrategies();
 
-        if (null == abstractNodeStrategies) {
-            throw new RuntimeException("The node evaluate strategy is null!");
+        List<EvaluateStrategy> nodeStrategies = AchieveStrategy.getNodeStrategies();
+
+        if (null == nodeStrategies) {
+            LOGGER.error("the node strategy is null!");
         }
 
-        for (NodeLoad nodeLoad : nodeLoads) {
-            for (AbstractNodeStrategy abstractNodeStrategy : abstractNodeStrategies) {
-                boolean isHealthy = abstractNodeStrategy.evaluate(nodeLoad);
+        for (Node node : nodes) {
+            for (EvaluateStrategy evaluateStrategy : nodeStrategies) {
+                Class clazz = null;
+                Method method = null;
+                Object result = null;
+                try {
+                    clazz = Class.forName(evaluateStrategy.getClassName());
+                    method = clazz.getMethod("evaluate",Node.class);
+                    result = method.invoke(clazz.newInstance(),node);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                boolean isHealthy = (Boolean)result;
                 if (!isHealthy) {
-                    System.out.println("调用调控模块node接口！");
+                    LOGGER.info("the "+node.toString()+" is ill health!");
+                    IllHealthyDealDAO illHealthyDealDAO = new RegulateIllHealthDaoImp();
+                    boolean isDeal = illHealthyDealDAO.regulateIllHealthNode(node.getMasterIp(), node.getHostName());
+
+                    if (isDeal) {
+                        LOGGER.info("the "+node.toString()+" is succeed dealed!");
+                    }
+                    LOGGER.info("the "+node.toString()+" is failed dealed!");
+                    break;
                 }
             }
         }

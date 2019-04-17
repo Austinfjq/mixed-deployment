@@ -9,6 +9,9 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Service;
 import com.google.gson.Gson;
 import net.sf.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 public class DOUtils {
     public static String NAME_SPLIT = "_";
 
@@ -131,5 +134,34 @@ public class DOUtils {
             return false;
         }
         return true;
+    }
+
+    public static int binaryLessThan(double[] a, double key) {
+        return binaryLessThan(a, 0, a.length, key);
+    }
+
+    public static int binaryLessThan(double[] a, int fromIndex, int toIndex, double key) {
+        if (key < a[fromIndex]) {
+            return fromIndex;
+        } else if (key > a[toIndex - 1]) {
+            return toIndex;
+        }
+
+        int low = fromIndex;
+        int high = toIndex - 1;
+
+        while (low < high - 1) {
+            int mid = (low + high) >>> 1;
+            double midVal = a[mid];
+
+            if (midVal < key) {
+                low = mid;
+            } else if (midVal > key) {
+                high = mid;
+            } else {
+                return mid; // key found
+            }
+        }
+        return high;  // key not found.
     }
 }

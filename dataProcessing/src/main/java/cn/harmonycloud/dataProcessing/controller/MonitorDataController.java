@@ -6,20 +6,24 @@ import cn.harmonycloud.dataProcessing.model.MonitorService;
 import cn.harmonycloud.dataProcessing.tools.K8sClient;
 import cn.harmonycloud.dataProcessing.tools.ReadUrl;
 import cn.harmonycloud.dataProcessing.tools.SetValue;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static cn.harmonycloud.dataProcessing.metric.Constant.PROMETHEUS_NODE_CONFIG_PATH;
-import static cn.harmonycloud.dataProcessing.metric.Constant.PROMETHEUS_SERVICE_CONFIG_PATH;
+import static cn.harmonycloud.dataProcessing.metric.Constant.*;
+
 
 @RestController
 public class MonitorDataController {
@@ -106,7 +110,7 @@ public class MonitorDataController {
     }
 
     @GetMapping(value = "monitorService")
-    public List<MonitorService> getMonitorService(){
+    public List<MonitorService> getMonitorService() {
         ArrayList<MonitorService> serviceList = new ArrayList<>();
         svcInitFromApi(serviceList);
 
@@ -167,5 +171,84 @@ public class MonitorDataController {
         return serviceList;
     }
 
+
+    @PostMapping("/queryData")
+    public String getQueryData(@RequestBody Map<String, Object> requestMap) {
+        String queryString = (String) requestMap.get("queryString");
+        String url = "http://" + PROMETHEUS_HOST + ":" + PROMETHEUS_PORT + "/api/v1/query?query=" + queryString;
+        try {
+            JSONObject result = JSONObject.parseObject(ReadUrl.read(url));
+            return result.toJSONString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString("");
+
+    }
+
+    @PostMapping("/queryNode")
+    public String getQueryNode(@RequestBody Map<String, Object> requestMap) {
+        String metric = (String) requestMap.get("metric");
+        String nodeIP = (String) requestMap.get("nodeIP");
+        String q = "";
+        if (metric.equals("cpuUsage")) {
+            q = "sum(rate(node_cpu_seconds_total{kubernetes_pod_host_ip=\"" + nodeIP
+                    + "\"}[5m]))by(kubernetes_pod_host_ip,kubernetes_pod_node_name)";
+
+        } else if (metric.equals("memUsage")) {
+            q = "sum(node_memory_MemTotal_bytes-node_memory_MemAvailable_bytes{kubernetes_pod_host_ip=\"" + nodeIP
+                    + "\"})by(kubernetes_pod_host_ip,kubernetes_pod_node_name)/sum(node_memory_MemTotal_bytes"
+                    + ")by(kubernetes_pod_host_ip,kubernetes_pod_node_name)";
+
+        } else if (metric.equals("diskUsage")) {
+            q = "(sum(node_filesystem_size_bytes{kubernetes_pod_host_ip=\"" + nodeIP
+                    + "\"})by(kubernetes_pod_node_name,kubernetes_pod_host_ip)-sum(node_filesystem_avail_bytes{kubernetes_pod_host_ip=\"" + nodeIP
+                    + "\"})by(kubernetes_pod_node_name,kubernetes_pod_host_ip))/sum(node_filesystem_avail_bytes{kubernetes_pod_host_ip=\"" + nodeIP
+                    + "\"})by(kubernetes_pod_node_name,kubernetes_pod_host_ip)";
+
+        }
+
+        String url = "http://" + PROMETHEUS_HOST + ":" + PROMETHEUS_PORT + "/api/v1/query?query=" + q;
+        try {
+            JSONObject result = JSONObject.parseObject(ReadUrl.read(url));
+            return result.toJSONString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString("");
+
+    }
+
+    @PostMapping("/queryService")
+    public String getQueryService(@RequestBody Map<String, Object> requestMap) {
+        String serviceName = (String) requestMap.get("serviceName");
+        String namespace = (String) requestMap.get("namespace");
+        String metric = (String) requestMap.get("metric");
+
+        String q = "";
+        if (metric.equals("responseTime")) {
+            q = "sum(nginx_ingress_controller_response_duration_seconds_sum{"
+                    + "service=\"" + serviceName
+                    + "\",namespace=\"" + namespace
+                    + "\",method=\"POST\"})by(service,namespace)";
+
+        } else if (metric.equals("netErrors")) {
+            q = "sum(container_network_transmit_errors_total{"
+                    + "namespace=\"" + namespace
+                    + "\"})by(pod_name,namespace)";
+
+        }
+
+
+        String url = "http://" + PROMETHEUS_HOST + ":" + PROMETHEUS_PORT + "/api/v1/query?query=" + q;
+        try {
+            JSONObject result = JSONObject.parseObject(ReadUrl.read(url));
+            return result.toJSONString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString("");
+
+    }
 
 }

@@ -1,62 +1,44 @@
 package cn.harmonycloud;
 
-import cn.harmonycloud.beans.LoadConfigFile;
-import cn.harmonycloud.entry.Config;
-import cn.harmonycloud.tools.Constant;
-import cn.harmonycloud.tools.Write2ES;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import static cn.harmonycloud.ScenarioExecutor.getResults;
+/**
+ * @author wangyuzhong
+ * @date 18-12-5 下午2:40
+ * @Despriction 定时任务，定时执行调控
+ */
 
-public class ExecuteTimer {
-    public static void main(String[] args) {
+@Component
+@Order(value = 2)
+public class ExecuteTimer implements ApplicationRunner {
 
-        //解析策略配置文件，获取所有策略
-        ArrayList<Config> configList = LoadConfigFile.run();
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExecuteTimer.class);
 
-        Calendar startDate = Calendar.getInstance();
+    @Value("${SchedulePeriod}")
+    private int schedulePeriod;
 
-        for (Config cfg : configList) {
-
-            long daySpan = Constant.TIME_STEP;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + cfg.getTime());
-
-            try {
-                Date startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(sdf.format(new Date()));
-                // 如果今天的已经过了 首次运行时间就改为明天
-                if (System.currentTimeMillis() > startTime.getTime()) {
-                    startTime = new Date(startTime.getTime() + daySpan);
-                }
-
-                TimerTask task1 = new TimerTask() {
-                    @Override
-                    public void run() {
-                        StrategyExecutor.run(cfg.getOnlineNum(), cfg.getOfflineNum());
-                    }
-                };
-
-                Timer timer = new Timer();
-                timer.schedule(task1, startTime, daySpan);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-        }
-
+    public void run(ApplicationArguments args) {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-//                System.out.println("lll");
-//                ScenarioExecutor.run();
+                ExecuteTask dispatcher = new ExecuteTask();
+                dispatcher.process();
             }
         };
+
+        LOGGER.info("start timer task!");
         Timer timer = new Timer();
         long delay = 0;
-        long intevalPeriod = 1000;  //毫秒
+        long intevalPeriod = schedulePeriod;
         timer.scheduleAtFixedRate(task, delay, intevalPeriod);
     }
 
