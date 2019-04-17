@@ -28,10 +28,10 @@ public class ServiceDaoImp implements ServiceDAO {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServiceDaoImp.class);
 
-    @Value("${DataCenterHostIP}")
+    @Value("${ScheduleExecutorHostIP}")
     private String hostIp;
 
-    @Value("${DataCenterPort}")
+    @Value("${ScheduleExecutorPort}")
     private String port;
 
     @Override
@@ -63,6 +63,8 @@ public class ServiceDaoImp implements ServiceDAO {
         Map<String,String> params = new HashMap<>();
         params.put("clusterIp", masterIp);
         String url = "http://"+ hostIp + ":" + port + "/service/onlineServices";
+
+        System.out.println(url);
 //        String url = "http://10.107.249.160:8080/service/onlineServices";
         HttpClientResult httpClientResult = null;
         try {
