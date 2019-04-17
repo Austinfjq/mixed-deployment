@@ -1,32 +1,26 @@
 package cn.harmonycloud;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
- * @Author: changliu
- * @Date: 2019/1/3 16:32
- * @Description:
+ * @author wangyuzhong
+ * @date 18-12-5 下午2:42
+ * @Despriction 定时执行的任务
  */
 public class ExecuteTask {
-    public static void process(){
 
-//        NodeDAO monitorDataDAO = NodeDAO.getInstance();
-//
-//        List<ServiceLoad> serviceLoads = ServiceDAO.getServiceLoadList("2019-01-21 10:46:00","2019-01-21 10:47:00");
-//
-//        List<NodeLoad> nodeLoads = NodeDAO.getNodeLoadList("2019-01-21 10:46:00","2019-01-21 10:47:00");
+    @Value("${SchedulePeriod}")
+    private int schedulePeriod;
 
+    public void process() {
+        //start the thread of regulate all online service!
+        OnlineRegulateTaskThread onlineRegulateTaskThread = new OnlineRegulateTaskThread();
+        Thread onlineRegulateThread = new Thread(onlineRegulateTaskThread);
+        onlineRegulateThread.start();
 
-
-
-    }
-
-
-    public static void main(String[] args) {
-        process();
+        //start the thread of regulate offline service!
+        OfflineRegulateTaskThread offlineRegulateTaskThread = new OfflineRegulateTaskThread();
+        Thread offlineRegulateThread = new Thread(offlineRegulateTaskThread);
+        offlineRegulateThread.start();
     }
 }
-
-

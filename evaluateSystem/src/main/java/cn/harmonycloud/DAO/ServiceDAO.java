@@ -1,132 +1,23 @@
 package cn.harmonycloud.DAO;
 
-import cn.harmonycloud.beans.HttpClientResult;
-import cn.harmonycloud.beans.ServiceLoad;
-import cn.harmonycloud.tools.HttpClientUtils;
-import com.alibaba.fastjson.JSON;
+import cn.harmonycloud.beans.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * @author wangyuzhong
- * @date 19-1-9 下午4:50
- * @Despriction
- */
-public class ServiceDAO {
+public interface ServiceDAO {
 
-    public static double getServiceNormalResponseTime(String namespace,String serviceName) {
-        Map<String,String> params = new HashMap<>();
-        params.put("namespace",namespace);
-        params.put("serviceName",serviceName);
-        String url = "http://localhost:8080/evaluatesystem/servicenormalresponsetime";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doGet(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    List<Service> getAllOnlineService(String masterIp);
 
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get service normal response time failed!");
-            return 0;
-        }
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取节点的某个指标最新值
+     * @Date 8:08 2019/4/15
+     * @Param 查询语句
+     * @return
+     **/
+    double getServiceIndexValue(String queryStr);
 
-        return Double.valueOf(httpClientResult.getContent());
-    }
+    double getServiceNormalResponseTime(String masterIp, String namespace,String serviceName);
 
-
-    public static double getServiceNormalErrorRate(String namespace,String serviceName) {
-        Map<String,String> params = new HashMap<>();
-        params.put("namespace",namespace);
-        params.put("serviceName",serviceName);
-        String url = "http://localhost:8080/evaluatesystem/servicenormalerrorrate";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doGet(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get service normal error rate failed!");
-            return 0;
-        }
-
-        return Double.valueOf(httpClientResult.getContent());
-    }
-
-    public static int getPodNumberByServiceLoad(String namespace, String serviceName, int requestNumber) {
-        Map<String,String> params = new HashMap<>();
-        params.put("namespace",namespace);
-        params.put("serviceName",serviceName);
-        params.put("requestNumber",String.valueOf(requestNumber));
-        String url = "http://localhost:8080/evaluatesystem/needPodNumber";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doGet(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get service normal error rate failed!");
-            return 0;
-        }
-
-        return Integer.valueOf(httpClientResult.getContent());
-    }
-
-    public static String getServicesMonitorData(String startTime, String endTime) {
-        Map<String,String> params = new HashMap<>();
-        params.put("startTime",startTime);
-        params.put("endTime",endTime);
-        String url = "http://localhost:8080/evaluatesystem/services";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doGet(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            System.out.println("get index data failed!");
-            return null;
-        }
-
-        return httpClientResult.getContent();
-    }
-
-    public static List<ServiceLoad> getServiceLoadList(String startTime, String endTime) {
-        String servicesStr = getServicesMonitorData(startTime,endTime);
-
-        if (null == servicesStr) {
-            System.out.println("get service load data failed!");
-            return null;
-        }
-
-        List<ServiceLoad> list = JSON.parseArray(servicesStr,ServiceLoad.class);
-
-        for (ServiceLoad serviceLoad:list) {
-            double normalTimeResponse = getServiceNormalResponseTime(serviceLoad.getNamespace(),serviceLoad.getServiceName());
-            serviceLoad.setNormalTimeResponse(normalTimeResponse);
-
-            double normalErrorRate = getServiceNormalErrorRate(serviceLoad.getNamespace(),serviceLoad.getServiceName());
-            serviceLoad.setNormalErrorRate(normalErrorRate);
-
-            System.out.println(serviceLoad.toString());
-
-        }
-
-        return list;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(String.valueOf(getServiceNormalResponseTime("online","wordpress")));
-        System.out.println(String.valueOf(getServiceNormalErrorRate("offline","hadoop")));
-        System.out.println(String.valueOf(getPodNumberByServiceLoad("online","wordpress",56)));
-
-    }
-
+    double getServiceNormalErrorRate(String masterIp, String namespace,String serviceName);
 }
