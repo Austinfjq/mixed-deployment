@@ -25,7 +25,7 @@ public class Reference {
 
         String result = null;
         result = HttpClientUtil.httpGet(paramMap);
-        if(result == null){
+        if(result == null || result.length() == 0){
             LOGGER.debug("Owner information is null");
             return null;
         }

@@ -1,9 +1,19 @@
 package cn.harmonycloud;
 
-import cn.harmonycloud.entry.DataPoint;
-import cn.harmonycloud.entry.DataSet;
-import cn.harmonycloud.entry.ForecastCell;
-import cn.harmonycloud.input.DeriveData;
+import cn.harmonycloud.beans.ForecastCell;
+import cn.harmonycloud.beans.ForecastIndex;
+import cn.harmonycloud.beans.ForecastResultCell;
+import cn.harmonycloud.beans.Node;
+import cn.harmonycloud.service.IData;
+import cn.harmonycloud.service.IForecast;
+import cn.harmonycloud.service.imp.DataImp;
+import cn.harmonycloud.service.imp.ForecastImp;
+import cn.harmonycloud.tools.DataUtil;
+import cn.harmonycloud.tools.PropertyFileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author wangyuzhong
@@ -12,54 +22,48 @@ import cn.harmonycloud.input.DeriveData;
  */
 public class NodeTaskThreadExecutor implements Runnable{
 
-    private ForecastCell forecastCell;
-
-    public NodeTaskThreadExecutor(ForecastCell forecastCell) {
-        this.forecastCell = forecastCell;
-    }
+    private final static Logger LOGGER = LoggerFactory.getLogger(NodeTaskThreadExecutor.class);
 
     @Override
     public void run() {
-        if (forecastCell == null) {
-            return;
+
+        IData iData = new DataImp();
+        IForecast iForecast = new ForecastImp();
+        List<Node> nodes = iData.getNodeList(PropertyFileUtil.getValue("ClusterIp"));
+
+        if (null == nodes) {
+            LOGGER.error("get node list failed!");
         }
 
-        DataSet dataSet = DeriveData.getDataSet(forecastCell);
-        dataSet.setPeriodsPerYear(forecastCell.getNumberOfPerPeriod());
+        List<ForecastIndex> nodeForecastIndices = AchieveForecastIndex.getNodeForecastIndexs();
 
-        if (forecastCell.getForecastingModel().equals("")) {
-            ForecastingModel forecastingModel = Forecaster.getBestForecast(dataSet);
+        for (Node node:nodes) {
+            for (ForecastIndex forecastIndex:nodeForecastIndices) {
+                String ID = node.getMasterIp()+"&"+node.getHostName();
+                ForecastCell forecastCell = iData.getForecastCell(ID,"1",forecastIndex.getIndexName());
 
-            if (forecastingModel == null) {
-                System.out.println("get beat forecast model failed!");
+                if (null == forecastCell) {
+                    LOGGER.error("the forecastCell:"+forecastCell.toString()+" is not exit!");
+                    break;
+                }
+
+                List<ForecastResultCell> forecastResultCells = iForecast.forecast(forecastCell);
+
+                if (null == forecastResultCells) {
+                    LOGGER.error("the forecastCell:"+forecastCell.toString()+" forecast failed!");
+                    break;
+                }
+                boolean isForecast = iData.saveForecastData(DataUtil.listToJson(forecastResultCells));
+
+                if (isForecast) {
+                    LOGGER.debug("the " + forecastCell.toString() + " forecast succeed!");
+                } else {
+                    LOGGER.error("the " + forecastCell.toString() + " forecast failed!");
+                }
             }
-
-            System.out.println("Forecast model type selected: "+forecastingModel.getForecastType());
-            System.out.println( forecastingModel.toString() );
-
-
-            // Create additional data points for which forecast values are required
-            DataSet requiredDataPoints = new DataSet();
-            DataPoint dp;
-            for ( int count=7; count<15; count++ )
-            {
-                dp = new DataPoint( 0.0 ,count);
-
-                requiredDataPoints.add( dp );
-            }
-
-            // Dump data set before forecast
-            System.out.println("Required data set before forecast");
-            System.out.println( requiredDataPoints );
-
-            // Use the given forecasting model to forecast values for
-            //  the required (future) data points
-            forecastingModel.forecast( requiredDataPoints );
-
-            // Output the results
-            System.out.println("Output data, forecast values");
-            System.out.println( requiredDataPoints );
         }
 
     }
+
+
 }

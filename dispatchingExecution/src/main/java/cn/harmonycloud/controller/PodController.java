@@ -29,8 +29,8 @@ public class PodController {
     public static boolean createPodController(final String masterIp, final String namespace, String servicename, final String nodeList){
         //get Owner
         JSONObject owner = Reference.getOwnerOfPod(masterIp,namespace ,servicename);
-        if (owner == null){
-            LOGGER.debug("Owner is null");
+        if (owner == null || owner.size() ==0){
+            LOGGER.debug("Owner is empty!");
             return false;
         }
         final String ownerName = owner.getString("resourceName");

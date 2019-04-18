@@ -36,5 +36,6 @@ public interface IOnlineRegulateControl {
     OnlineStrategy productOnlineStrategy(Service service, int regulateNums);
 
 
+    void process();
 
 }
