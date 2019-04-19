@@ -1,11 +1,14 @@
 package cn.harmonycloud.datacenter.controller;
 
 import cn.harmonycloud.datacenter.entity.es.PodData;
-import cn.harmonycloud.datacenter.entity.es.SearchPod;
+import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.service.IPodDataService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -67,6 +70,10 @@ public class PodDataController {
     @GetMapping("/pods")
     public List<PodData> findAllPods(){
         List<PodData> pods = podDataService.findAllPodDatas();
+        // TODO: 需修改实现
+        for(PodData podData:pods){
+            podData.changeLabels();
+        }
         return pods;
     }
 
@@ -77,73 +84,27 @@ public class PodDataController {
      */
     @GetMapping("/nowPod")
     public List<PodData> getNowServices(){
-        return podDataService.getNowServices();
-    }
-    @GetMapping("/node/service/pods")
-    public List<Map<String, String>> getNowServices(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
-            , @RequestParam("serviceName") String serviceName, @RequestParam("hostName") String hostName){
-        List<Map<String, String>> map=new ArrayList<Map<String, String>>();
-        SearchPod pdd=new SearchPod();
-        pdd.setClusterIp(clusterIp);
-        pdd.setNamespace(namespace);
-        pdd.setServiceName(serviceName);
-        pdd.setHostName(hostName);
-        List<PodData> pod=podDataService.getNowServices();
-        for(PodData pd:pod)
-        {
-            Map<String, String> responseMap = new HashMap<>();
-            //System.out.println(pd.toString()+ "\n");
-            //if(clusterIp.equals(pd.getClusterMasterIP())&&
-            //        namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName())
-            //&&hostName.equals(pd.getNodeName()))
-            {
-                responseMap.put("podName",pd.getPodName());
-                map.add(responseMap);
-            }
+        List<PodData> pods = podDataService.getNowServices();
+        // TODO: 需修改实现
+        for(PodData podData:pods){
+            podData.changeLabels();
         }
-        return map;
+        return pods;
     }
-    @GetMapping("/service/podNums")
-    public Map<String, Integer> getPodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
-            , @RequestParam("serviceName") String serviceName){
-        Map<String, Integer> responseMap = new HashMap<>();
-        SearchPod pdd=new SearchPod();
-        pdd.setClusterIp(clusterIp);
-        pdd.setNamespace(namespace);
-        pdd.setServiceName(serviceName);
-        List<PodData> pod=podDataService.getNowServices();
-        Integer ins=0;
-        for(PodData pd:pod)
-        {
-            if(clusterIp.equals(pd.getClusterMasterIP())&&
-                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName()))
-            {
-                ins++;
-            }
-        }
-        responseMap.put("podNums",ins);
-        return responseMap;
-    }
-    @GetMapping("/service/requestPodNums")
-    public Map<String, Integer> getRequestPodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
-            , @RequestParam("serviceName") String serviceName, @RequestParam("requestNums") Double requestNums){
-        Map<String, Integer> responseMap = new HashMap<>();
-        SearchPod pdd=new SearchPod();
-        pdd.setClusterIp(clusterIp);
-        pdd.setNamespace(namespace);
-        pdd.setServiceName(serviceName);
-        pdd.setRequestNums(requestNums);
-        List<PodData> pod=podDataService.getNowServices();
-        Integer ins=0;
-        for(PodData pd:pod)
-        {
-            if(clusterIp.equals(  pd.getClusterMasterIP())&&requestNums==pd.getResponseBytes()&&
-                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName()))
-            {
-                ins++;
-            }
-        }
-        responseMap.put("podNums",ins);
-        return responseMap;
-    }
+
+
+//    @GetMapping("/test")
+//    public void test(){
+//        PodData podData = new PodData();
+//        Map<String,String> label = new HashMap<>();
+//        label.put("app","xxx");
+//        label.put("app.kubernetes.io/name","xxx ");
+//        podData.setLabels(label);
+//        podDataService.saveOnePodData(podData);
+//        podData = new PodData();
+//        //label.clear();
+//
+//        podData.setLabels(label);
+//        podDataService.saveOnePodData(podData);
+//    }
 }

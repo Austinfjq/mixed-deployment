@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static cn.harmonycloud.datacenter.tools.Constant.POD_INDEX;
@@ -359,7 +360,18 @@ public class PodData {
     }
 
     public void setLabels(Map<String, String> labels) {
-        this.labels = labels;
+        Map<String, String> map = new HashMap<>();
+        for(Map.Entry entry : labels.entrySet()){
+            map.put(entry.getKey().toString().replace('.','_'),entry.getValue().toString());
+        }
+        this.labels = map;
+    }
+    public void changeLabels(){
+        Map<String,String> map = new HashMap<>();
+        for(Map.Entry entry : labels.entrySet()){
+            map.put(entry.getKey().toString().replace('_','.'),entry.getValue().toString());
+        }
+        this.labels = map;
     }
 
     public void setPersistentVolumeClaimNames(ArrayList<String> persistentVolumeClaimNames) {
