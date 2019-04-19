@@ -137,7 +137,7 @@ public class PodDataController {
         Integer ins=0;
         for(PodData pd:pod)
         {
-            if(clusterIp.equals(pd.getClusterMasterIP())&&requestNums==pd.getResponseBytes()&&
+            if(clusterIp.equals(  pd.getClusterMasterIP())&&requestNums==pd.getResponseBytes()&&
                     namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName()))
             {
                 ins++;
