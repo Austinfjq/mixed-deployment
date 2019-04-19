@@ -36,9 +36,11 @@ public class K8sClient {
                 if (!CLIENTS.containsKey(masterIp)){
                     KubernetesClient CLIENT = new DefaultKubernetesClient(new ConfigBuilder().withUsername("kubernetes-admin")
                             //.withOauthToken(AUTHORITY_DATA)
-                            .withClientCertData(CERT_DATA)
-                            .withClientKeyData(KEY_DATA)
-                            .withCaCertData(CA_DATA)
+                            //.withClientCertData(CERT_DATA)
+                            //.withClientKeyData(KEY_DATA)
+                            //.withCaCertData(CA_DATA)
+                            .withOauthToken("330957b867a3462ea457bec41410624b")
+                            .withTrustCerts(true)
                             .withMasterUrl("https://"+masterIp+":6443/").build());
                     CLIENTS.put(masterIp,CLIENT);
                     return CLIENT;

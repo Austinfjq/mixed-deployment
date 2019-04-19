@@ -1,8 +1,9 @@
 package cn.harmonycloud.service.serviceImp;
+
 import cn.harmonycloud.beans.Node;
 import cn.harmonycloud.beans.OfflineDilatationStrategy;
 import cn.harmonycloud.beans.OfflineShrinkageStrategy;
-import cn.harmonycloud.dao.imp.NodeDaoImp;
+import cn.harmonycloud.dao.NodeDAO;
 import cn.harmonycloud.dao.imp.StrategyDaoImp;
 import cn.harmonycloud.service.IOfflineRegulateControl;
 import cn.harmonycloud.tools.DateUtil;
@@ -57,9 +58,11 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
     @Value("${HadoopNamespace}")
     private String hadoopNamespace;
 
+    @Value("${ClusterIp}")
+    private String clusterIp;
 
     @Autowired
-    NodeDaoImp nodeDaoImp;
+    private NodeDAO nodeDao;
 
     @Autowired
     StrategyProduceServiceImp strategyProduceServiceImp;
@@ -74,7 +77,7 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
         if (regulateNums == 0) {
             LOGGER.info("this node load is narmal!");
             return true;
-        }else if (regulateNums > 0) {
+        } else if (regulateNums > 0) {
             LOGGER.info("this node load is need increace!");
             List<OfflineDilatationStrategy> offlineDilatationStrategies = productOfflineDilatationStrategy(node, regulateNums);
 
@@ -88,7 +91,7 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
                 return true;
             }
 
-            for (OfflineDilatationStrategy offlineDilatationStrategy:offlineDilatationStrategies) {
+            for (OfflineDilatationStrategy offlineDilatationStrategy : offlineDilatationStrategies) {
                 boolean isDealSucceed = strategyDealServiceImp.dealOfflineDilatationStrategy(offlineDilatationStrategy);
                 if (!isDealSucceed) {
                     return false;
@@ -110,7 +113,7 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
                 return true;
             }
 
-            for (OfflineShrinkageStrategy offlineShrinkageStrategy:offlineShrinkageStrategies) {
+            for (OfflineShrinkageStrategy offlineShrinkageStrategy : offlineShrinkageStrategies) {
                 boolean isDealSucceed = strategyDealServiceImp.dealOfflineShrinkageStrategy(offlineShrinkageStrategy);
                 if (!isDealSucceed) {
                     return false;
@@ -125,8 +128,8 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
         double maxCpuUsage = getLastPeriodMaxCpuUsage(node.getMasterIp(), node.getHostName());
         double maxMemUsage = getLastPeriodMaxMemUsage(node.getMasterIp(), node.getHostName());
 
-        double cpuTotal = nodeDaoImp.getNodeCpuTotal(node.getMasterIp(), node.getHostName());
-        double memTotal = nodeDaoImp.getNodeMemTotal(node.getMasterIp(), node.getHostName());
+        double cpuTotal = nodeDao.getNodeCpuTotal(node.getMasterIp(), node.getHostName());
+        double memTotal = nodeDao.getNodeMemTotal(node.getMasterIp(), node.getHostName());
 
         if (maxCpuUsage < cpuUsageMinThreshold && maxMemUsage < memUsageMinThreshold) {
             return calculateDilatationNums(cpuTotal, memTotal, maxCpuUsage, maxMemUsage);
@@ -155,18 +158,38 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
         return strategyProduceServiceImp.produceOfflineDilatationStrategy(node.getMasterIp(), hadoopNamespace, nodeManagerServiceName, node.getHostName(), regulateNums);
     }
 
+    @Override
+    public void process() {
+        //NodeDAO nodeDAO = new NodeDaoImp();
+        List<Node> nodes = nodeDao.getNodeList(clusterIp);
+
+        if (nodes == null) {
+            LOGGER.error("get all node failed!");
+            return;
+        }
+
+        if (nodes.size() == 0) {
+            LOGGER.error("there is no any node!");
+            return;
+        }
+
+        for (Node node : nodes) {
+            dealNode(node);
+        }
+    }
+
     double getLastPeriodMaxCpuUsage(String masterIp, String hostName) {
         String endTime = DateUtil.getCurrentTime();
         String startTime = DateUtil.getLastPeriodTime();
 
-        return nodeDaoImp.getLastPeriodMaxCpuUsage(masterIp, hostName, startTime, endTime);
+        return nodeDao.getLastPeriodMaxCpuUsage(masterIp, hostName, startTime, endTime);
     }
 
     double getLastPeriodMaxMemUsage(String masterIp, String hostName) {
         String endTime = DateUtil.getCurrentTime();
         String startTime = DateUtil.getLastPeriodTime();
 
-        return nodeDaoImp.getLastPeriodMaxMemUsage(masterIp, hostName, startTime, endTime);
+        return nodeDao.getLastPeriodMaxMemUsage(masterIp, hostName, startTime, endTime);
     }
 
     public int calculateDilatationNums(double cpuTotal, double memTotal, double maxCpuUsage, double maxMemUsage) {
