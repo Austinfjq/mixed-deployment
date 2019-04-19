@@ -70,6 +70,10 @@ public class PodDataController {
     @GetMapping("/pods")
     public List<PodData> findAllPods(){
         List<PodData> pods = podDataService.findAllPodDatas();
+        // TODO: 需修改实现
+        for(PodData podData:pods){
+            podData.changeLabels();
+        }
         return pods;
     }
 
@@ -80,7 +84,27 @@ public class PodDataController {
      */
     @GetMapping("/nowPod")
     public List<PodData> getNowServices(){
-
-        return podDataService.getNowServices();
+        List<PodData> pods = podDataService.getNowServices();
+        // TODO: 需修改实现
+        for(PodData podData:pods){
+            podData.changeLabels();
+        }
+        return pods;
     }
+
+
+//    @GetMapping("/test")
+//    public void test(){
+//        PodData podData = new PodData();
+//        Map<String,String> label = new HashMap<>();
+//        label.put("app","xxx");
+//        label.put("app.kubernetes.io/name","xxx ");
+//        podData.setLabels(label);
+//        podDataService.saveOnePodData(podData);
+//        podData = new PodData();
+//        //label.clear();
+//
+//        podData.setLabels(label);
+//        podDataService.saveOnePodData(podData);
+//    }
 }
