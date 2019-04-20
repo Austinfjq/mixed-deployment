@@ -6,6 +6,7 @@ import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
+import cn.harmonycloud.datacenter.service.serviceImpl.ServiceSqlService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,9 @@ public class ServiceDataController {
 
     @Autowired
     private INodeDataService nodeDataService;
+
+    @Autowired
+    private ServiceSqlService serviceSqlService;
 
     @PutMapping("/service")
     public Map<String, Object> saveOneServiceData(@RequestBody ServiceData serviceData){
@@ -270,23 +274,7 @@ public class ServiceDataController {
     @GetMapping("/service/onlineServices")
     public List<services> getService(@RequestParam("clusterIp") String clusterIp)
     {
-        List<ServiceData> pod=serviceDataService.getNowServices();
-        List<services> serviceNodes=new ArrayList<services>();
-        for(ServiceData pd:pod)
-        {
-            //System.out.println(newStr + "1\n");
-            //System.out.println(pd.getClusterMasterIP() + "2\n");
-            if(clusterIp.equals(pd.getClusterMasterIP()))
-            {
-                services sn=new services();
-                sn.setClusterIp(pd.getClusterMasterIP());
-                sn.setServiceName(pd.getServiceName());
-                sn.setNamespace(pd.getNamespace());
-                sn.setServiceType(pd.getServiceType());
-                serviceNodes.add(sn);
-            }
-        }
-        return serviceNodes;
+        return serviceSqlService.getServiceByClusterIp(clusterIp);
     }
     @GetMapping("/service/lastPeriodMaxRequestNums")
     public Map<String,Integer> getServiceRequsetNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
