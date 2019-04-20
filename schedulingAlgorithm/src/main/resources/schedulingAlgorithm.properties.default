@@ -18,3 +18,5 @@ URI_EXECUTE_REMOVE=http://10.10.101.115:8082/dispatching/deletePod
 #URI_GET_SERVICE=http://127.0.0.1:8081/nowService
 #URI_GET_POD=http://127.0.0.1:8081/nowPod
 #URI_GET_NODE=http://127.0.0.1:8081/nowNode
+#URI_EXECUTE_ADD=http://127.0.0.1:8080/dispatching/createPod
+#URI_EXECUTE_REMOVE=http://127.0.0.1:8080/dispatching/deletePod
