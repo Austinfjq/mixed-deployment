@@ -1,6 +1,5 @@
 package cn.harmonycloud.datacenter.service.serviceImpl;
 
-import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.entity.mysql.Service;
 import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.mapper.ServiceMapper;
@@ -26,17 +25,17 @@ public class ServiceSqlService implements IServiceSqlService {
     }
     @Override
     public List<services> getServiceByClusterIp(String clusterIp) {
-        List<ServiceData> service= serviceMapper.findServiceByClusterIp(clusterIp);
+        List<Service> service= serviceMapper.findServiceByClusterIp(clusterIp);
         List<services> serviceNodes=new ArrayList<services>();
-        for(ServiceData pd:service)
+        for(Service pd:service)
         {
-            if(clusterIp.equals(pd.getClusterMasterIP()))
+            if(clusterIp.equals(pd.getClusterIp()))
             {
                 services sn=new services();
-                sn.setClusterIp(pd.getClusterMasterIP());
-                sn.setServiceName(pd.getServiceName());
+                sn.setClusterIp(pd.getClusterIp());
+                sn.setServiceName(pd.getOwnerName());
                 sn.setNamespace(pd.getNamespace());
-                sn.setServiceType(pd.getServiceType());
+                sn.setServiceType(pd.getOwnerType());
                 serviceNodes.add(sn);
             }
         }

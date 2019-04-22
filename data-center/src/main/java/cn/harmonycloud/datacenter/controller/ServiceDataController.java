@@ -3,7 +3,6 @@ package cn.harmonycloud.datacenter.controller;
 import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
-import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
 import cn.harmonycloud.datacenter.service.serviceImpl.ServiceSqlService;
@@ -32,7 +31,7 @@ public class ServiceDataController {
     private INodeDataService nodeDataService;
 
     @Autowired
-    private ServiceSqlService serviceSqlService;
+    private ServiceSqlService serviceSqlService=new ServiceSqlService();
 
     @PutMapping("/service")
     public Map<String, Object> saveOneServiceData(@RequestBody ServiceData serviceData){
@@ -270,11 +269,6 @@ public class ServiceDataController {
                                             @RequestParam("serviceName") String serviceName,
                                             @RequestParam("clusterMasterIP") String clusterMasterIP){
         return serviceDataService.getManagement(namespace,serviceName,clusterMasterIP);
-    }
-    @GetMapping("/service/onlineServices")
-    public List<services> getService(@RequestParam("clusterIp") String clusterIp)
-    {
-        return serviceSqlService.getServiceByClusterIp(clusterIp);
     }
     @GetMapping("/service/lastPeriodMaxRequestNums")
     public Map<String,Integer> getServiceRequsetNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
