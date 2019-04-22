@@ -13,19 +13,19 @@ import java.util.Properties;
 public class DataCenterApplication {
 
     public static void main(String[] args) throws IOException {
-        Properties properties = new Properties();
-        InputStream in = null;
-        //String path = "./usr/local/data-center/application.properties";
-        //String path = "/root/application/application.properties";
-        String path = "./data-center/application.properties";
+//        Properties properties = new Properties();
+//        InputStream in = null;
+//        //String path = "./usr/local/data-center/application.properties";
+//        //String path = "/root/application/application.properties";
+//        String path = "./data-center/application.properties";
         //String path = "E:\\mixed-deployment\\data-center\\application.properties";
-        if(args.length != 0){//args[0]-->配置文件地址
-            in = new FileInputStream(new File(path));
-        }else {
-            //in = DataCenterApplication.class.getClassLoader().getResourceAsStream("application.properties");
-            in = new FileInputStream(new File(path));
-        }
-        properties.load(in);
+//        if(args.length != 0){//args[0]-->配置文件地址
+//            in = new FileInputStream(new File(path));
+//        }else {
+//            //in = DataCenterApplication.class.getClassLoader().getResourceAsStream("application.properties");
+//            in = new FileInputStream(new File(path));
+//        }
+//        properties.load(in);
         SpringApplication app = new SpringApplication(DataCenterApplication.class);
 //      app.setDefaultProperties(properties);
         app.run(args);
