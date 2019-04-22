@@ -7,6 +7,7 @@ package cn.harmonycloud.datacenter.entity.mysql;
 */
 public class Service {
     private String serviceId;
+    private String serviceName;
     private String namespace;
     private String clusterIp;
     private String ownerType;
@@ -108,6 +109,15 @@ public class Service {
     public void setType(int type) {
         this.type = type;
     }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
 
     @Override
     public String toString() {

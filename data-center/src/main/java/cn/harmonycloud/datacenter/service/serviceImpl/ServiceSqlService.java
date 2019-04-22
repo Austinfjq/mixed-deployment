@@ -33,9 +33,10 @@ public class ServiceSqlService implements IServiceSqlService {
             {
                 services sn=new services();
                 sn.setClusterIp(pd.getClusterIp());
-                sn.setServiceName(pd.getOwnerName());
+                sn.setServiceName(pd.getServiceName());
                 sn.setNamespace(pd.getNamespace());
-                sn.setServiceType(pd.getOwnerType());
+                sn.setServiceType(String.valueOf(pd.getType()));
+                System.out.print(sn.toString());
                 serviceNodes.add(sn);
             }
         }
