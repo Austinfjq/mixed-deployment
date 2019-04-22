@@ -4,6 +4,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,16 +25,10 @@ import java.util.Map;
 @Configuration
 @MapperScan(value = "cn.harmonycloud.datacenter.mapper")
 public class DruidConfig {
-    //@ConfigurationProperties(prefix = "spring.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource")
     @Bean
     public DataSource druid(){
         DruidDataSource druidDataSource= new DruidDataSource();
-        //druidDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true");
-        druidDataSource.setUrl("jdbc:mysql://10.10.101.115:3306/mixed_deployment?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true");
-        druidDataSource.setUsername("root");
-        //druidDataSource.setPassword("root");
-        druidDataSource.setPassword("123456");
-        druidDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         return  druidDataSource;
     }
     //配置Druid的监控

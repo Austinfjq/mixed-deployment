@@ -20,7 +20,7 @@ public class DataCenterApplication {
         String path = "./data-center/application.properties";
         //String path = "E:\\mixed-deployment\\data-center\\application.properties";
         if(args.length != 0){//args[0]-->配置文件地址
-            in = new FileInputStream(new File(args[0]));
+            in = new FileInputStream(new File(path));
         }else {
             //in = DataCenterApplication.class.getClassLoader().getResourceAsStream("application.properties");
             in = new FileInputStream(new File(path));
