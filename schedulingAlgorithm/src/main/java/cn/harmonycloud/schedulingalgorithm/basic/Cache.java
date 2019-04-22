@@ -250,7 +250,7 @@ public class Cache implements Cloneable {
     }
 
     /**
-     * 同一轮调度内不再使用fetchCacheData()更新数据，updateCache()方法对缓存进行增量维护，更节省时间
+     * 同一轮调度内不再使用获取监控数据，updateCache()方法对缓存进行增量维护，更节省时间
      *
      * @param pod  被调度的pod
      * @param host 为pod选择的节点

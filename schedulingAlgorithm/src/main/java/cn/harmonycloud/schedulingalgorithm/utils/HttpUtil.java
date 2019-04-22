@@ -108,8 +108,7 @@ public class HttpUtil {
             Object[] objects = (Object[]) gson.fromJson(jsonStr, clazz);
             Collections.addAll(result, objects);
         } catch (Exception e) {
-            LOGGER.debug("Data format error:");
-            e.printStackTrace();
+            LOGGER.debug("Http request error: data format error from" + uri);
         }
         return result;
     }
