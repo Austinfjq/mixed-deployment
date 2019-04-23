@@ -34,7 +34,9 @@ public class PodController {
             return false;
         }
         final String ownerName = owner.getString("resourceName");
+        LOGGER.debug("--------ownername------:"+ownerName);
         final String ownerType = owner.getString("resourceKind");
+        LOGGER.debug("--------ownertype------:"+ownerType);
         //countDownLatch
         final CountDownLatch countDownLatch = new CountDownLatch(THREAD_NUM);
         //create CRD Rule
