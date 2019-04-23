@@ -50,17 +50,15 @@ public class GetSvcData {
             //get svc pod list nums
             ArrayList<String> podNameList = new ArrayList<>();
             if (d.getMetadata().getLabels() != null
-                    && d.getMetadata().getLabels().containsKey("daemon")) {
+                    && d.getMetadata().getLabels().containsKey("app")) {
 
                 for (Pod pod : podList.getItems()) {
                     if (pod.getMetadata().getLabels() != null
-                            && pod.getMetadata().getLabels().containsKey("daemon")) {
+                            && pod.getMetadata().getLabels().containsKey("app")
+                            && d.getMetadata().getNamespace().equals(pod.getMetadata().getNamespace())
+                            && d.getMetadata().getLabels().get("app").equals(pod.getMetadata().getLabels().get("app"))) {
 
-                        if (d.getMetadata().getLabels().get("daemon")
-                                .equals(pod.getMetadata().getLabels().get("daemon"))) {
-                            podNameList.add(pod.getMetadata().getName());
-
-                        }
+                        podNameList.add(pod.getMetadata().getName());
                     }
                 }
 
