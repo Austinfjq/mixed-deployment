@@ -163,9 +163,9 @@ public class Cache implements Cloneable {
     public void getPortrait(List<Pod> pods) {
         LOGGER.info("start getPortrait!");
         try {
-            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
-            Map<String, Service> serviceMap = getServiceMap();
             // 不再使用资源画像接口
+//            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
+//            Map<String, Service> serviceMap = getServiceMap();
 //            for (String serviceFullName : serviceFullNames) {
 //                // 获取预计占用资源信息
 //                Map<String, String> parameters = new HashMap<>();

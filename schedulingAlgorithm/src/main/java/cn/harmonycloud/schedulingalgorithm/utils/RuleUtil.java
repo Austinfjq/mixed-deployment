@@ -140,10 +140,10 @@ public class RuleUtil {
         if (taint == null) {
             return true;
         }
-        if (Objects.equals(toleration.getEffect(), taint.getEffectObject().getEffect())) {
+        if (!Objects.equals(toleration.getEffect(), taint.getEffectObject().getEffect())) {
             return false;
         }
-        if (Objects.equals(toleration.getKey(), taint.getKey())) {
+        if (!Objects.equals(toleration.getKey(), taint.getKey())) {
             return false;
         }
         if (toleration.getOperatorObject() == null) {
