@@ -33,8 +33,12 @@ public class PodController {
             LOGGER.debug("Owner is empty!");
             return false;
         }
+
+        LOGGER.info("--------ownerInfo------:"+owner.toJSONString());
         final String ownerName = owner.getString("resourceName");
+        LOGGER.info("--------ownerName------:"+ownerName);
         final String ownerType = owner.getString("resourceKind");
+        LOGGER.info("--------ownerType------:"+ownerType);
         //countDownLatch
         final CountDownLatch countDownLatch = new CountDownLatch(THREAD_NUM);
         //create CRD Rule

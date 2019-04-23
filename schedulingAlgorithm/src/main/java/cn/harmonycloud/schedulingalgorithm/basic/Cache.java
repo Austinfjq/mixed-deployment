@@ -163,9 +163,9 @@ public class Cache implements Cloneable {
     public void getPortrait(List<Pod> pods) {
         LOGGER.info("start getPortrait!");
         try {
-            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
-            Map<String, Service> serviceMap = getServiceMap();
             // 不再使用资源画像接口
+//            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
+//            Map<String, Service> serviceMap = getServiceMap();
 //            for (String serviceFullName : serviceFullNames) {
 //                // 获取预计占用资源信息
 //                Map<String, String> parameters = new HashMap<>();
@@ -188,7 +188,16 @@ public class Cache implements Cloneable {
             //查找同service下的pod，填写新pod的属性
             pods.forEach(p -> {
                 Service service = getServiceMap().get(DOUtils.getServiceFullName(p));
+                if (service == null) {
+                    throw new RuntimeException("No such service found:" + DOUtils.getServiceFullName(p));
+                }
+                if (service.getPodList() == null || service.getPodList().size() == 0) {
+                    throw new RuntimeException("No pod of such service:" + DOUtils.getServiceFullName(p));
+                }
                 Pod sp = getPodMap().get(DOUtils.getPodFullName(service.getPodList().get(0), p.getNamespace()));
+                if (sp == null) {
+                    throw new RuntimeException("No such pod found in podList of service:" + DOUtils.getPodFullName(service.getPodList().get(0), p.getNamespace()));
+                }
                 p.setCpuRequest(sp.getCpuRequest());
                 p.setMemRequest(sp.getMemRequest());
                 p.setNodeSelector(sp.getNodeSelector());
@@ -212,7 +221,7 @@ public class Cache implements Cloneable {
 //                p.setAffinityObject(affinity);
             });
         } catch (Exception e) {
-            LOGGER.debug("getPortrait error");
+            LOGGER.error("getPortrait error");
             e.printStackTrace();
         }
     }

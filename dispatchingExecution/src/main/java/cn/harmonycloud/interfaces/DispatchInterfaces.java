@@ -22,9 +22,9 @@ public class DispatchInterfaces {
     public boolean createPod(@RequestParam(value = "masterIp") String masterIp,
                              @RequestParam(value = "namespace") String namespace,
                              @RequestParam(value = "servicename")String servicename,
-                             @RequestParam(value = "nodeList") JSONObject nodeList) {
+                             @RequestParam(value = "nodeList") String nodeList) {
         LOGGER.info("#######Create a Pod#######");
-        boolean result = PodController.createPodController(masterIp,namespace,servicename,"");
+        boolean result = PodController.createPodController(masterIp,namespace,servicename,nodeList);
         return result;
     }
 
