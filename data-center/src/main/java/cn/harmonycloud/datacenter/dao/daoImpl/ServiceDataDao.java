@@ -19,6 +19,9 @@ import org.elasticsearch.search.aggregations.metrics.avg.AvgAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.InternalAvg;
 import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
 import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -765,25 +768,32 @@ public class ServiceDataDao implements IServiceDataDao {
 
     @Override
     public Map<String, Object> getManagement(String namespace, String serviceName, String clusterMasterIP) {
-        //{
-        //	"query":{
-        //		"bool":{
-        //			"must":[
-        //				{"match_phrase" : {"namespace" : "xxx"}},
-        //				{"match_phrase" : {"serviceName" : "xxx"}}
-        //			]
-        //		}
-        //	},
-        //	"_source":["resourceKind","resourceType","clusterMasterIP"]
-        //}
+//        {
+//        	"query":{
+//        		"bool":{
+//        			"must":[
+//        				{"match_phrase" : {"namespace" : "xxx"}},
+//        				{"match_phrase" : {"serviceName" : "xxx"}}
+//        			]
+//        		}
+//        	},
+//        	"sort" : [
+//        	{
+//            	"time" : "desc"
+//        	}
+//    		],
+//        	"_source":["resourceKind","resourceName","clusterMasterIP"]
+//        }
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("namespace",namespace));
         boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
         String[] includes = {"resourceKind","resourceName","clusterMasterIP"};
         FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+        SortBuilder sortBuilder = SortBuilders.fieldSort("time").order(SortOrder.DESC);
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQueryBuilder)
+                .withSort(sortBuilder)
                 .withIndices(SERVICE_INDEX)
                 .withTypes(SERVICE_TYPE)
                 .withSourceFilter(fetchSourceFilter)
