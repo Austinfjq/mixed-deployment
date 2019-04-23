@@ -22,16 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 对service, node, pod的缓存
@@ -287,8 +281,8 @@ public class Cache implements Cloneable {
 //        service.setMemUsage(String.valueOf(Double.valueOf(service.getMemUsage()) + (isAdd ? 1 : -1) * Double.valueOf(service.getMemCosume())));
         // 更新 node占用的资源
         Node node = nodeMap.get(host);
-        node.setCpuUsage(node.getCpuUsage() + (isAdd ? 1 : -1) * pod.getCpuRequest());
-        node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest());
+        node.setCpuUsage(node.getCpuUsage() + (isAdd ? 1 : -1) * pod.getCpuRequest() / node.getCpuCores());
+        node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest() / node.getMemMaxCapacity());
         // 更新node下端口列表
         for (ContainerPort cp : pod.getWantPorts()) {
             if (cp != null) {

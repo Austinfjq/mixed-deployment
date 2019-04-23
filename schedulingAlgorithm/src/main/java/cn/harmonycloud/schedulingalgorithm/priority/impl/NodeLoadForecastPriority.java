@@ -6,10 +6,8 @@ import cn.harmonycloud.schedulingalgorithm.constant.GlobalSetting;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Node;
 import cn.harmonycloud.schedulingalgorithm.dataobject.NodeForecastData;
 import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
-import cn.harmonycloud.schedulingalgorithm.dataobject.Resource;
 import cn.harmonycloud.schedulingalgorithm.priority.DefaultPriorityRule;
 
-import java.util.List;
 import java.util.Map;
 
 public class NodeLoadForecastPriority implements DefaultPriorityRule {
@@ -35,8 +33,8 @@ public class NodeLoadForecastPriority implements DefaultPriorityRule {
             return GlobalSetting.PRIORITY_MAX_SCORE / 2;
         }
         NodeForecastData forecastResource = forecastMap.get(node.getNodeIP());
-        double cpuScore = ((node.getCpuUsage() - (double) forecastResource.getCpuUsage()) / pod.getCpuRequest());
-        double memScore = ((node.getMemUsage() - (double) forecastResource.getMemUsage()) / pod.getMemRequest());
+        double cpuScore = ((node.getCpuUsage() * node.getCpuCores() - (double) forecastResource.getCpuUsage()) / pod.getCpuRequest());
+        double memScore = ((node.getMemUsage() * node.getMemMaxCapacity() - (double) forecastResource.getMemUsage()) / pod.getMemRequest());
 
         cpuScore = normalize(cpuScore);
         memScore = normalize(memScore);

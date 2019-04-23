@@ -24,13 +24,13 @@ public class PodFitsResourcesPredicate implements PredicateRule {
         if (pod.getCpuRequest().equals(0D) && pod.getMemRequest().equals(0D)) {
             return true;
         }
-        if (node.getAllocatableCpuCores() < pod.getCpuRequest() + node.getCpuUsage()) {
+        if (node.getAllocatableCpuCores() < pod.getCpuRequest() + node.getCpuUsage() * node.getCpuCores()) {
             if (GlobalSetting.LOG_DETAIL) {
                 LOGGER.info("cpu cores not enough");
             }
             return false;
         }
-        if (node.getAllocatableMem() < pod.getMemRequest() + node.getMemUsage()) {
+        if (node.getAllocatableMem() < pod.getMemRequest() + node.getMemUsage() * node.getMemMaxCapacity()) {
             if (GlobalSetting.LOG_DETAIL) {
                 LOGGER.info("memory not enough");
             }
