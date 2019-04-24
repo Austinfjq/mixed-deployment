@@ -41,7 +41,7 @@ public class ExecuteUtil {
             } else {
                 Optional<String> op = cache.getNodeMapPodList().get(host.getHostname()).stream().filter(p -> DOUtils.getServiceFullName(pod).equals(DOUtils.getServiceFullName(p))).map(Pod::getPodName).findFirst();
                 String podName = op.orElse(null);
-                paramList.add(new BasicNameValuePair("podName", podName));
+                paramList.add(new BasicNameValuePair("podname", podName));
                 uri = GlobalSetting.URI_EXECUTE_REMOVE;
             }
             String result = HttpUtil.get(uri, paramList);

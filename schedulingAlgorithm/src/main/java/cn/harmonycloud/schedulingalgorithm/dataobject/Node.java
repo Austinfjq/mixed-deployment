@@ -26,11 +26,11 @@ public class Node implements Cloneable {
      */
     private Double cpuCores;
     /**
-     * 节点cpu使用率
+     * 节点cpu使用率，百分比
      */
     private Double cpuUsage;
     /**
-     * 节点内存使用量
+     * 节点内存使用量，百分比
      */
     private Double memUsage;
     /**
@@ -38,7 +38,7 @@ public class Node implements Cloneable {
      */
     private Double memMaxCapacity;
     /**
-     * 节点磁盘使用量
+     * 节点磁盘使用量，百分比
      */
     private Double diskUsage;
     /**

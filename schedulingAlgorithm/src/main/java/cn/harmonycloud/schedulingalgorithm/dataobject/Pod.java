@@ -59,27 +59,27 @@ public class Pod {
      */
     private String imageName;
     /**
-     * Pod的cpu使用量
+     * Pod的cpu使用量，百分比
      */
     private Double cpuUsage;
     /**
-     * Pod的cpu请求量
+     * Pod的cpu请求量，核数
      */
     private Double cpuRequest;
     /**
-     * Pod的cpu限制量
+     * Pod的cpu限制量，核数
      */
     private Double cpuLimit;
     /**
-     * Pod的mem使用量
+     * Pod的mem使用量，百分比
      */
     private Double memUsage;
     /**
-     * Pod的mem请求量
+     * Pod的mem请求量，Byte
      */
     private Double memRequest;
     /**
-     * Pod的mem限制量
+     * Pod的mem限制量，Byte
      */
     private Double memLimit;
     /**
@@ -87,7 +87,7 @@ public class Pod {
      */
     private String volumeType;
     /**
-     * Pod存储使用量
+     * Pod存储使用量，百分比
      */
     private Double volumeUsage;
     /**

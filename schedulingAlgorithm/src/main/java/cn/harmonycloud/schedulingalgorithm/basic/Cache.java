@@ -22,16 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 对service, node, pod的缓存
@@ -163,9 +157,9 @@ public class Cache implements Cloneable {
     public void getPortrait(List<Pod> pods) {
         LOGGER.info("start getPortrait!");
         try {
-            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
-            Map<String, Service> serviceMap = getServiceMap();
             // 不再使用资源画像接口
+//            List<String> serviceFullNames = pods.stream().map(DOUtils::getServiceFullName).distinct().collect(Collectors.toList());
+//            Map<String, Service> serviceMap = getServiceMap();
 //            for (String serviceFullName : serviceFullNames) {
 //                // 获取预计占用资源信息
 //                Map<String, String> parameters = new HashMap<>();
@@ -188,7 +182,16 @@ public class Cache implements Cloneable {
             //查找同service下的pod，填写新pod的属性
             pods.forEach(p -> {
                 Service service = getServiceMap().get(DOUtils.getServiceFullName(p));
+                if (service == null) {
+                    throw new RuntimeException("No such service found:" + DOUtils.getServiceFullName(p));
+                }
+                if (service.getPodList() == null || service.getPodList().size() == 0) {
+                    throw new RuntimeException("No pod of such service:" + DOUtils.getServiceFullName(p));
+                }
                 Pod sp = getPodMap().get(DOUtils.getPodFullName(service.getPodList().get(0), p.getNamespace()));
+                if (sp == null) {
+                    throw new RuntimeException("No such pod found in podList of service:" + DOUtils.getPodFullName(service.getPodList().get(0), p.getNamespace()));
+                }
                 p.setCpuRequest(sp.getCpuRequest());
                 p.setMemRequest(sp.getMemRequest());
                 p.setNodeSelector(sp.getNodeSelector());
@@ -212,7 +215,7 @@ public class Cache implements Cloneable {
 //                p.setAffinityObject(affinity);
             });
         } catch (Exception e) {
-            LOGGER.debug("getPortrait error");
+            LOGGER.error("getPortrait error");
             e.printStackTrace();
         }
     }
@@ -250,7 +253,7 @@ public class Cache implements Cloneable {
     }
 
     /**
-     * 同一轮调度内不再使用fetchCacheData()更新数据，updateCache()方法对缓存进行增量维护，更节省时间
+     * 同一轮调度内不再使用获取监控数据，updateCache()方法对缓存进行增量维护，更节省时间
      *
      * @param pod  被调度的pod
      * @param host 为pod选择的节点
@@ -278,8 +281,8 @@ public class Cache implements Cloneable {
 //        service.setMemUsage(String.valueOf(Double.valueOf(service.getMemUsage()) + (isAdd ? 1 : -1) * Double.valueOf(service.getMemCosume())));
         // 更新 node占用的资源
         Node node = nodeMap.get(host);
-        node.setCpuUsage(node.getCpuUsage() + (isAdd ? 1 : -1) * pod.getCpuRequest());
-        node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest());
+        node.setCpuUsage(node.getCpuUsage() + (isAdd ? 1 : -1) * pod.getCpuRequest() / node.getCpuCores());
+        node.setMemUsage(node.getMemUsage() + (isAdd ? 1 : -1) * pod.getMemRequest() / node.getMemMaxCapacity());
         // 更新node下端口列表
         for (ContainerPort cp : pod.getWantPorts()) {
             if (cp != null) {

@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static cn.harmonycloud.datacenter.tools.Constant.POD_INDEX;
@@ -359,7 +360,18 @@ public class PodData {
     }
 
     public void setLabels(Map<String, String> labels) {
-        this.labels = labels;
+        Map<String, String> map = new HashMap<>();
+        for(Map.Entry entry : labels.entrySet()){
+            map.put(entry.getKey().toString().replace('.','_'),entry.getValue().toString());
+        }
+        this.labels = map;
+    }
+    public void changeLabels(){
+        Map<String,String> map = new HashMap<>();
+        for(Map.Entry entry : labels.entrySet()){
+            map.put(entry.getKey().toString().replace('_','.'),entry.getValue().toString());
+        }
+        this.labels = map;
     }
 
     public void setPersistentVolumeClaimNames(ArrayList<String> persistentVolumeClaimNames) {
@@ -404,5 +416,41 @@ public class PodData {
     public void setKey(ArrayList<String> key) {
         this.setPodName(key.get(0));
         this.setNamespace(key.get(1));
+    }
+
+    @Override
+    public String toString() {
+        return "PodData{" +
+                "id='" + id + '\'' +
+                ", time='" + time + '\'' +
+                ", podName='" + podName + '\'' +
+                ", podIp='" + podIp + '\'' +
+                ", nodeName='" + nodeName + '\'' +
+                ", serviceName='" + serviceName + '\'' +
+                ", namespace='" + namespace + '\'' +
+                ", onlineType='" + onlineType + '\'' +
+                ", resourceKind='" + resourceKind + '\'' +
+                ", resourceName='" + resourceName + '\'' +
+                ", state='" + state + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", imageName='" + imageName + '\'' +
+                ", cpuUsage=" + cpuUsage +
+                ", cpuRequest=" + cpuRequest +
+                ", cpuLimit=" + cpuLimit +
+                ", memUsage=" + memUsage +
+                ", memRequest=" + memRequest +
+                ", memLimit=" + memLimit +
+                ", volumeType='" + volumeType + '\'' +
+                ", volumeUsage=" + volumeUsage +
+                ", readsBytes=" + readsBytes +
+                ", writesBytes=" + writesBytes +
+                ", receiveBytes=" + receiveBytes +
+                ", responseBytes=" + responseBytes +
+                ", locateNodeIP='" + locateNodeIP + '\'' +
+                ", deletionStamp='" + deletionStamp + '\'' +
+                ", ownerReferencesUid='" + ownerReferencesUid + '\'' +
+                ", netErrors=" + netErrors +
+                ", clusterMasterIP='" + clusterMasterIP + '\'' +
+                '}';
     }
 }

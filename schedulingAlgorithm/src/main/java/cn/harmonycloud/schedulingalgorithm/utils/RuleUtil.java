@@ -1,10 +1,8 @@
 package cn.harmonycloud.schedulingalgorithm.utils;
 
-import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorOperator;
 import cn.harmonycloud.schedulingalgorithm.basic.Cache;
 import cn.harmonycloud.schedulingalgorithm.affinity.InternalSelector;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelector;
-import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorOperator;
 import cn.harmonycloud.schedulingalgorithm.affinity.LabelSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorRequirement;
 import cn.harmonycloud.schedulingalgorithm.affinity.NodeSelectorTerm;
@@ -35,11 +33,11 @@ public class RuleUtil {
         Resource requested = new Resource();
 
         if (op == Constants.OPERATION_ADD) {
-            requested.setMilliCPU((long) (1000 * (node.getCpuUsage() + pod.getCpuRequest())));
-            requested.setMemory(node.getMemUsage().longValue() + pod.getMemRequest().longValue());
+            requested.setMilliCPU((long) (1000 * (node.getCpuUsage() * node.getCpuCores() + pod.getCpuRequest())));
+            requested.setMemory((long) (node.getMemUsage() * node.getMemMaxCapacity() + pod.getMemRequest()));
         } else {
-            requested.setMilliCPU((long) (1000 * (node.getCpuUsage() - pod.getCpuRequest())));
-            requested.setMemory(node.getMemUsage().longValue() - pod.getMemRequest().longValue());
+            requested.setMilliCPU((long) (1000 * (node.getCpuUsage() * node.getCpuCores() - pod.getCpuRequest())));
+            requested.setMemory((long) (node.getMemUsage() * node.getMemMaxCapacity() - pod.getMemRequest()));
         }
         return requested;
     }
@@ -56,8 +54,8 @@ public class RuleUtil {
 
     public static Resource getNodeResource(Node node) {
         Resource resource = new Resource();
-        resource.setMilliCPU((long) (1000 * (node.getCpuUsage())));
-        resource.setMemory(node.getMemUsage().longValue());
+        resource.setMilliCPU((long) (1000 * (node.getCpuUsage() * node.getCpuCores())));
+        resource.setMemory((long) (node.getMemUsage() * node.getMemMaxCapacity()));
         return resource;
     }
 
@@ -140,10 +138,10 @@ public class RuleUtil {
         if (taint == null) {
             return true;
         }
-        if (Objects.equals(toleration.getEffect(), taint.getEffectObject().getEffect())) {
+        if (!Objects.equals(toleration.getEffect(), taint.getEffectObject().getEffect())) {
             return false;
         }
-        if (Objects.equals(toleration.getKey(), taint.getKey())) {
+        if (!Objects.equals(toleration.getKey(), taint.getKey())) {
             return false;
         }
         if (toleration.getOperatorObject() == null) {

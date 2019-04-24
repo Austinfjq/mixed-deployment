@@ -17,6 +17,8 @@ public class Constant {
     public static final String SCHEDULE_POD_TYPE="schedulePodData";
     public static final String FORECAST_RESULT_CELL_INDEX="forecast";
     public static final String FORECAST_RESULT_CELL_TYPE="forecastResultCell";
+    public static final String SEARCH_POD_INDEX="searchPod";
+    public static final String SEARCH_POD_TYPE="searchPod";
 
     //for test
     public static final String RESULT_NODE_INDEX="testnode";

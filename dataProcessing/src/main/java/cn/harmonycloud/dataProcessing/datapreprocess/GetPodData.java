@@ -62,22 +62,26 @@ public class GetPodData {
                 pod.setImageName(item.getImage());
             }
 
-
             if (d.getMetadata().getLabels() != null
-                    && d.getMetadata().getLabels().containsKey("daemon")) {
-
-                for (Service svc : svcList.getItems()) {
-                    if (svc.getMetadata().getLabels() != null
-                            && svc.getMetadata().getLabels().containsKey("daemon")) {
-
-                        if (d.getMetadata().getLabels().get("daemon")
-                                .equals(svc.getMetadata().getLabels().get("daemon"))) {
-                            pod.setServiceName(svc.getMetadata().getName());
-                        }
-                    }
-                }
-
+                    && d.getMetadata().getLabels().containsKey("app")) {
+                pod.setServiceName(d.getMetadata().getLabels().get("app"));
             }
+
+//            if (d.getMetadata().getLabels() != null
+//                    && d.getMetadata().getLabels().containsKey("daemon")) {
+//
+//                for (Service svc : svcList.getItems()) {
+//                    if (svc.getMetadata().getLabels() != null
+//                            && svc.getMetadata().getLabels().containsKey("daemon")) {
+//
+//                        if (d.getMetadata().getLabels().get("daemon")
+//                                .equals(svc.getMetadata().getLabels().get("daemon"))) {
+//                            pod.setServiceName(svc.getMetadata().getName());
+//                        }
+//                    }
+//                }
+//
+//            }
 
 
             //get PersistentVolumeClaimNames

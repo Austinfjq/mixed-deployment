@@ -56,7 +56,7 @@ public class AnnealingScheduler implements Scheduler {
     private static void showCacheResource() {
         FakeCache c = new FakeCache();
         c.fetchSingleCacheData();
-        Map map1 = c.getNodeList().stream().collect(Collectors.toMap(Node::getNodeName, n -> n.getCpuUsage() + "/" + n.getAllocatableCpuCores() + "," + n.getMemUsage() + "/" + n.getAllocatableMem()));
+        Map map1 = c.getNodeList().stream().collect(Collectors.toMap(Node::getNodeName, n -> n.getCpuUsage() * n.getCpuCores() + "/" + n.getAllocatableCpuCores() + "," + n.getMemUsage() * n.getMemMaxCapacity() + "/" + n.getAllocatableMem()));
         Map map2 = c.getPodMap().values().stream().collect(Collectors.toMap(DOUtils::getPodFullName, p -> p.getCpuRequest() + "," + p.getMemRequest()));
         LOGGER.info("\n" + map1);
         LOGGER.info("\n" + map2);
