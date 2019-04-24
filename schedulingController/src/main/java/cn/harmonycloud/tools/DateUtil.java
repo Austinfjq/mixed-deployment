@@ -1,7 +1,5 @@
 package cn.harmonycloud.tools;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,15 +11,14 @@ import java.util.Date;
  */
 public class DateUtil {
 
-    @Value("${SchedulePeriod}")
-    private static int schedulePeriod;
-
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-    private static Calendar currentTime = null;
+    private Calendar currentTime = null;
 
-    public static String getCurrentTime() {
+
+
+    public String getCurrentTime() {
        Calendar nowTime = Calendar.getInstance();
        currentTime = nowTime;
        Date nowDate = nowTime.getTime();
@@ -29,30 +26,29 @@ public class DateUtil {
        return time;
     }
 
-    public static String getLastPeriodTime() {
+    public String getLastPeriodTime(int schedulePeriod) {
         if (null == currentTime) {
             getCurrentTime();
         }
 
         Calendar calendar = currentTime;
-        calendar.add(Calendar.SECOND, -schedulePeriod);
+        calendar.add(Calendar.MILLISECOND, -schedulePeriod);
 
         Date nowDate = calendar.getTime();
         String time = sdf.format(nowDate);
         return time;
     }
 
-    public static String getNextPeriodTime() {
+    public String getNextPeriodTime(int schedulePeriod) {
         if (null == currentTime) {
             getCurrentTime();
         }
 
         Calendar calendar = currentTime;
-        calendar.add(Calendar.SECOND, schedulePeriod);
+        calendar.add(Calendar.MILLISECOND, schedulePeriod);
 
         Date nowDate = calendar.getTime();
         String time = sdf.format(nowDate);
         return time;
     }
-
 }

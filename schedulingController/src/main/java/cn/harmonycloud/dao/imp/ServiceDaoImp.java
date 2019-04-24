@@ -28,10 +28,10 @@ public class ServiceDaoImp implements ServiceDAO {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServiceDaoImp.class);
 
-    @Value("${ScheduleExecutorHostIP}")
+    @Value("${DataCenterHostIP}")
     private String hostIp;
 
-    @Value("${ScheduleExecutorPort}")
+    @Value("${DataCenterPort}")
     private String port;
 
     @Override
@@ -63,9 +63,6 @@ public class ServiceDaoImp implements ServiceDAO {
         Map<String,String> params = new HashMap<>();
         params.put("clusterIp", masterIp);
         String url = "http://"+ hostIp + ":" + port + "/service/onlineServices";
-
-        System.out.println(url);
-//        String url = "http://10.107.249.160:8080/service/onlineServices";
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -78,12 +75,19 @@ public class ServiceDaoImp implements ServiceDAO {
         }
 
         String serviceListStr = httpClientResult.getContent();
-        List<Service> services = new ArrayList<>();
 
+        System.out.println(serviceListStr);
+
+        List<Service> services = new ArrayList<>();
+        if (null == serviceListStr || serviceListStr.equals("")) {
+            LOGGER.error("this cluster not have any online service!");
+            return services;
+        }
+        LOGGER.info("service list :" + serviceListStr);
         JSONArray jsonArray = JSONArray.parseArray(serviceListStr);
 
         for (int i=0; i<jsonArray.size(); i++) {
-            String clusterIP = jsonArray.getJSONObject(i).getString("masterIp");
+            String clusterIP = jsonArray.getJSONObject(i).getString("clusterIp");
             String namespace = jsonArray.getJSONObject(i).getString("namespace");
             String serviceName = jsonArray.getJSONObject(i).getString("serviceName");
             int serviceType = jsonArray.getJSONObject(i).getIntValue("serviceType");
@@ -192,13 +196,4 @@ public class ServiceDaoImp implements ServiceDAO {
         double nextPeriodMaxRequestNums = jsonObject.getIntValue("lastPeriodMaxRequestNums");
         return nextPeriodMaxRequestNums;
     }
-
-    public static void main(String[] args) {
-        ServiceDaoImp serviceDaoImp = new ServiceDaoImp();
-
-        List<Service> services = serviceDaoImp.getAllOnlineService("10.10.102.25");
-
-
-    }
-
 }

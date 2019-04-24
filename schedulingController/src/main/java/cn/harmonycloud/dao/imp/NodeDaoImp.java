@@ -86,7 +86,12 @@ public class NodeDaoImp implements NodeDAO {
 
         String podListStr = httpClientResult.getContent();
         List<Node> nodes = new ArrayList<>();
+        if (null == podListStr || podListStr.equals("")) {
+            LOGGER.error("this cluster not have any node!");
+            return nodes;
+        }
 
+        LOGGER.info("node list：" + podListStr);
         JSONArray jsonArray = JSONArray.parseArray(podListStr);
 
         for (int i=0; i<jsonArray.size(); i++) {
@@ -118,7 +123,7 @@ public class NodeDaoImp implements NodeDAO {
             return 0;
         }
         JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
-        double cpuTotal = jsonObject.getIntValue("cpuTotal");
+        double cpuTotal = jsonObject.getDoubleValue("cpuTotal");
         return cpuTotal;
     }
 
@@ -139,7 +144,7 @@ public class NodeDaoImp implements NodeDAO {
             return 0;
         }
         JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
-        double memTotal = jsonObject.getIntValue("memTotal");
+        double memTotal = jsonObject.getDoubleValue("memTotal");
         return memTotal;
     }
 
@@ -162,7 +167,7 @@ public class NodeDaoImp implements NodeDAO {
             return 0;
         }
         JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
-        double lastPeriodMaxCpuUsage = jsonObject.getIntValue("lastPeriodMaxCpuUsage");
+        double lastPeriodMaxCpuUsage = jsonObject.getDoubleValue("lastPeriodMaxCpuUsage");
         return lastPeriodMaxCpuUsage;
     }
 
@@ -185,7 +190,7 @@ public class NodeDaoImp implements NodeDAO {
             return 0;
         }
         JSONObject jsonObject = DataUtil.jsonStringtoObject(httpClientResult.getContent());
-        double lastPeriodMaxMemUsage = jsonObject.getIntValue("lastPeriodMaxMemUsage");
+        double lastPeriodMaxMemUsage = jsonObject.getDoubleValue("lastPeriodMaxMemUsage");
         return lastPeriodMaxMemUsage;
     }
 }
