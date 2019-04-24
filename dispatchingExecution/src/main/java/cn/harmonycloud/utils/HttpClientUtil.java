@@ -38,8 +38,8 @@ import java.util.Map;
  */
 public class HttpClientUtil {
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
-//    private static String URL = StringUtil.combineUrl(Config.DB_SERVER+":8080/management");
-    private static String URL = StringUtil.combineUrl("10.10.102.25:31863/management");
+    private static String URL = StringUtil.combineUrl("data-center:8080/management");
+//    private static String URL = StringUtil.combineUrl("10.10.102.25:31286/management");
 
     public static String httpGet(Map<String,String> paramMap)  {
         List<NameValuePair> paramList = new ArrayList<>();

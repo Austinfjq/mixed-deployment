@@ -71,15 +71,15 @@ public class PodDataDao implements IPodDataDao {
 
     @Override
     public List<PodData> getNowPods() {
-        //{
-        //	"query":{
-        //		"bool":{
-        //			"must":[
-        //				{"match_phrase" : {"time" : "2019-02-28 18:25:29"}}
-        //			]
-        //		}
-        //	}
-        //}
+//        {
+//        	"query":{
+//        		"bool":{
+//        			"must":[
+//        				{"match_phrase" : {"time" : "2019-02-28 18:25:29"}}
+//        			]
+//        		}
+//        	}
+//        }
         List<PodData> resultList = new ArrayList<>();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -115,15 +115,15 @@ public class PodDataDao implements IPodDataDao {
      */
     public String getRecentTime(){
         //GET /pod/podData/_search
-        //{
-        //	"aggs":{
-        //		"recent_time":{
-        //			"max":{
-        //				"field":"time"
-        //			}
-        //		}
-        //	}
-        //}
+//        {
+//        	"aggs":{
+//        		"recent_time":{
+//        			"max":{
+//        				"field":"time"
+//        			}
+//        		}
+//        	}
+//        }
         MaxAggregationBuilder maxAggregationBuilder = AggregationBuilders.max("recent_time").field("time");
 
         SearchQuery searchQuery = new NativeSearchQueryBuilder()

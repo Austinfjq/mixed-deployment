@@ -1,12 +1,12 @@
 package cn.harmonycloud.tools;
 
-import cn.harmonycloud.strategy.AbstractClusterStrategy;
-import cn.harmonycloud.strategy.AbstractNodeStrategy;
-import cn.harmonycloud.strategy.AbstractServiceStrategy;
+import cn.harmonycloud.beans.EvaluateStrategy;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,8 +20,9 @@ import java.util.List;
  * @Despriction
  */
 public class XMLUtil {
+    private final static Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
-    private static String fileName = Constant.STRATEGY_CONFIG_FIME_NAME;
+    private static String fileName = PropertyFileUtil.getValue("STRATEGY_CONFIG_FIME_NAME");
 
     public static Element getRootNode() {
         SAXReader reader = new SAXReader();
@@ -41,7 +42,7 @@ public class XMLUtil {
         Iterator it = rootElement.elementIterator();
         while (it.hasNext()) {
             Element element = (Element)it.next();
-            if (Constant.NODE.equals(element.getName())) {
+            if ("node".equals(element.getName())) {
                 return element;
             }
         }
@@ -54,7 +55,7 @@ public class XMLUtil {
         Iterator it = rootElement.elementIterator();
         while (it.hasNext()) {
             Element element = (Element)it.next();
-            if (Constant.SERVICE.equals(element.getName())) {
+            if ("service".equals(element.getName())) {
                 return element;
             }
         }
@@ -67,7 +68,7 @@ public class XMLUtil {
         Iterator it = rootElement.elementIterator();
         while (it.hasNext()) {
             Element element = (Element)it.next();
-            if (Constant.CLUSTER.equals(element.getName())) {
+            if ("cluster".equals(element.getName())) {
                 return element;
             }
         }
@@ -76,84 +77,40 @@ public class XMLUtil {
     }
 
 
-    public static List<AbstractNodeStrategy> getNodeStrategys() {
-        Element root = getNodeElement();
-        List<AbstractNodeStrategy> list = new ArrayList<>();
-
-        if (null == root) {
-            throw new RuntimeException("The strategy config not have node elememt!");
+    public static List<EvaluateStrategy> getNodeStrategys() {
+        Element nodeRoot = getNodeElement();
+        if (null == nodeRoot) {
+            LOGGER.error("the strategy config file not exist node strategy!");
+            return null;
         }
-
-        Iterator it = root.elementIterator();
-
-        while(it.hasNext()) {
-
-            Element element = (Element)it.next();
-
-            String name = "";
-            String className = "";
-            double maxValue = 0;
-            boolean status = false;
-            String description = "";
-
-            Iterator strategyIterator = element.elementIterator();
-            while (strategyIterator.hasNext()) {
-                Element nodeElement = (Element) strategyIterator.next();
-                if ("name".equals(nodeElement.getName())) {
-                    name = nodeElement.getStringValue();
-                }else if("class".equals(nodeElement.getName())) {
-                    className = nodeElement.getStringValue();
-                }else if ("maxValue".equals(nodeElement.getName())) {
-                    maxValue = Double.valueOf(nodeElement.getStringValue());
-                }else if ("status".equals(nodeElement.getName())) {
-                    status = Boolean.valueOf(nodeElement.getStringValue());
-                }else if ("description".equals(nodeElement.getName())) {
-                    description = nodeElement.getStringValue();
-                }else {
-                    throw new RuntimeException("The strategy config file have unknown element!");
-                }
-            }
-
-            if ("".equals(className)) {
-                throw new RuntimeException("Class element value is null!");
-            }
-
-            AbstractNodeStrategy abstractNodeStrategy = null;
-            try {
-                Class c=Class.forName(className);
-                Object obj=c.newInstance();
-                abstractNodeStrategy = (AbstractNodeStrategy)obj;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-            abstractNodeStrategy.setName(name);
-            abstractNodeStrategy.setClassName(className);
-            abstractNodeStrategy.setMaxValue(maxValue);
-            abstractNodeStrategy.setStatus(status);
-            abstractNodeStrategy.setDescription(description);
-
-            if (abstractNodeStrategy.isStatus()) {
-                list.add(abstractNodeStrategy);
-            }
-        }
-
-        return list;
+        return getEvaluateStrategys(nodeRoot);
     }
 
 
-    public static List<AbstractServiceStrategy> getServiceStrategys() {
-        Element root = getServiceElement();
-        List<AbstractServiceStrategy> list = new ArrayList<>();
+    public static List<EvaluateStrategy> getServiceStrategys() {
+        Element serviceRoot = getServiceElement();
+        if (null == serviceRoot) {
+            LOGGER.error("the strategy config file not exist service strategy!");
+            return null;
+        }
+        return getEvaluateStrategys(serviceRoot);
+    }
+
+    public static List<EvaluateStrategy> getClusterStrategys() {
+        Element clusterRoot = getClusterElement();
+        if (null == clusterRoot) {
+            LOGGER.error("the strategy config file not exist cluster strategy!");
+            return null;
+        }
+        return getEvaluateStrategys(clusterRoot);
+    }
+
+    private static List<EvaluateStrategy> getEvaluateStrategys(Element root) {
+        List<EvaluateStrategy> list = new ArrayList<>();
 
         if (null == root) {
-            throw new RuntimeException("The strategy config not have service elememt!");
+            throw new RuntimeException("The element is null!");
         }
-
         Iterator it = root.elementIterator();
 
         while(it.hasNext()) {
@@ -181,55 +138,18 @@ public class XMLUtil {
                 }
             }
 
-            if ("".equals(className)) {
-                throw new RuntimeException("Class element value is null!");
-            }
+            EvaluateStrategy evaluateStrategy = null;
 
-            AbstractServiceStrategy abstractServiceStrategy = null;
-            try {
-                Class c=Class.forName(className);
-                Object obj=c.newInstance();
-                abstractServiceStrategy = (AbstractServiceStrategy)obj;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            evaluateStrategy.setName(name);
+            evaluateStrategy.setClassName(className);
+            evaluateStrategy.setStatus(status);
+            evaluateStrategy.setDescription(description);
 
-            abstractServiceStrategy.setName(name);
-            abstractServiceStrategy.setClassName(className);
-            abstractServiceStrategy.setStatus(status);
-            abstractServiceStrategy.setDescription(description);
-
-            if (abstractServiceStrategy.isStatus()) {
-                list.add(abstractServiceStrategy);
+            if (evaluateStrategy.isStatus()) {
+                list.add(evaluateStrategy);
             }
         }
 
         return list;
-    }
-
-    public static List<AbstractClusterStrategy> getClusterStrategys() {
-        Element root = getClusterElement();
-
-        //TODO 后期扩展
-        return null;
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        List<AbstractNodeStrategy> list = getNodeStrategys();
-        for (AbstractNodeStrategy abstractNodeStrategy:list) {
-            System.out.println(abstractNodeStrategy.toString());
-        }
-
-        List<AbstractServiceStrategy> list1 = getServiceStrategys();
-        for (AbstractServiceStrategy abstractServiceStrategy:list1) {
-            System.out.println(abstractServiceStrategy.toString());
-        }
     }
 }

@@ -224,17 +224,17 @@ public class NodeDataDao implements INodeDataDao {
 
     @Override
     public List<NodeData> getNowNodes() {
-        //GET /node/nodedata/_search
-        //{
-        //    "query":{
-        //        "bool":{
-        //            "must":[
-        //                {"match_phrase":{"time":"2019-01-01 00:00:00"}}
-        //            ]
-        //        }
-        //    },
-        //	"_source":["nodeName","nodeIP","podNums","cpuUsage","memUsage"]
-        //}
+//        GET /node/nodedata/_search
+//        {
+//            "query":{
+//                "bool":{
+//                    "must":[
+//                        {"match_phrase":{"time":"2019-01-01 00:00:00"}}
+//                    ]
+//                }
+//            },
+//        	"_source":["nodeName","nodeIP","podNums","cpuUsage","memUsage"]
+//        }
         List<NodeData> resultList = new ArrayList<>();
 //        final SearchResultMapper nowNodeResultMapper = new SearchResultMapper() {
 //            @Override

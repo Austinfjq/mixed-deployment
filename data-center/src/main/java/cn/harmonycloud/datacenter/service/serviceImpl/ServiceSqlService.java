@@ -1,11 +1,14 @@
 package cn.harmonycloud.datacenter.service.serviceImpl;
 
+import cn.harmonycloud.datacenter.entity.mysql.Service;
+import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.mapper.ServiceMapper;
 import cn.harmonycloud.datacenter.service.IServiceSqlService;
 import org.springframework.beans.factory.annotation.Autowired;
-import cn.harmonycloud.datacenter.entity.mysql.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @org.springframework.stereotype.Service
@@ -19,5 +22,24 @@ public class ServiceSqlService implements IServiceSqlService {
         resultMap.put("ownerType",service.getOwnerType());
         resultMap.put("ownerName",service.getOwnerName());
         return resultMap;
+    }
+    @Override
+    public List<services> getServiceByClusterIp(String clusterIp) {
+        List<Service> service= serviceMapper.findServiceByClusterIp(clusterIp);
+        List<services> serviceNodes=new ArrayList<services>();
+        for(Service pd:service)
+        {
+            if(clusterIp.equals(pd.getClusterIp()))
+            {
+                services sn=new services();
+                sn.setClusterIp(pd.getClusterIp());
+                sn.setServiceName(pd.getServiceName());
+                sn.setNamespace(pd.getNamespace());
+                sn.setServiceType(String.valueOf(pd.getType()));
+                System.out.print(sn.toString());
+                serviceNodes.add(sn);
+            }
+        }
+        return serviceNodes;
     }
 }

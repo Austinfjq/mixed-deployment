@@ -1,0 +1,30 @@
+<strategys>
+    <node>
+        <strategy>
+            <indexName>cpu</indexName>
+            <status>true</status>
+            <description>node cpu usage!</description>
+        </strategy>
+        <strategy>
+            <indexName>memory</indexName>
+            <status>true</status>
+            <description>node memory usage!</description>
+        </strategy>
+    </node>
+
+    <service>
+        <strategy>
+            <indexName>responseTime</indexName>
+            <status>true</status>
+            <description>service response time!</description>
+        </strategy>
+    </service>
+
+
+    <cluster>
+
+    </cluster>
+
+
+</strategys>
+

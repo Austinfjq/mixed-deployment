@@ -6,6 +6,7 @@ bin/
 appLogs/
 *.log
 ~$*.docx
+__pycache__/
 
 # Intellij project files
 *.iml

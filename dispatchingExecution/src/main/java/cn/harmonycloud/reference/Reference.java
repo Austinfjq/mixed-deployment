@@ -19,7 +19,7 @@ public class Reference {
     private final static Logger LOGGER = LoggerFactory.getLogger(Reference.class);
     public static JSONObject getOwnerOfPod(String masterIp,String namespace,String serviceName)  {
         Map<String,String> paramMap = new HashMap<>();
-        paramMap.put("masterIp",masterIp);
+        paramMap.put("clusterMasterIP",masterIp);
         paramMap.put("namespace",namespace);
         paramMap.put("serviceName", serviceName);
 
@@ -32,7 +32,7 @@ public class Reference {
         return  JSON.parseObject(result);
     }
     public static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException {
-        JSONObject data = getOwnerOfPod("","wordpress","wordpress-wp");
+        JSONObject data = getOwnerOfPod("10.10.102.25","test","nginx");
         System.out.println("ResourceKing:"+data.getString("resourceKind"));
         System.out.println("ResourceName:"+data.getString("resourceName"));
     }

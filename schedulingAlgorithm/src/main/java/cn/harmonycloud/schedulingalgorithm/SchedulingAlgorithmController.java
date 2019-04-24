@@ -6,6 +6,7 @@ import cn.harmonycloud.schedulingalgorithm.dataobject.Pod;
 import cn.harmonycloud.schedulingalgorithm.dataobject.SchedulePod;
 import cn.harmonycloud.schedulingalgorithm.utils.CheckUtil;
 import cn.harmonycloud.schedulingalgorithm.utils.DOUtils;
+import com.google.gson.Gson;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.util.Map;
 @RestController
 public class SchedulingAlgorithmController {
     private final static Logger LOGGER = LoggerFactory.getLogger(SchedulingAlgorithmController.class);
+    private final static Gson gson = new Gson();
 
     /**
      * @param schedulePods 请求
@@ -30,7 +32,7 @@ public class SchedulingAlgorithmController {
      */
     @RequestMapping("/schedulepod")
     public Map<String, Object> schedulePod(@RequestBody List<SchedulePod> schedulePods) {
-        LOGGER.info("POST /schedulepod");
+        LOGGER.info("POST /schedulepod: " + gson.toJson(schedulePods));
         // check parameter
         if (CheckUtil.nullOrEmpty(schedulePods)) {
             return genFailResponseMap("Bad request: null or empty");

@@ -1,12 +1,13 @@
 package cn.harmonycloud.datacenter.controller;
 
+import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.service.IServiceSqlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.List;
 
 /**
 *@Author: shaodilong
@@ -19,9 +20,14 @@ public class ServiceSqlController {
     @Autowired
     private IServiceSqlService serviceSqlService;
 
-//    @GetMapping("/management")
-//    public Map<String, Object> getOwnerTypeAndName(@RequestParam("namespace") String namespace,
-//                                                   @RequestParam("serviceName") String serviceName){
-//        return serviceSqlService.getOwnerTypeAndName(namespace,serviceName);
-//    }
+/*    @GetMapping("/managements")
+    public Map<String, Object> getOwnerTypeAndName(@RequestParam("namespace") String namespace,
+                                                   @RequestParam("serviceName") String serviceName){
+        return serviceSqlService.getOwnerTypeAndName(namespace,serviceName);
+    }*/
+    @GetMapping("/service/onlineServices")
+    public List<services> getService(@RequestParam("clusterIp") String clusterIp)
+    {
+        return serviceSqlService.getServiceByClusterIp(clusterIp);
+    }
 }

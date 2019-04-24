@@ -56,7 +56,7 @@ public class AnnealingScheduler implements Scheduler {
     private static void showCacheResource() {
         FakeCache c = new FakeCache();
         c.fetchSingleCacheData();
-        Map map1 = c.getNodeList().stream().collect(Collectors.toMap(Node::getNodeName, n -> n.getCpuUsage() + "/" + n.getAllocatableCpuCores() + "," + n.getMemUsage() + "/" + n.getAllocatableMem()));
+        Map map1 = c.getNodeList().stream().collect(Collectors.toMap(Node::getNodeName, n -> n.getCpuUsage() * n.getCpuCores() + "/" + n.getAllocatableCpuCores() + "," + n.getMemUsage() * n.getMemMaxCapacity() + "/" + n.getAllocatableMem()));
         Map map2 = c.getPodMap().values().stream().collect(Collectors.toMap(DOUtils::getPodFullName, p -> p.getCpuRequest() + "," + p.getMemRequest()));
         LOGGER.info("\n" + map1);
         LOGGER.info("\n" + map2);
@@ -73,7 +73,7 @@ public class AnnealingScheduler implements Scheduler {
             // 2. 获取应用画像信息
             cache.getPortrait(schedulingRequests);
             // 贪心算法
-            SearchOptSolution greedySolution = simulatedGreedySchedule(schedulingRequests);
+            SearchOptSolution greedySolution = simulatedGreedySchedule(this.cache, schedulingRequests);
             LOGGER.info("GreedyScheduler simple sum score = " + greedySolution.getScoreWithFinalResource(cache) + "; hosts=" + greedySolution.getHosts());
             // 退火算法
             SearchOptSolution annealingSolution = annealing(schedulingRequests, greedySolution);
@@ -136,10 +136,10 @@ public class AnnealingScheduler implements Scheduler {
         return sb.toString();
     }
 
-    private SearchOptSolution simulatedGreedySchedule(List<Pod> schedulingRequests) {
+    public static SearchOptSolution simulatedGreedySchedule(Cache cache, List<Pod> schedulingRequests) {
         // 对比GreedyScheduler
         GreedyScheduler greedyScheduler = new GreedyScheduler();
-        greedyScheduler.cache = this.cache.clone();
+        greedyScheduler.cache = cache.clone();
         GreedyAlgorithm greedyAlgorithm = new DefaultGreedyAlgorithm();
 //        List<Pod> sortedPods = new ArrayList<>(schedulingRequests);
         List<Pod> sortedPods = greedyAlgorithm.presort(new ArrayList<>(schedulingRequests), greedyScheduler.cache);
@@ -181,7 +181,7 @@ public class AnnealingScheduler implements Scheduler {
 //        solution = SearchOptSolution.getInitialSolution(cache, pods);
         if (solution == null) {
             try {
-                solution = simulatedGreedySchedule(pods);
+                solution = simulatedGreedySchedule(this.cache, pods);
             } catch (Exception e) {
                 throw new RuntimeException("Cannot find an initial solution.");
             }

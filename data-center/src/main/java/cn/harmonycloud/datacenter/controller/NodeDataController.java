@@ -2,11 +2,17 @@ package cn.harmonycloud.datacenter.controller;
 
 
 import cn.harmonycloud.datacenter.entity.es.NodeData;
+import cn.harmonycloud.datacenter.entity.es.SearchNode;
+import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.service.INodeDataService;
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,6 +26,7 @@ import java.util.*;
 @RestController
 public class NodeDataController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeDataController.class);
     @Autowired
     private INodeDataService nodeDataService;
 
@@ -50,8 +57,10 @@ public class NodeDataController {
                 nodeData.setId(UUID.randomUUID().toString());
                 nodeData.setTime(time);
             }
-
+            long start = System.currentTimeMillis();
             Iterable<NodeData> nodeDataIterable = nodeDataService.saveAllNodeDatas(nodeDatas);
+            long end = System.currentTimeMillis();
+            LOGGER.info("Save all Node data in " + (end - start) / 1000.0 + "seconds");
             if(Lists.newArrayList(nodeDataIterable).size() == nodeDatas.size()){
                 responseMap.put("isSucceed",true);
             }else{
@@ -91,5 +100,138 @@ public class NodeDataController {
     @GetMapping("/nowNode")
     public List<NodeData> getNowNodes(){
         return nodeDataService.getNowNodes();
+    }
+    @GetMapping("/node/nodes")
+    public List<SearchNode> getNodes(@RequestParam("clusterIp") String clusterIp)
+    {
+        //String newStr = clusterIp.substring(1, clusterIp.length()-1);
+        List<NodeData> pod=nodeDataService.getNowNodes();
+        List<SearchNode> searchNodes=new ArrayList<SearchNode>();
+        for(NodeData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP()))
+            {
+                SearchNode sn=new SearchNode();
+                sn.setClusterIp(pd.getClusterMasterIP());
+                sn.setHostName(pd.getNodeName());
+                searchNodes.add(sn);
+            }
+        }
+        return searchNodes;
+    }
+    @GetMapping("/node/cpuTotal")
+    public Map<String, Double> getNodeCpuNums(@RequestParam("clusterIp") String clusterIp,
+                                                 @RequestParam("hostName") String hostName){
+        Map<String, Double> responseMap = new HashMap<>();
+        List<NodeData> pod=nodeDataService.getNowNodes();
+        double ins=0;
+        for(NodeData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP())&& hostName.equals(pd.getNodeName()))
+            {
+                ins+=pd.getCpuCores();
+            }
+        }
+        responseMap.put("cpuTotal",ins);
+        return responseMap;
+    }
+    @GetMapping("/node/memTotal")
+    public Map<String, Double> getNodeMem(@RequestParam("clusterIp") String clusterIp,
+                                                 @RequestParam("hostName") String hostName){
+        Map<String, Double> responseMap = new HashMap<>();
+        List<NodeData> pod=nodeDataService.getNowNodes();
+        double ins=0;
+        for(NodeData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP())&& hostName.equals(pd.getNodeName()))
+            {
+                ins+=pd.getAllocatableMem();
+            }
+        }
+        ins/=1024;
+        responseMap.put("memTotal",ins);
+        return responseMap;
+    }
+    @GetMapping("/node/lastPeriodMaxCpuUsage")
+    public Map<String, Double> getNodeMaxCpu(@RequestParam("clusterIp") String clusterIp
+            , @RequestParam("hostName") String hostName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
+        Map<String, Double> responseMap = new HashMap<>();
+        List<NodeData> pod=nodeDataService.getNowNodes();
+        double ins=0;
+        Date startTimes=new Date();
+        Date endTimes=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startTimes = df.parse(startTime);
+            endTimes=df.parse(endTime);
+        }
+        catch (ParseException e)
+        {
+            System.out.println("字符串转日期失败3\n");
+        }
+        for(NodeData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP())&&
+                    hostName.equals(pd.getNodeName()))
+            {
+                Date nowTime=new Date();
+                try
+                {
+                    nowTime = df.parse(pd.getTime());
+                }
+                catch (ParseException e)
+                {
+                    System.out.println("字符串转日期失败2\n");
+                }
+                if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
+                {
+                    double te=pd.getCpuUsage();
+                    if(te>ins) ins=te;
+                }
+            }
+        }
+        responseMap.put("lastPeriodMaxCpuUsage",ins);
+        return responseMap;
+    }
+    @GetMapping("/node/lastPeriodMaxMemUsage")
+    public Map<String, Double> getNodeMaxMem(@RequestParam("clusterIp") String clusterIp
+            , @RequestParam("hostName") String hostName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime){
+        Map<String, Double> responseMap = new HashMap<>();
+        List<NodeData> pod=nodeDataService.getNowNodes();
+        double ins=0;
+        Date startTimes=new Date();
+        Date endTimes=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startTimes = df.parse(startTime);
+            endTimes=df.parse(endTime);
+        }
+        catch (ParseException e)
+        {
+            System.out.println("字符串转日期失败3\n");
+        }
+        for(NodeData pd:pod)
+        {
+            if(clusterIp.equals(pd.getClusterMasterIP())&&
+                    hostName.equals(pd.getNodeName()))
+            {
+                Date nowTime=new Date();
+                try
+                {
+                    nowTime = df.parse(pd.getTime());
+                }
+                catch (ParseException e)
+                {
+                    System.out.println("字符串转日期失败2\n");
+                }
+                if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
+                {
+                    double te=pd.getMemUsage();
+                    if(te>ins) ins=te;
+                }
+            }
+        }
+        responseMap.put("lastPeriodMaxMemUsage",ins);
+        return responseMap;
     }
 }

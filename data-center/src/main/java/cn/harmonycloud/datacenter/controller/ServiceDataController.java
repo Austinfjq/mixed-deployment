@@ -2,12 +2,15 @@ package cn.harmonycloud.datacenter.controller;
 
 import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
+import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.service.INodeDataService;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
+import cn.harmonycloud.datacenter.service.serviceImpl.ServiceSqlService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -26,6 +29,9 @@ public class ServiceDataController {
 
     @Autowired
     private INodeDataService nodeDataService;
+
+    @Autowired
+    private ServiceSqlService serviceSqlService=new ServiceSqlService();
 
     @PutMapping("/service")
     public Map<String, Object> saveOneServiceData(@RequestBody ServiceData serviceData){
@@ -163,12 +169,12 @@ public class ServiceDataController {
      * @param clusterIP
      * @return
      */
-    @GetMapping("/service/podNums")
+/*    @GetMapping("/service/podNums")
     public Map<String,Object> getPodNums(@RequestParam("namespace") String namespace,
                                          @RequestParam("serviceName") String serviceName,
                                          @RequestParam("clusterIP") String clusterIP){
         return serviceDataService.getPodNums(namespace,serviceName,clusterIP);
-    }
+    }*/
 
     /**
      * 获取指定service的实时网络IO流量
@@ -260,7 +266,98 @@ public class ServiceDataController {
      */
     @GetMapping("/management")
     public Map<String,Object> getManagement(@RequestParam("namespace") String namespace,
-                                            @RequestParam("serviceName") String serviceName){
-        return serviceDataService.getManagement(namespace,serviceName);
+                                            @RequestParam("serviceName") String serviceName,
+                                            @RequestParam("clusterMasterIP") String clusterMasterIP){
+        return serviceDataService.getManagement(namespace,serviceName,clusterMasterIP);
+    }
+    @GetMapping("/service/lastPeriodMaxRequestNums")
+    public Map<String,Integer> getServiceRequsetNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime)
+    {
+        List<ServiceData> pod=serviceDataService.getNowServices();
+        Map<String, Integer> responseMap = new HashMap<>();
+        ServiceRequest serviceRequests=new ServiceRequest();
+        serviceRequests.setClusterIp(clusterIp);
+        serviceRequests.setNamespace(namespace);
+        serviceRequests.setServiceName(serviceName);
+        serviceRequests.setStartTime(startTime);
+        serviceRequests.setEndTime(endTime);
+        Date startTimes=new Date();
+        Date endTimes=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startTimes = df.parse(serviceRequests.getStartTime());
+            endTimes=df.parse(serviceRequests.getEndTime());
+        }
+        catch (ParseException e)
+        {
+            System.out.println("字符串转日期失败1\n");
+        }
+        Integer ins=0;
+        for(ServiceData pd:pod)
+        {
+            //System.out.println(newStr + "1\n");
+            //System.out.println(pd.getClusterMasterIP() + "2\n");
+            Date nowTime=new Date();
+            try
+            {
+                nowTime = df.parse(serviceRequests.getStartTime());
+            }
+            catch (ParseException e)
+            {
+                System.out.println("字符串转日期失败2\n");
+            }
+            if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
+            {
+                ins++;
+            }
+        }
+        responseMap.put("lastPeriodMaxRequestNums",ins);
+        return responseMap;
+    }
+    @GetMapping("/service/nextPeriodMaxRequestNums")
+    public Map<String,Integer> getServicePRequsetNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+            , @RequestParam("serviceName") String serviceName, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime)
+    {
+        List<ServiceData> pod=serviceDataService.getNowServices();
+        Map<String, Integer> responseMap = new HashMap<>();
+        ServiceRequest serviceRequests=new ServiceRequest();
+        serviceRequests.setClusterIp(clusterIp);
+        serviceRequests.setNamespace(namespace);
+        serviceRequests.setServiceName(serviceName);
+        serviceRequests.setStartTime(startTime);
+        serviceRequests.setEndTime(endTime);
+        Date startTimes=new Date();
+        Date endTimes=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startTimes = df.parse(serviceRequests.getStartTime());
+            endTimes=df.parse(serviceRequests.getEndTime());
+        }
+        catch (ParseException e)
+        {
+            System.out.println("字符串转日期失败1\n");
+        }
+        Integer ins=0;
+        for(ServiceData pd:pod)
+        {
+            //System.out.println(newStr + "1\n");
+            //System.out.println(pd.getClusterMasterIP() + "2\n");
+            Date nowTime=new Date();
+            try
+            {
+                nowTime = df.parse(serviceRequests.getStartTime());
+            }
+            catch (ParseException e)
+            {
+                System.out.println("字符串转日期失败2\n");
+            }
+            if(ServiceRequest.isEffectiveDate(nowTime,startTimes,endTimes))
+            {
+                ins++;
+            }
+        }
+        responseMap.put("lastPeriodMaxRequestNums",ins);
+        return responseMap;
     }
 }
