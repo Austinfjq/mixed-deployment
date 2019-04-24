@@ -5,7 +5,10 @@ import cn.harmonycloud.datacenter.entity.es.NodeData;
 import cn.harmonycloud.datacenter.entity.es.SearchNode;
 import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.service.INodeDataService;
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +26,7 @@ import java.util.*;
 @RestController
 public class NodeDataController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeDataController.class);
     @Autowired
     private INodeDataService nodeDataService;
 
@@ -53,8 +57,10 @@ public class NodeDataController {
                 nodeData.setId(UUID.randomUUID().toString());
                 nodeData.setTime(time);
             }
-
+            long start = System.currentTimeMillis();
             Iterable<NodeData> nodeDataIterable = nodeDataService.saveAllNodeDatas(nodeDatas);
+            long end = System.currentTimeMillis();
+            LOGGER.info("Save all Node data in " + (end - start) / 1000.0 + "seconds");
             if(Lists.newArrayList(nodeDataIterable).size() == nodeDatas.size()){
                 responseMap.put("isSucceed",true);
             }else{
