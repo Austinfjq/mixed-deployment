@@ -3,18 +3,21 @@ package cn.harmonycloud.dao.imp;
 import cn.harmonycloud.beans.OfflineDilatationStrategy;
 import cn.harmonycloud.beans.OfflineShrinkageStrategy;
 import cn.harmonycloud.beans.OnlineStrategy;
+import cn.harmonycloud.beans.SchedulableNode;
 import cn.harmonycloud.dao.StrategyDAO;
 import cn.harmonycloud.tools.DataUtil;
-import cn.harmonycloud.tools.HttpClientResult;
 import cn.harmonycloud.tools.HttpClientUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @classname：StrategyDaoImp
@@ -43,7 +46,7 @@ public class StrategyDaoImp implements StrategyDAO {
 
     @Override
     public boolean dealOnlineStrategy(OnlineStrategy onlineStrategy) {
-        LOGGER.debug("onlineStrategy is:"+ DataUtil.objectToJson(onlineStrategy));
+        LOGGER.info("start scheduleAlgoruthm:  onlineStrategy=" + DataUtil.objectToJson(onlineStrategy));
         String url = "http://"+ scheduleAlgorithmHostIP + ":" + scheduleAlgorithmPort + "/schedulepod";
         String onlineStrategyStr = "["+DataUtil.objectToJson(onlineStrategy)+"]";
         String result = null;
@@ -65,50 +68,51 @@ public class StrategyDaoImp implements StrategyDAO {
 
     @Override
     public boolean dealOfflineDilatationStrategy(OfflineDilatationStrategy offlineDilatationStrategy) {
-        Map<String,String> params = new HashMap<>();
-        params.put("offlineDilatationStrategy", DataUtil.objectToJson(offlineDilatationStrategy));
+        LOGGER.info("start offlineDilatationStrategy scheduleExecute:  offlineDilatationStrategy=" + DataUtil.objectToJson(offlineDilatationStrategy));
+
+        List<NameValuePair> paramList = new ArrayList<>();
         String url = "http://"+ scheduleExecutorHostIP + ":" + scheduleExecutorPort + "/dispatching/createPod";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doPost(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        paramList.add(new BasicNameValuePair("namespace", offlineDilatationStrategy.getNamespace()));
+        paramList.add(new BasicNameValuePair("servicename", offlineDilatationStrategy.getServiceName()));
+        paramList.add(new BasicNameValuePair("masterIp", offlineDilatationStrategy.getMasterIp()));
+
+        JSONArray jsonArray = new JSONArray();
+        for (SchedulableNode schedulableNode:offlineDilatationStrategy.getSchedulableNodes()) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("hostname", schedulableNode.getNodeHostName());
+            jsonObject.put("score", schedulableNode.getScore());
+            jsonArray.add(jsonObject);
         }
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
+        paramList.add(new BasicNameValuePair("nodeList", jsonArray.toString()));
+
+        String result = HttpClientUtils.get(url, paramList);
+        LOGGER.info("scheduleExecute result: " + result);
+        if (result == null || !result.equals("true")) {
             LOGGER.error("offlineDilatationStrategy deal failed!");
             return false;
         }
-        return Boolean.valueOf(httpClientResult.getContent());
+        return Boolean.valueOf(result);
     }
 
     @Override
     public boolean dealOfflineShrinkageStrategy(OfflineShrinkageStrategy offlineShrinkageStrategy) {
-        Map<String,String> params = new HashMap<>();
-        params.put("offlineShrinkageStrategy", DataUtil.objectToJson(offlineShrinkageStrategy));
+        LOGGER.info("start offlineShrinkageStrategy scheduleExecute:  offlineShrinkageStrategy=" + DataUtil.objectToJson(offlineShrinkageStrategy));
+
+        List<NameValuePair> paramList = new ArrayList<>();
         String url = "http://"+ scheduleExecutorHostIP + ":" + scheduleExecutorPort + "/dispatching/deletePod";
-        HttpClientResult httpClientResult = null;
-        try {
-            httpClientResult =  HttpClientUtils.doPost(url,params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
+
+        paramList.add(new BasicNameValuePair("namespace", offlineShrinkageStrategy.getNamespace()));
+        paramList.add(new BasicNameValuePair("servicename", offlineShrinkageStrategy.getServiceName()));
+        paramList.add(new BasicNameValuePair("masterIp", offlineShrinkageStrategy.getMasterIP()));
+        paramList.add(new BasicNameValuePair("podName", offlineShrinkageStrategy.getPodName()));
+
+        String result = HttpClientUtils.get(url, paramList);
+        LOGGER.info("scheduleExecute result: " + result);
+        if (result == null || !result.equals("true")) {
             LOGGER.error("offlineShrinkageStrategy deal failed!");
             return false;
         }
-        return Boolean.valueOf(httpClientResult.getContent());
-    }
-
-    public static void main(String[] args) {
-        OnlineStrategy onlineStrategy = new OnlineStrategy();
-        onlineStrategy.setClusterMasterIP("https://10.10.102.25:6443/");
-        onlineStrategy.setNamespace("wordpress");
-        onlineStrategy.setServiceName("wordpress-wp");
-        onlineStrategy.setOperation(1);
-        onlineStrategy.setNumber(3);
-
-        StrategyDaoImp strategyDaoImp = new StrategyDaoImp();
-        System.out.println(String.valueOf(strategyDaoImp.dealOnlineStrategy(onlineStrategy)));
-
+        return Boolean.valueOf(result);
     }
 }

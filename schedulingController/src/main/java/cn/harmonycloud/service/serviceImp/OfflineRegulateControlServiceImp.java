@@ -28,6 +28,9 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OfflineRegulateControlServiceImp.class);
 
+    @Value("${SchedulePeriod}")
+    private int schedulePeriod;
+
     @Value("${CpuUsageMaxThreshold}")
     private double cpuUsageMaxThreshold;
 
@@ -179,15 +182,17 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
     }
 
     double getLastPeriodMaxCpuUsage(String masterIp, String hostName) {
-        String endTime = DateUtil.getCurrentTime();
-        String startTime = DateUtil.getLastPeriodTime();
+        DateUtil dateUtil = new DateUtil();
+        String endTime = dateUtil.getCurrentTime();
+        String startTime = dateUtil.getLastPeriodTime(schedulePeriod);
 
         return nodeDao.getLastPeriodMaxCpuUsage(masterIp, hostName, startTime, endTime);
     }
 
     double getLastPeriodMaxMemUsage(String masterIp, String hostName) {
-        String endTime = DateUtil.getCurrentTime();
-        String startTime = DateUtil.getLastPeriodTime();
+        DateUtil dateUtil = new DateUtil();
+        String endTime = dateUtil.getCurrentTime();
+        String startTime = dateUtil.getLastPeriodTime(schedulePeriod);
 
         return nodeDao.getLastPeriodMaxMemUsage(masterIp, hostName, startTime, endTime);
     }

@@ -26,6 +26,8 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OnlineRegulateControlServiceImp.class);
 
+    @Value("${SchedulePeriod}")
+    private int schedulePeriod;
 
     @Autowired
     ServiceDAO serviceDAO;
@@ -86,15 +88,17 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
     }
 
     double getLastPeriodMaxRequestNums(String masterIp, String namespace, String serviceName) {
-        String endTime = DateUtil.getCurrentTime();
-        String startTime = DateUtil.getLastPeriodTime();
+        DateUtil dateUtil = new DateUtil();
+        String endTime = dateUtil.getCurrentTime();
+        String startTime = dateUtil.getLastPeriodTime(schedulePeriod);
 
         return serviceDAO.getLastPeriodMaxRequestNums(masterIp, namespace, serviceName, startTime, endTime);
     }
 
     double getNextPeriodMaxRequestNums(String masterIp, String namespace, String serviceName) {
-        String startTime = DateUtil.getCurrentTime();
-        String endTime = DateUtil.getNextPeriodTime();
+        DateUtil dateUtil = new DateUtil();
+        String startTime = dateUtil.getCurrentTime();
+        String endTime = dateUtil.getNextPeriodTime(schedulePeriod);
 
         return serviceDAO.getNextPeriodMaxRequestNums(masterIp, namespace, serviceName, startTime, endTime);
     }

@@ -44,7 +44,12 @@ public class CreateResourceServiceImp implements ICreatResource {
 
     public boolean creatOthersResource(KubernetesClient client, String yaml) {
         InputStream is = new ByteArrayInputStream(yaml.getBytes());
-        Object o = client.load(is).createOrReplace();
+        Object o = null;
+        try {
+            client.load(is).createOrReplace();
+        } catch (Exception e) {
+            LOGGER.error("create service faild!");
+        }
         if (o == null) {
             return false;
         }

@@ -1,11 +1,13 @@
 package cn.harmonycloud.tools;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -372,6 +374,22 @@ public class HttpClientUtils {
 		}
 		return result;
 
+	}
+
+
+	public static String get(String uri, List<NameValuePair> paramList) {
+		try {
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			if (paramList != null && !paramList.isEmpty()) {
+				uri += "?" + URLEncodedUtils.format(paramList,"utf-8");
+			}
+			HttpGet httpget = new HttpGet(uri);
+			CloseableHttpResponse response = httpClient.execute(httpget);
+			HttpEntity httpEntity = response.getEntity();
+			return EntityUtils.toString(httpEntity);
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 }
