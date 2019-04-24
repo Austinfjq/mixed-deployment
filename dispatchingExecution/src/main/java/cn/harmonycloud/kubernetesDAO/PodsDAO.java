@@ -13,14 +13,14 @@ public class PodsDAO {
     private final static int REPLICAS = 1;
     public static void createPod(String masterIp,String namespace,String ownerType,String ownerName){
         //创建pod
-        switch (ownerType) {
-            case "replicaSet":
+        switch (ownerType.toLowerCase()) {
+            case "replicaset":
                 PodsDAO.createReplicasetPod(masterIp, namespace, ownerName, REPLICAS);
                 break;
             case "deployment":
                 PodsDAO.createDeploymentPod(masterIp, namespace, ownerName, REPLICAS);
                 break;
-            case "statefulSet":
+            case "statefulset":
                 PodsDAO.createStatefulsetPod(masterIp, namespace, ownerName, REPLICAS);
                 break;
             default:
@@ -40,14 +40,14 @@ public class PodsDAO {
     }
 
     public static void subtractReplicas(String masterIp, String namespace, String ownerType, String ownername){
-        switch (ownerType){
-            case "replicaSet":
+        switch (ownerType.toLowerCase()){
+            case "replicaset":
                 PodsDAO.deleteReplicasetPod(masterIp,namespace,ownername,REPLICAS);
                 break;
             case "deployment":
                 PodsDAO.deleteDeploymentPod(masterIp,namespace,ownername,REPLICAS);
                 break;
-            case "statefulSet":
+            case "statefulset":
                 PodsDAO.deleteStatefulsetPod(masterIp,namespace,ownername,REPLICAS);
                 break;
             default:
