@@ -111,7 +111,7 @@ public class ServiceDataController {
     @PostMapping("/indexData")
     public List<DataPoint> getIndexDatas(@RequestBody Map<String, Object> requestMap){
 
-        int type = (int) requestMap.get("type");
+        int type = Integer.parseInt(requestMap.get("type").toString());
         String id = (String) requestMap.get("id");
         String indexName = (String) requestMap.get("index");//需要获取的指标名
         String startTime = (String) requestMap.get("startTime");

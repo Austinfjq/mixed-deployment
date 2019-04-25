@@ -255,4 +255,9 @@ public class NodeDataController {
 //        System.out.println(nodeData.size());
 //        return nodeData;
 //    }
+
+    @GetMapping("/findById")
+    public NodeData findById(@RequestParam("id") String id){
+        return nodeDataService.findById(id).get();
+    }
 }
