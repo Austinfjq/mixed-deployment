@@ -5,7 +5,6 @@ import cn.harmonycloud.datacenter.entity.es.NodeData;
 import cn.harmonycloud.datacenter.entity.es.SearchNode;
 import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.service.INodeDataService;
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
