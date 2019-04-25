@@ -89,17 +89,17 @@ public class PodDataController {
         return pods;
     }
 
+//    @GetMapping("/test")
+//    public void test(){
+//        PodData podData = new PodData();
+//        Map<String,String> label = new HashMap<>();
+//        label.put("app","xxx");
+//
+//        podData.setLabels(label);
+//        podDataService.saveOnePodData(podData);
+//
+//    }
 
-    @GetMapping("/test")
-    public void test(){
-        PodData podData = new PodData();
-        Map<String,String> label = new HashMap<>();
-        label.put("app","xxx");
-
-        podData.setLabels(label);
-        podDataService.saveOnePodData(podData);
-
-    }
     /**
      * 获取某个节点上某个service的所有Pod实例数
      *

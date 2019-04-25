@@ -56,6 +56,20 @@ public class ForecastDataController {
         return forecastCellService.getAllForecastCells();
     }
 
+    /**
+     * 根据ID,type,indexName获取对应的ForecastCell
+     *
+     * @param cellId
+     * @param type
+     * @param forecastingIndex
+     * @return
+     */
+    @GetMapping("/forecast/forecastCell")
+    public ForecastCell getOneForecastCellByIndex(@RequestParam("ID") String cellId,
+                                                  @RequestParam("type") int type,
+                                                  @RequestParam("indexName") String forecastingIndex){
+        return forecastCellService.getOneForecastCellByIndex(cellId,type,forecastingIndex);
+    }
 
     /**
      * 获得所有service和node的所有指标的预测数据
@@ -66,8 +80,8 @@ public class ForecastDataController {
      */
     @GetMapping("/forecast/forecastValues")
     public List getAllForecastValue(@RequestParam("id") String id,
-                                                 @RequestParam("startTime") String startTime,
-                                                 @RequestParam("endTime") String endTime){
+                                    @RequestParam("startTime") String startTime,
+                                    @RequestParam("endTime") String endTime){
         if(id.equals("service")){
             return forecastDataService.getAllServiceLoads(startTime,endTime);
         }else if(id.equals("node")){
@@ -75,5 +89,55 @@ public class ForecastDataController {
         }else{
             return Collections.EMPTY_LIST;
         }
+    }
+
+    /**
+     * 保存ForecastCell的预测模型
+     * 将生成的预测模型名称和参数持久化到数据库中
+     *
+     * @param cellId
+     * @param type
+     * @param forecastingIndex
+     * @param forecastingModel
+     * @param modelParams
+     * @return
+     */
+    @PutMapping("/forecast/forecastCellModel")
+    public Map<String,Object> saveForecastingModel(@RequestParam("ID") String cellId,
+                                                   @RequestParam("type") int type,
+                                                   @RequestParam("indexName") String forecastingIndex,
+                                                   @RequestParam("forecastingModel") String forecastingModel,
+                                                   @RequestParam("modelParams") String modelParams){
+        Map<String,Object> responseMap = new HashMap<>();
+        int result = forecastCellService.saveForecastingModel(cellId,type,forecastingIndex,forecastingModel,modelParams);
+        if(result>0){
+            responseMap.put("isSucceed",true);
+        }else{
+            responseMap.put("isSucceed",false);
+        }
+        return responseMap;
+    }
+
+    /**
+     * 保存ForecastCell完成预测的未来最远时间点
+     * @param cellId
+     * @param type
+     * @param forecastingIndex
+     * @param forecastingEndTime
+     * @return
+     */
+    @PutMapping("/forecast/forecastCellEndTime")
+    public Map<String,Object> saveForecastingEndTime(@RequestParam("ID") String cellId,
+                                                   @RequestParam("type") int type,
+                                                   @RequestParam("indexName") String forecastingIndex,
+                                                   @RequestParam("lastForecastTime") String forecastingEndTime){
+        Map<String,Object> responseMap = new HashMap<>();
+        int result = forecastCellService.saveForecastingEndTime(cellId,type,forecastingIndex,forecastingEndTime);
+        if(result>0){
+            responseMap.put("isSucceed",true);
+        }else{
+            responseMap.put("isSucceed",false);
+        }
+        return responseMap;
     }
 }

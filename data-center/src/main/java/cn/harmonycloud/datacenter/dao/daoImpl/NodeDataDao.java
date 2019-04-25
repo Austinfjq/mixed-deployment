@@ -3,6 +3,7 @@ package cn.harmonycloud.datacenter.dao.daoImpl;
 import cn.harmonycloud.datacenter.dao.INodeDataDao;
 import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.NodeData;
+import cn.harmonycloud.datacenter.service.serviceImpl.NodeDataService;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -13,6 +14,8 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
 import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +43,7 @@ import static cn.harmonycloud.datacenter.tools.Constant.*;
 
 @Repository(value = "nodeDataDao")
 public class NodeDataDao implements INodeDataDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeDataDao.class);
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
 
