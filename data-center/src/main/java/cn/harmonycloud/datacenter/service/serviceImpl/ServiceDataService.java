@@ -2,6 +2,7 @@ package cn.harmonycloud.datacenter.service.serviceImpl;
 
 import cn.harmonycloud.datacenter.dao.IServiceDataDao;
 import cn.harmonycloud.datacenter.entity.DataPoint;
+import cn.harmonycloud.datacenter.entity.es.PodData;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.repository.ServiceDataRepository;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static cn.harmonycloud.datacenter.tools.Constant.TIME_INTERVAL;
 
@@ -26,6 +28,7 @@ import static cn.harmonycloud.datacenter.tools.Constant.TIME_INTERVAL;
 @Service
 public class ServiceDataService implements IServiceDataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDataService.class);
+    private ReentrantLock lock = new ReentrantLock();
     @Autowired
     private ServiceDataRepository serviceDataRepository;
 
@@ -39,7 +42,16 @@ public class ServiceDataService implements IServiceDataService {
 
     @Override
     public Iterable<ServiceData> saveAllServiceDatas(List<ServiceData> serviceDatas) {
-        return serviceDataRepository.saveAll(serviceDatas);
+        Iterable<ServiceData> serviceData = null;
+        lock.lock();
+        try{
+            serviceData = serviceDataRepository.saveAll(serviceDatas);
+        }catch(Exception ex){
+
+        }finally{
+            lock.unlock();   //释放锁
+        }
+        return serviceData;
     }
 
     @Override
@@ -118,10 +130,19 @@ public class ServiceDataService implements IServiceDataService {
 
     @Override
     public List<ServiceData> getNowServices() {
-        return serviceDataDao.getNowServices();
+        List<ServiceData> serviceData = null;
+        while(true){
+            if(!lock.isLocked()){
+                serviceData = serviceDataDao.getNowServices();
+                break;
+            }
+        }
+
+        return serviceData;
     }
 
     @Override
     public Map<String, Object> getManagement(String namespace, String serviceName, String clusterMasterIP) {
-        return serviceDataDao.getManagement(namespace,serviceName,clusterMasterIP);}
+        return serviceDataDao.getManagement(namespace,serviceName,clusterMasterIP);
+    }
 }
