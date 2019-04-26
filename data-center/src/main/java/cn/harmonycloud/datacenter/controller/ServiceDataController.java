@@ -117,9 +117,9 @@ public class ServiceDataController {
         String startTime = (String) requestMap.get("startTime");
         String endTime = (String) requestMap.get("endTime");
 
-        if(type == 0){
+        if(type == 0){//id = clusterMasterIP&namespace&serviceName
             return serviceDataService.getIndexDatas(id,indexName,startTime,endTime);
-        }else if(type == 1){
+        }else if(type == 1){//id = clusterMasterIP&nodeName
             return nodeDataService.getIndexDatas(id,indexName,startTime,endTime);
         }else{
             return new ArrayList<>();

@@ -157,13 +157,14 @@ public class ServiceDataDao implements IServiceDataDao {
     }
 
     @Override
-    public List<DataPoint> getIndexDatas(String namespace, String serviceName, String indexName, String startTime, String endTime) {
+    public List<DataPoint> getIndexDatas(String clusterMasterIP,String namespace, String serviceName, String indexName, String startTime, String endTime) {
         //GET /service/serviceData/_search
         //{
         //   "query": {
         //   		"bool" : {
         //            "must" : [
-        //                {"match_phrase" : {"namespace" : "hadoop"}},
+        //                { "h"match_phrase" : {"clusterMasterIP" :"xxx"}},
+        //                { "h"match_phrase" : {"namespace" :"adoop"}},
         //                {"match_phrase" : {"serviceName" : "hadoop-datanode-web"}}
         //            ],
         //            "filter":{
@@ -207,6 +208,7 @@ public class ServiceDataDao implements IServiceDataDao {
         };
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP));
         boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
         boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("namespace",namespace));
         boolQueryBuilder.filter(QueryBuilders.rangeQuery("time").format("yyyy-MM-dd HH:mm:ss").gte(startTime).lte(endTime));

@@ -5,6 +5,8 @@ import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import cn.harmonycloud.datacenter.repository.ServiceDataRepository;
 import cn.harmonycloud.datacenter.service.IServiceDataService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ import static cn.harmonycloud.datacenter.tools.Constant.TIME_INTERVAL;
 
 @Service
 public class ServiceDataService implements IServiceDataService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDataService.class);
     @Autowired
     private ServiceDataRepository serviceDataRepository;
 
@@ -57,9 +60,14 @@ public class ServiceDataService implements IServiceDataService {
     @Override
     public List<DataPoint> getIndexDatas(String id, String indexName, String startTime, String endTime) {
         String[] splits = id.split("&");
-        String namespace = splits[0];
-        String serviceName = splits[1];
-        return serviceDataDao.getIndexDatas(namespace,serviceName,indexName,startTime,endTime);
+        if(splits.length != 3){
+            LOGGER.error("Service getting history index data occurs a problem: id is not valid" );
+            return null;
+        }
+        String clusterMasterIP = splits[0];
+        String namespace = splits[1];
+        String serviceName = splits[2];
+        return serviceDataDao.getIndexDatas(clusterMasterIP, namespace, serviceName, indexName, startTime, endTime);
     }
 
     @Override

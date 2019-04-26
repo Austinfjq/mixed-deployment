@@ -84,13 +84,13 @@ public class NodeDataDao implements INodeDataDao {
     }
 
     @Override
-    public List<DataPoint> getIndexDatas(String nodeName, String nodeIP, String indexName, String startTime, String endTime) {
+    public List<DataPoint> getIndexDatas(String clusterMasterIP, String nodeName, String indexName, String startTime, String endTime) {
         //{
         //   "query": {
         //   		"bool" : {
         //            "must" : [
         //                {"match_phrase" : {"nodeName" : "10.10.101.65-share"}},
-        //                {"match_phrase" : {"nodeIP" : "10.10.101.65"}}
+        //                {"match_phrase" : {"clusterMasterIP" : "10.10.101.65"}}
         //            ],
         //            "filter":{
         //            	"range": {
@@ -132,11 +132,11 @@ public class NodeDataDao implements INodeDataDao {
         };
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("nodeName",nodeName));
-        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("nodeIP",nodeIP));
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP));
         boolQueryBuilder.filter(QueryBuilders.rangeQuery("time").format("yyyy-MM-dd HH:mm:ss").gte(startTime).lte(endTime));
 
-        String[] includes = {indexName,"time"};
-        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes, null);
+        //String[] includes = {indexName,"time"};
+        //FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes, null);
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQueryBuilder)
                 .withIndices(NODE_INDEX)
