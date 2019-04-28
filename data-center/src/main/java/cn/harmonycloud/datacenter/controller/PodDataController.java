@@ -130,30 +130,6 @@ public class PodDataController {
     return map;
     }
     /**
-     * 获取某个服务正在运行的Pod实例数
-     *
-     * @return
-     */
-    @GetMapping("/service/podNums")
-    public Map<String, Integer> getServicePodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
-            , @RequestParam("serviceName") String serviceName){
-        Map<String, Integer> responseMap = new HashMap<>();
-        SearchPod pdd=new SearchPod();
-        pdd.setClusterIp(clusterIp);
-        pdd.setNamespace(namespace);
-        pdd.setServiceName(serviceName);
-        List<PodData> pod=podDataService.getNowPods();
-        Integer ins=0;
-        for(PodData pd:pod) {
-            if(clusterIp.equals(pd.getClusterMasterIP())&&
-                    namespace.equals(pd.getNamespace())&&serviceName.equals(pd.getServiceName())) {
-                ins++;
-            }
-        }
-        responseMap.put("podNums",ins);
-        return responseMap;
-    }
-    /**
      * 获取某个服务在一定请求量下所需的Pod实例数
      *
      * @return
