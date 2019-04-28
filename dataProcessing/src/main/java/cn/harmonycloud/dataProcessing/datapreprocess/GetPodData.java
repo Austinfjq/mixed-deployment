@@ -32,6 +32,16 @@ public class GetPodData {
 
         for (Pod d : podList.getItems()) {
 
+            //过滤其他namespace
+            ArrayList<String> namespaceFilter = new ArrayList<>();
+            namespaceFilter.add("kube-public");
+            namespaceFilter.add("kube-system");
+            namespaceFilter.add("md-system");
+            namespaceFilter.add("monitoring");
+            if (namespaceFilter.contains(d.getMetadata().getNamespace())) {
+                continue;
+            }
+
             PodData pod = new PodData();
 
             pod.setPodName(d.getMetadata().getName());
