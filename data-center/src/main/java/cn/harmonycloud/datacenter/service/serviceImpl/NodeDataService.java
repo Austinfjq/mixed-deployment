@@ -68,10 +68,13 @@ public class NodeDataService implements INodeDataService {
     @Override
     public List<DataPoint> getIndexDatas(String id, String indexName, String startTime, String endTime) {
         String[] splits = id.split("&");
-        String nodeName = splits[0];
-        String nodeIp = splits[1];
+        if(splits.length != 2){
+            LOGGER.error("Node getting history index data occurs a problem: id is not valid");
+        }
+        String clusterMasterIP = splits[0];
+        String nodeName = splits[1];
 
-        return nodeDataDao.getIndexDatas(nodeName,nodeIp,indexName,startTime,endTime);
+        return nodeDataDao.getIndexDatas(clusterMasterIP,nodeName,indexName,startTime,endTime);
     }
 
     @Override

@@ -5,7 +5,10 @@ import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ServiceData;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 import static cn.harmonycloud.datacenter.tools.Constant.*;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 /**
  *@Author: shaodilong
@@ -157,13 +161,14 @@ public class ServiceDataDao implements IServiceDataDao {
     }
 
     @Override
-    public List<DataPoint> getIndexDatas(String namespace, String serviceName, String indexName, String startTime, String endTime) {
+    public List<DataPoint> getIndexDatas(String clusterMasterIP,String namespace, String serviceName, String indexName, String startTime, String endTime) {
         //GET /service/serviceData/_search
         //{
         //   "query": {
         //   		"bool" : {
         //            "must" : [
-        //                {"match_phrase" : {"namespace" : "hadoop"}},
+        //                { "match_phrase" : {"clusterMasterIP" :"xxx"}},
+        //                { "match_phrase" : {"namespace" :"adoop"}},
         //                {"match_phrase" : {"serviceName" : "hadoop-datanode-web"}}
         //            ],
         //            "filter":{
@@ -180,54 +185,92 @@ public class ServiceDataDao implements IServiceDataDao {
         //   "_source": [
         //      "cpuUsage",
         //      "time"
+        //   ],
+        //   "sort" : [
+        // 	 {
+        //     	"time" : "desc"
+        //	 }
         //   ]
         //}
         List<DataPoint> resultList = new ArrayList<>();
-
-        final SearchResultMapper dataPointResultMapper = new SearchResultMapper() {
-            @Override
-            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-                List<DataPoint> dataPoints = new ArrayList<>();
-                for (SearchHit searchHit : response.getHits()) {
-                    if (response.getHits().getHits().length <= 0) {
-                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
-                    }
-                    Map map = searchHit.getSourceAsMap();
-
-                    DataPoint dataPoint = new DataPoint();
-                    dataPoint.setValue(Double.parseDouble(map.get(indexName).toString()));
-                    dataPoint.setTime((String) map.get("time"));
-                    dataPoints.add(dataPoint);
-                }
-                if (dataPoints.size() > 0) {
-                    return new AggregatedPageImpl<T>((List<T>) dataPoints, response.getScrollId());
-                }
-                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
-            }
-        };
-
+        Client client = elasticsearchTemplate.getClient();
+        QueryBuilder qb = termQuery("multi", "test");
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
         boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("namespace",namespace));
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP));
         boolQueryBuilder.filter(QueryBuilders.rangeQuery("time").format("yyyy-MM-dd HH:mm:ss").gte(startTime).lte(endTime));
+        SearchResponse scrollResp = client.prepareSearch(NODE_INDEX)
+                .addSort(SortBuilders.fieldSort("time").order(SortOrder.DESC))
+                .setScroll(new TimeValue(60000))
+                .setQuery(boolQueryBuilder)
+                .setSize(100).get(); //max of 100 hits will be returned for each scroll
+        //Scroll until no hits are returned
+        do {
+            //List<DataPoint> dataPoints = new ArrayList<>();
+            for (SearchHit hit : scrollResp.getHits().getHits()) {
+                //Handle the hit...
+                Map map = hit.getSourceAsMap();
 
-        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQueryBuilder)
-                .withIndices(SERVICE_INDEX)
-                .withTypes(SERVICE_TYPE)
-                .withSearchType(SearchType.DEFAULT)
-                .withPageable(PageRequest.of(0,10))
-                .build();
-        Page<DataPoint> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, DataPoint.class,dataPointResultMapper);
-        String scrollId = ((ScrolledPage) scroll).getScrollId();
-        while (scroll.hasContent()) {
-            resultList.addAll(scroll.getContent());
-            scrollId = ((ScrolledPage) scroll).getScrollId();
-            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, DataPoint.class,dataPointResultMapper);
-        }
-        elasticsearchTemplate.clearScroll(scrollId);
+                DataPoint dataPoint = new DataPoint();
+                dataPoint.setValue(Double.parseDouble(map.get(indexName).toString()));
+                dataPoint.setTime((String) map.get("time"));
+                //dataPoints.add(dataPoint);
+                resultList.add(dataPoint);
+            }
 
+            scrollResp = client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
+        } while(scrollResp.getHits().getHits().length != 0);
         return resultList;
+
+        //默认的spring-data-elasticsearch scroll api中没有添加addSort的办法，无法进行排序
+//        List<DataPoint> resultList = new ArrayList<>();
+//
+//        final SearchResultMapper dataPointResultMapper = new SearchResultMapper() {
+//            @Override
+//            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
+//                List<DataPoint> dataPoints = new ArrayList<>();
+//                for (SearchHit searchHit : response.getHits()) {
+//                    if (response.getHits().getHits().length <= 0) {
+//                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+//                    }
+//                    Map map = searchHit.getSourceAsMap();
+//
+//                    DataPoint dataPoint = new DataPoint();
+//                    dataPoint.setValue(Double.parseDouble(map.get(indexName).toString()));
+//                    dataPoint.setTime((String) map.get("time"));
+//                    dataPoints.add(dataPoint);
+//                }
+//                if (dataPoints.size() > 0) {
+//                    return new AggregatedPageImpl<T>((List<T>) dataPoints, response.getScrollId());
+//                }
+//                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+//            }
+//        };
+//
+//        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+//        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP));
+//        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("serviceName",serviceName));
+//        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("namespace",namespace));
+//        boolQueryBuilder.filter(QueryBuilders.rangeQuery("time").format("yyyy-MM-dd HH:mm:ss").gte(startTime).lte(endTime));
+//
+//        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+//                .withQuery(boolQueryBuilder)
+//                .withIndices(SERVICE_INDEX)
+//                .withTypes(SERVICE_TYPE)
+//                .withSearchType(SearchType.DEFAULT)
+//                .withPageable(PageRequest.of(0,10))
+//                .build();
+//        Page<DataPoint> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, DataPoint.class,dataPointResultMapper);
+//        String scrollId = ((ScrolledPage) scroll).getScrollId();
+//        while (scroll.hasContent()) {
+//            resultList.addAll(scroll.getContent());
+//            scrollId = ((ScrolledPage) scroll).getScrollId();
+//            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, DataPoint.class,dataPointResultMapper);
+//        }
+//        elasticsearchTemplate.clearScroll(scrollId);
+//
+//        return resultList;
     }
 
     @Override

@@ -23,7 +23,7 @@ public interface ForecastCellMapper {
     @Select("SELECT * FROM forecastcell WHERE cell_id=#{cellId} AND type=#{type} AND forecasting_index=#{forecastingIndex}")
     public ForecastCell getOneForecastCellByIndex(String cellId, int type, String forecastingIndex);
 
-    @Update("UPDATE forecastcell SET forecasting_model=#{forecastingModel},model_params={modelParams} " +
+    @Update("UPDATE forecastcell SET forecasting_model=#{forecastingModel},model_params=#{modelParams} " +
             "WHERE cell_id=#{cellId} AND type=#{type} AND forecasting_index=#{forecastingIndex}")
     public int updateForecastingModel(String cellId, int type, String forecastingIndex, String forecastingModel,
                                      String modelParams);

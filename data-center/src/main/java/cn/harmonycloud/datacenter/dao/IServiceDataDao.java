@@ -20,7 +20,7 @@ public interface IServiceDataDao {
     //获得某个在线服务的某个指标在某段时间段的值
     public Double getIndexTimeSeries(String namespace, String serviceName, String indexName, String startTime, String endTime);
     //获取service某个指标的历史数据值
-    public List<DataPoint> getIndexDatas(String namespace, String serviceName, String indexName, String startTime, String endTime);
+    public List<DataPoint> getIndexDatas(String clusterMasterIP, String namespace, String serviceName, String indexName, String startTime, String endTime);
     //返回指定Services包括的Pod实例名
     public List<String> getAllPodNameFromOneService(String namespace,String serviceName,String clusterIP);
     //获得Service的存储卷信息接口
