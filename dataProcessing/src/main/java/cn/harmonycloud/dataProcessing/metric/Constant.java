@@ -16,9 +16,9 @@ public class Constant {
 
     static {
         try {
-            String propertiesFilePath = "C:/Users/chang/Downloads/CO-LOCATION/mixed-deployment/dataProcessing/src/main/resources/dataProcessing.properties";
+//            String propertiesFilePath = "C:/Users/chang/Downloads/CO-LOCATION/mixed-deployment/dataProcessing/src/main/resources/dataProcessing.properties";
 
-//            String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
+            String propertiesFilePath = "/usr/local/data-processing/config/dataProcessing.properties";
             LoadConfig.load(Constant.class, propertiesFilePath);
         } catch (Exception e) {
             System.out.println("Properties file error!");
