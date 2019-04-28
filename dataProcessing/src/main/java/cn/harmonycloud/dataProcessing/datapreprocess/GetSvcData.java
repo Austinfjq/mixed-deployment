@@ -30,6 +30,16 @@ public class GetSvcData {
 
         for (Service d : svcList.getItems()) {
 
+            //过滤其他namespace
+            ArrayList<String> namespaceFilter = new ArrayList<>();
+            namespaceFilter.add("kube-public");
+            namespaceFilter.add("kube-system");
+            namespaceFilter.add("md-system");
+            namespaceFilter.add("monitoring");
+            if (namespaceFilter.contains(d.getMetadata().getNamespace())) {
+                continue;
+            }
+
             ServiceData svc = new ServiceData();
             svc.setServiceName(d.getMetadata().getName());
             svc.setNamespace(d.getMetadata().getNamespace());
