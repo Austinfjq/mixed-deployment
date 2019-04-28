@@ -15,7 +15,7 @@ import java.util.Properties;
  **/
 public class PropertyFileUtil {
 
-    private static final String PROPERRY_FILE_PATH = "./usr/local/evaluateSystem/application.properties";
+    private static final String PROPERRY_FILE_PATH = "/Users/majianbo/IdeaProjects/mixed-deployment/evaluateSystem/application.properties";
 
     /**
      * @return

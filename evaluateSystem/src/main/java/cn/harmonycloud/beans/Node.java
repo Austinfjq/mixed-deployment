@@ -27,4 +27,12 @@ public class Node {
     public void setHostName(String hostName) {
         this.hostName = hostName;
     }
+    @Override
+    public String toString() {
+        return "Node{" +
+                "masterIp='" + masterIp + '\'' +
+                ", hostName='" + hostName + '\'' +
+
+                '}';
+    }
 }
