@@ -45,4 +45,14 @@ public class Service {
     public void setServiceType(int serviceType) {
         this.serviceType = serviceType;
     }
+    @Override
+    public String toString() {
+        return "Service{" +
+                "masterIp='" + masterIp + '\'' +
+                ", namespace='" + namespace+ '\'' +
+                ", serviceName=" + serviceName +
+                ", serviceType='" + serviceType + '\'' +
+                '}';
+    }
+
 }

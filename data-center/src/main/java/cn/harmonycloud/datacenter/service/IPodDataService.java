@@ -22,5 +22,5 @@ public interface IPodDataService {
     public List<PodData> findAllPodDatas();
 
     //获取当前service数据
-    public List<PodData> getNowServices();
+    public List<PodData> getNowPods();
 }

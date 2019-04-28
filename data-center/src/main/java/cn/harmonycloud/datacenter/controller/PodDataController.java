@@ -80,8 +80,8 @@ public class PodDataController {
      * @return
      */
     @GetMapping("/nowPod")
-    public List<PodData> getNowServices(){
-        List<PodData> pods = podDataService.getNowServices();
+    public List<PodData> getNowPods(){
+        List<PodData> pods = podDataService.getNowPods();
         // TODO: 需修改实现
         for(PodData podData:pods){
             podData.changeLabels();
@@ -106,7 +106,7 @@ public class PodDataController {
      * @return
      */
     @GetMapping("/node/service/pods")
-    public List<Map<String, String>> getNowServices(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
+    public List<Map<String, String>> getPodsInSomeNodeAndService(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
         , @RequestParam("serviceName") String serviceName, @RequestParam("hostName") String hostName){
     List<Map<String, String>> map=new ArrayList<Map<String, String>>();
     SearchPod pdd=new SearchPod();
@@ -114,7 +114,7 @@ public class PodDataController {
     pdd.setNamespace(namespace);
     pdd.setServiceName(serviceName);
     pdd.setHostName(hostName);
-    List<PodData> pod=podDataService.getNowServices();
+    List<PodData> pod=podDataService.getNowPods();
     for(PodData pd:pod)
     {
         Map<String, String> responseMap = new HashMap<>();
@@ -142,7 +142,7 @@ public class PodDataController {
         pdd.setClusterIp(clusterIp);
         pdd.setNamespace(namespace);
         pdd.setServiceName(serviceName);
-        List<PodData> pod=podDataService.getNowServices();
+        List<PodData> pod=podDataService.getNowPods();
         Integer ins=0;
         for(PodData pd:pod) {
             if(clusterIp.equals(pd.getClusterMasterIP())&&
@@ -167,7 +167,7 @@ public class PodDataController {
         pdd.setNamespace(namespace);
         pdd.setServiceName(serviceName);
         pdd.setRequestNums(requestNums);
-        List<PodData> pod=podDataService.getNowServices();
+        List<PodData> pod=podDataService.getNowPods();
         Integer ins=0;
         for(PodData pd:pod) {
             if(clusterIp.equals(  pd.getClusterMasterIP())&&requestNums==pd.getResponseBytes()&&

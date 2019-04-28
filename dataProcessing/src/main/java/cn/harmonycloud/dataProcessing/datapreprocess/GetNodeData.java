@@ -30,53 +30,61 @@ public class GetNodeData {
         PodList podList = client.pods().list();
 
         for (Node d : nodeList.getItems()) {
-            NodeData node = new NodeData();
-            node.setNodeName(d.getMetadata().getName());
-            node.setLabels(d.getMetadata().getLabels());
-            node.setNodeIP(d.getStatus().getAddresses().get(0).getAddress());
 
-            if (d.getSpec().getUnschedulable() != null) {
-                node.setUnschedulable(d.getSpec().getUnschedulable());
-            }
+            //过滤节点，只保留工作节点
+            if (d.getMetadata().getLabels().get("HarmonyCloud_Status") != null &&
+                    d.getMetadata().getLabels().get("HarmonyCloud_Status").equals("C")) {
 
-            if (d.getSpec().getTaints() != null) {
-                node.setTaints(d.getSpec().getTaints().toString());
-            }
+                NodeData node = new NodeData();
+                node.setNodeName(d.getMetadata().getName());
+                node.setLabels(d.getMetadata().getLabels());
+                node.setNodeIP(d.getStatus().getAddresses().get(0).getAddress());
+
+                if (d.getSpec().getUnschedulable() != null) {
+                    node.setUnschedulable(d.getSpec().getUnschedulable());
+                }
+
+                if (d.getSpec().getTaints() != null) {
+                    node.setTaints(d.getSpec().getTaints().toString());
+                }
 
 
-            // get nodeContions
-            Map<String, String> nodeConditions = new HashMap<>();
-            for (NodeCondition c : d.getStatus().getConditions()) {
-                nodeConditions.put("type", c.getType());
-                nodeConditions.put("status", c.getStatus());
-            }
-            node.setNodeConditions(nodeConditions);
+                // get nodeContions
+                Map<String, String> nodeConditions = new HashMap<>();
+                for (NodeCondition c : d.getStatus().getConditions()) {
+                    nodeConditions.put("type", c.getType());
+                    nodeConditions.put("status", c.getStatus());
+                }
+                node.setNodeConditions(nodeConditions);
 
-            //get used ports and podnums
-            Map<String, String> portTemp = new HashMap<>();
-            long podNums = 0l;
+                //get used ports and podnums
+                Map<String, String> portTemp = new HashMap<>();
+                long podNums = 0l;
 
-            for (Pod pod : podList.getItems()) {
-                if (pod.getSpec().getNodeName() != null &&
-                        pod.getSpec().getNodeName().equals(d.getMetadata().getName())) {
+                for (Pod pod : podList.getItems()) {
+                    if (pod.getSpec().getNodeName() != null &&
+                            pod.getSpec().getNodeName().equals(d.getMetadata().getName())) {
 
-                    podNums++;
-                    //get ports
-                    for (Container c : pod.getSpec().getContainers()) {
-                        if (c.getPorts() != null) {
-                            for (ContainerPort cp : c.getPorts()) {
-                                portTemp.put(cp.getContainerPort().toString(), cp.getProtocol());
+                        podNums++;
+                        //get ports
+                        for (Container c : pod.getSpec().getContainers()) {
+                            if (c.getPorts() != null) {
+                                for (ContainerPort cp : c.getPorts()) {
+                                    portTemp.put(cp.getContainerPort().toString(), cp.getProtocol());
+                                }
                             }
                         }
                     }
                 }
+
+                node.setPodNums(podNums);
+                node.setUsedPorts(portTemp);
+
+                n.add(node);
             }
-
-            node.setPodNums(podNums);
-            node.setUsedPorts(portTemp);
-
-            n.add(node);
         }
+
+
     }
 
     public static ArrayList<NodeData> run() {
