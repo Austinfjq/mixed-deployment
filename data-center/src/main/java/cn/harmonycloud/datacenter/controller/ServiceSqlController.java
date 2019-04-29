@@ -39,7 +39,7 @@ public class ServiceSqlController {
      *
      * @return
      */
-    @GetMapping("/service//podInstances")
+    @GetMapping("/service/podInstances")
     public Map<String, Integer> getServicePodNums(@RequestParam("clusterIp") String clusterIp, @RequestParam("namespace") String namespace
             , @RequestParam("serviceName") String serviceName){
         Map<String, Integer> responseMap = new HashMap<>();
