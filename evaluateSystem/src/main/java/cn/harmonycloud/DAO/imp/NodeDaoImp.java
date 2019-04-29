@@ -27,11 +27,17 @@ public class NodeDaoImp implements NodeDAO {
     @Override
     public List<Node> getNodeList(String clusterIp) {
         Map<String,String> params = new HashMap<>();
-        params.put("clusterIp", clusterIp);
+        params.put("clusterMasterIP", clusterIp);
         String url = "http://"+ PropertyFileUtil.getValue("hostIp") + ":" + PropertyFileUtil.getValue("port") + "/node/nodes";
+        //ip和port在配置文件中修改
+
+        //String url ="http://10.10.102.25:31286/nowNode";
+
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,9 +52,12 @@ public class NodeDaoImp implements NodeDAO {
 
         JSONArray jsonArray = JSONArray.parseArray(podListStr);
 
+
         for (int i=0; i<jsonArray.size(); i++) {
-            String clusterIP = jsonArray.getJSONObject(i).getString("clusterIp");
-            String hostName = jsonArray.getJSONObject(i).getString("hostName");
+            //String clusterIP = jsonArray.getJSONObject(i).getString("clusterIp");
+            //String hostName = jsonArray.getJSONObject(i).getString("hostName");
+            String clusterIP = jsonArray.getJSONObject(i).getString("clusterMasterIP");
+            String hostName = jsonArray.getJSONObject(i).getString("nodeName");
             Node node = new Node();
             node.setMasterIp(clusterIP);
             node.setHostName(hostName);
@@ -81,5 +90,17 @@ public class NodeDaoImp implements NodeDAO {
         }
 
         return Double.valueOf(jsonObject.getJSONObject("data").getJSONObject("result").getString(""));
+    }
+
+    public static void main(String[] args) {
+        NodeDaoImp test1=new NodeDaoImp();
+        List<Node> nodes = new ArrayList<>();
+
+        nodes=test1.getNodeList("10.10.102.31");
+        for (int i=0;i<nodes.size();i++){
+            System.out.println(nodes.get(i).toString());
+        }
+
+
     }
 }

@@ -15,4 +15,11 @@ import java.util.List;
 @Service
 public interface IForecastCellService {
     public List<ForecastCell> getAllForecastCells();
+
+    public ForecastCell getOneForecastCellByIndex(String cellId, int type, String forecastingIndex);
+
+    public int saveForecastingModel(String cellId, int type, String forecastingIndex, String forecastingModel,
+                                     String modelParams);
+
+    public int saveForecastingEndTime(String cellId, int type, String forecastingIndex, String forecastingEndTime);
 }

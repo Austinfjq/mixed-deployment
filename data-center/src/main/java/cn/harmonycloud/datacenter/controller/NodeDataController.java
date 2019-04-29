@@ -5,7 +5,6 @@ import cn.harmonycloud.datacenter.entity.es.NodeData;
 import cn.harmonycloud.datacenter.entity.es.SearchNode;
 import cn.harmonycloud.datacenter.entity.es.ServiceRequest;
 import cn.harmonycloud.datacenter.service.INodeDataService;
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,10 +56,7 @@ public class NodeDataController {
                 nodeData.setId(UUID.randomUUID().toString());
                 nodeData.setTime(time);
             }
-            long start = System.currentTimeMillis();
             Iterable<NodeData> nodeDataIterable = nodeDataService.saveAllNodeDatas(nodeDatas);
-            long end = System.currentTimeMillis();
-            LOGGER.info("Save all Node data in " + (end - start) / 1000.0 + "seconds");
             if(Lists.newArrayList(nodeDataIterable).size() == nodeDatas.size()){
                 responseMap.put("isSucceed",true);
             }else{
@@ -233,5 +229,34 @@ public class NodeDataController {
         }
         responseMap.put("lastPeriodMaxMemUsage",ins);
         return responseMap;
+    }
+
+//    @GetMapping("/testSave")
+//    public void testSave() throws InterruptedException {
+//        while(true) {
+//            List<NodeData> nodeDatas = new ArrayList<>();
+//            for (int i = 0; i < 6; ++i) {
+//                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                String time = df.format(new Date());
+//                NodeData nodeData = new NodeData();
+//                nodeData.setId(UUID.randomUUID().toString());
+//                nodeData.setTime(time);
+//                nodeDatas.add(nodeData);
+//            }
+//            nodeDataService.saveAllNodeDatas(nodeDatas);
+//            Thread.sleep(1000);
+//        }
+//    }
+//
+//    @GetMapping("testGet")
+//    public List<NodeData> testGet() {
+//        List<NodeData> nodeData = nodeDataService.getNowNodes();
+//        System.out.println(nodeData.size());
+//        return nodeData;
+//    }
+
+    @GetMapping("/findById")
+    public NodeData findById(@RequestParam("id") String id){
+        return nodeDataService.findById(id).get();
     }
 }

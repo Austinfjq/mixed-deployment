@@ -1,5 +1,6 @@
 package cn.harmonycloud.datacenter.service.serviceImpl;
 
+import cn.harmonycloud.datacenter.entity.es.SearchPod;
 import cn.harmonycloud.datacenter.entity.mysql.Service;
 import cn.harmonycloud.datacenter.entity.mysql.services;
 import cn.harmonycloud.datacenter.mapper.ServiceMapper;
@@ -41,5 +42,10 @@ public class ServiceSqlService implements IServiceSqlService {
             }
         }
         return serviceNodes;
+    }
+    @Override
+    public int getPodNumsByService(SearchPod searchPod){
+        return serviceMapper.findPodNumsByService(searchPod.getClusterIp(),
+                searchPod.getNamespace(),searchPod.getServiceName());
     }
 }

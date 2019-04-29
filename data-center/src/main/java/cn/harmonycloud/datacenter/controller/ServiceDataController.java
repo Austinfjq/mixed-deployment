@@ -111,15 +111,15 @@ public class ServiceDataController {
     @PostMapping("/indexData")
     public List<DataPoint> getIndexDatas(@RequestBody Map<String, Object> requestMap){
 
-        int type = (int) requestMap.get("type");
+        int type = Integer.parseInt(requestMap.get("type").toString());
         String id = (String) requestMap.get("id");
         String indexName = (String) requestMap.get("index");//需要获取的指标名
         String startTime = (String) requestMap.get("startTime");
         String endTime = (String) requestMap.get("endTime");
 
-        if(type == 0){
+        if(type == 0){//id = clusterMasterIP&namespace&serviceName
             return serviceDataService.getIndexDatas(id,indexName,startTime,endTime);
-        }else if(type == 1){
+        }else if(type == 1){//id = clusterMasterIP&nodeName
             return nodeDataService.getIndexDatas(id,indexName,startTime,endTime);
         }else{
             return new ArrayList<>();

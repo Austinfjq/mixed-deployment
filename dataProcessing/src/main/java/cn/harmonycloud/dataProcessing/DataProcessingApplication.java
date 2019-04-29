@@ -34,11 +34,31 @@ public class DataProcessingApplication {
             public void run() {
                 //要执行的操作
                 Write2ES.run(GetNodeData.run(), "nodes");
+
+            }
+        }, delay, cacheTime);
+
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //要执行的操作
                 Write2ES.run(GetPodData.run(), "pods");
+
+            }
+        }, delay, cacheTime);
+
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
                 Write2ES.run(GetSvcData.run(), "services");
 
             }
         }, delay, cacheTime);
+
+
     }
 
 
