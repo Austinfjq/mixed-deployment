@@ -76,14 +76,11 @@ public class ServiceDaoImp implements ServiceDAO {
 
         String serviceListStr = httpClientResult.getContent();
 
-        System.out.println(serviceListStr);
-
         List<Service> services = new ArrayList<>();
         if (null == serviceListStr || serviceListStr.equals("")) {
             LOGGER.error("this cluster not have any online service!");
             return services;
         }
-        LOGGER.info("service list :" + serviceListStr);
         JSONArray jsonArray = JSONArray.parseArray(serviceListStr);
 
         for (int i=0; i<jsonArray.size(); i++) {
@@ -108,7 +105,7 @@ public class ServiceDaoImp implements ServiceDAO {
         params.put("clusterIp", masterIp);
         params.put("namespace", namespace);
         params.put("serviceName", serviceName);
-        String url = "http://"+ hostIp + ":" + port + "/service/podNums";
+        String url = "http://"+ hostIp + ":" + port + "/service/podInstances";
 
         HttpClientResult httpClientResult = null;
         try {
