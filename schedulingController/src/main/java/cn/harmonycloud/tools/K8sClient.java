@@ -6,7 +6,9 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @classname：K8sClient
@@ -18,21 +20,29 @@ import org.springframework.beans.factory.annotation.Value;
 public class K8sClient {
     private final static Logger LOGGER = LoggerFactory.getLogger(K8sClient.class);
 
-    @Value("${CERT_DATA}")
-    private static String CERT_DATA;
+    private static Map<String,KubernetesClient> CLIENTS = new HashMap<>();
 
-    @Value("${KEY_DATA}")
-    private static String KEY_DATA;
+    public static KubernetesClient getInstance(String masterIp){
+        if (!CLIENTS.containsKey(masterIp)){
+            synchronized (K8sClient.class){
+                if (!CLIENTS.containsKey(masterIp)){
+                    KubernetesClient CLIENT = createClient(masterIp);
+                    if (CLIENT != null) {
+                        CLIENTS.put(masterIp,CLIENT);
+                    }
+                    return CLIENT;
+                }
+            }
+        }
+        return CLIENTS.get(masterIp);
+    }
 
-    @Value("${CA_DATA}")
-    private static String CA_DATA;
-
-    public static KubernetesClient createClient(String clusterIP, String port, String namespace) {
+    public static KubernetesClient createClient(String clusterIP) {
         Config config = new ConfigBuilder()
                 .withOauthToken("330957b867a3462ea457bec41410624b")
                 .withTrustCerts(true)
-                .withMasterUrl("https://" + clusterIP +":" + port + "/")
-                .withNamespace(namespace).build();
+                .withMasterUrl("https://" + clusterIP +":6443/")
+                .build();
         KubernetesClient client = new DefaultKubernetesClient(config);
         if (client == null) {
             LOGGER.error("Create k8s client failed！");
