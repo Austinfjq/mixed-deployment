@@ -45,6 +45,7 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
     @Override
     public boolean dealService(Service service) {
         int regulateNums = regulate(service);
+        LOGGER.info("---------------" + service.toString() + " regulateNums is " + regulateNums);
 
         if (regulateNums == 0) {
             return true;
@@ -68,12 +69,24 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
             return 0;
         }
 
+        LOGGER.info("---------------" + service.toString() + " has " + servicePodNums + " pod!");
+
         double lastPeriodMaxRequestNums = getLastPeriodMaxRequestNums(service.getMasterIp(), service.getNamespace(), service.getServiceName());
 
+        LOGGER.info("---------------" + service.toString() + " lastPeriodMaxRequestNums is " + lastPeriodMaxRequestNums);
+
         double nextPeriodMaxRequestNums = getNextPeriodMaxRequestNums(service.getMasterIp(), service.getNamespace(), service.getServiceName());
+
+        LOGGER.info("---------------" + service.toString() + " nextPeriodMaxRequestNums is " + nextPeriodMaxRequestNums);
+
         double maxRequestNums = getMaxRequestNums(lastPeriodMaxRequestNums, nextPeriodMaxRequestNums);
 
+        LOGGER.info("---------------" + service.toString() + " maxRequestNums is " + maxRequestNums);
+
         int serviceRequestPodNums = serviceDAO.getServiceRequestPodNums(service.getMasterIp(), service.getNamespace(), service.getServiceName(), maxRequestNums);
+
+        LOGGER.info("---------------" + service.toString() + " serviceRequestPodNums is " + serviceRequestPodNums);
+
         return servicePodNums - serviceRequestPodNums;
     }
 
@@ -147,6 +160,8 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
     @Override
     public void process() {
         List<Service> services = serviceDAO.getAllOnlineService(clusterIp);
+
+        LOGGER.info("server list:" + services.toString());
         if (services == null) {
             LOGGER.error("get all online service failed!");
             return;
