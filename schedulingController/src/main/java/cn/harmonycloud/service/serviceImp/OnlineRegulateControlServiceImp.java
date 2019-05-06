@@ -7,6 +7,7 @@ import cn.harmonycloud.dao.imp.StrategyDaoImp;
 import cn.harmonycloud.service.IOnlineRegulateControl;
 import cn.harmonycloud.service.IStrategyProduce;
 import cn.harmonycloud.tools.DateUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
     @Override
     public boolean dealService(Service service) {
         int regulateNums = regulate(service);
+        LOGGER.info("---------------" + service.toString() + " regulateNums is " + regulateNums);
 
         if (regulateNums == 0) {
             return true;
@@ -60,14 +62,31 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
 
     @Override
     public int regulate(Service service) {
-        int servicePodNums = serviceDAO.getServicePodNums(service.getMasterIp(), service.getNamespace(), service.getServiceName());
+        int servicePodNums = getPodNumbers(service.getMasterIp(), service.getNamespace(), service.getServiceName());
+
+        if (servicePodNums < 0) {
+            LOGGER.error("the " + service.toString() + " pod number is invaild!");
+            return 0;
+        }
+
+        LOGGER.info("---------------" + service.toString() + " has " + servicePodNums + " pod!");
 
         double lastPeriodMaxRequestNums = getLastPeriodMaxRequestNums(service.getMasterIp(), service.getNamespace(), service.getServiceName());
 
+        LOGGER.info("---------------" + service.toString() + " lastPeriodMaxRequestNums is " + lastPeriodMaxRequestNums);
+
         double nextPeriodMaxRequestNums = getNextPeriodMaxRequestNums(service.getMasterIp(), service.getNamespace(), service.getServiceName());
+
+        LOGGER.info("---------------" + service.toString() + " nextPeriodMaxRequestNums is " + nextPeriodMaxRequestNums);
+
         double maxRequestNums = getMaxRequestNums(lastPeriodMaxRequestNums, nextPeriodMaxRequestNums);
 
+        LOGGER.info("---------------" + service.toString() + " maxRequestNums is " + maxRequestNums);
+
         int serviceRequestPodNums = serviceDAO.getServiceRequestPodNums(service.getMasterIp(), service.getNamespace(), service.getServiceName(), maxRequestNums);
+
+        LOGGER.info("---------------" + service.toString() + " serviceRequestPodNums is " + serviceRequestPodNums);
+
         return servicePodNums - serviceRequestPodNums;
     }
 
@@ -104,17 +123,49 @@ public class OnlineRegulateControlServiceImp implements IOnlineRegulateControl {
     }
 
 
+    public int getPodNumbers(String masterIp, String namespace, String serviceName) {
+        JSONObject jsonObject = serviceDAO.getOwner(masterIp, namespace, serviceName);
+
+        if (jsonObject == null || jsonObject.size() ==0) {
+            LOGGER.error("the " + masterIp + " :" + namespace + " :" + serviceName + " not have owner!");
+        }
+
+        String ownerType = jsonObject.getString("resourceKind");
+
+        String ownerName = jsonObject.getString("resourceName");
+
+        int result = -1;
+        switch (ownerType.toLowerCase()) {
+            case "replicaset":
+                result = serviceDAO.getReplicasOfReplicaset(masterIp, namespace, ownerName);
+                break;
+            case "deployment":
+                result = serviceDAO.getReplicasOfDeployment(masterIp, namespace, ownerName);
+                break;
+            case "statefulset":
+                result = serviceDAO.getReplicasOfStatefulSet(masterIp, namespace, ownerName);
+                break;
+            default:
+                LOGGER.info("OwnType is unknown!");
+        }
+
+        if (result < 0) {
+            LOGGER.error("the " + clusterIp + "：" + namespace + ": " + ownerName + " replicas is invaild!");
+            return  -1;
+        }
+
+        return result;
+    }
+
     @Override
     public void process() {
-        //ServiceDAO serviceDAO = new ServiceDaoImp();
-        System.out.println("clusterIp："+clusterIp);
         List<Service> services = serviceDAO.getAllOnlineService(clusterIp);
 
+        LOGGER.info("server list:" + services.toString());
         if (services == null) {
             LOGGER.error("get all online service failed!");
             return;
         }
-
         if (services.size() == 0) {
             LOGGER.error("there is no any online service!");
             return;

@@ -1,5 +1,7 @@
 package cn.harmonycloud.datacenter.service;
 
+import cn.harmonycloud.datacenter.entity.es.SearchNode;
+import cn.harmonycloud.datacenter.entity.es.SearchPod;
 import cn.harmonycloud.datacenter.entity.mysql.services;
 import org.springframework.stereotype.Service;
 
@@ -17,5 +19,5 @@ public interface IServiceSqlService {
     //获取Service的管理方式信息
     public Map<String,Object> getOwnerTypeAndName(String namespace, String serviceName);
     public List<services> getServiceByClusterIp(String clusterIp);
-
+    public int getPodNumsByService(SearchPod searchPod);
 }

@@ -159,7 +159,8 @@ public class NodeDataDao implements INodeDataDao {
         } while(scrollResp.getHits().getHits().length != 0);
         return resultList;
 
-        //默认的spring-data-elasticsearch scroll api中没有添加addSort的办法，无法进行排序
+        //TODO: 默认的spring-data-elasticsearch 3.1.6.RELEASE scroll api中没有添加addSort（见ElasticsearchTemplate.prepareScroll）的办法，无法进行排序。
+        //      官方git上最新的代码已经添加了sort的功能，但还没有发布，后续发布后再更新代码。
 //        List<DataPoint> resultList = new ArrayList<>();
 //        final SearchResultMapper dataPointResultMapper = new SearchResultMapper() {
 //            @Override

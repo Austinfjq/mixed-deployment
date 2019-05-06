@@ -41,6 +41,6 @@ public interface ICreatResource {
      * @Param
      * @return
      **/
-    boolean createResource(String masterIP, String port, String namespace, String yaml);
+    boolean createResource(String masterIP, String yaml);
 
 }

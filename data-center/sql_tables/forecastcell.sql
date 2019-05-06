@@ -1,19 +1,3 @@
-/*
- Navicat MySQL Data Transfer
-
- Source Server         : localhost
- Source Server Type    : MySQL
- Source Server Version : 80013
- Source Host           : localhost:3306
- Source Schema         : aiops
-
- Target Server Type    : MySQL
- Target Server Version : 80013
- File Encoding         : 65001
-
- Date: 26/01/2019 01:31:14
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

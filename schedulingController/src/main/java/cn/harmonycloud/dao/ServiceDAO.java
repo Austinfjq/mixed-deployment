@@ -2,6 +2,7 @@ package cn.harmonycloud.dao;
 
 
 import cn.harmonycloud.beans.Service;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
@@ -50,4 +51,40 @@ public interface ServiceDAO {
      **/
     double getNextPeriodMaxRequestNums(String masterIp, String namespace, String serviceName, String startTime, String endTime);
 
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个服务对应的管理器类型和名称
+     * @Date 9:54 2019/4/30
+     * @Param
+     * @return
+     **/
+    JSONObject getOwner(String masterIp, String namespace, String serviceName);
+
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个deployment的replicas副本数
+     * @Date 9:58 2019/4/30
+     * @Param
+     * @return
+     **/
+    int getReplicasOfDeployment(String masterIp,String namespace,String ownName);
+
+
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个statefulset的replicas副本数
+     * @Date 9:59 2019/4/30
+     * @Param
+     * @return
+     **/
+    int getReplicasOfStatefulSet(String masterIp,String namespace,String ownName);
+
+    /**
+     * @Author WANGYUZHONG
+     * @Description //获取某个Replicaset的replicas副本数
+     * @Date 9:59 2019/4/30
+     * @Param
+     * @return
+     **/
+    int getReplicasOfReplicaset(String masterIp,String namespace,String ownName);
 }
