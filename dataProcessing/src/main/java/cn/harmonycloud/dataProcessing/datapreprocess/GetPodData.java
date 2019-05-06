@@ -38,7 +38,8 @@ public class GetPodData {
             namespaceFilter.add("kube-system");
             namespaceFilter.add("md-system");
             namespaceFilter.add("monitoring");
-            if (namespaceFilter.contains(d.getMetadata().getNamespace())) {
+            if (d.getMetadata().getNamespace() != null &&
+                    namespaceFilter.contains(d.getMetadata().getNamespace())) {
                 continue;
             }
 
