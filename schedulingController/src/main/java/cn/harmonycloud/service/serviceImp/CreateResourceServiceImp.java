@@ -115,9 +115,9 @@ public class CreateResourceServiceImp implements ICreatResource {
      * @Date 11:47 2019/4/9
      * @Param
      **/
-    public boolean createResource(String masterIP, String port, String namespace, String yaml) {
+    public boolean createResource(String masterIP, String yaml) {
 
-        KubernetesClient client = K8sClient.createClient(masterIP, port, namespace);
+        KubernetesClient client = K8sClient.getInstance(masterIP);
         if (client == null) {
             LOGGER.error("client is null!");
         }
@@ -131,12 +131,12 @@ public class CreateResourceServiceImp implements ICreatResource {
 
         String resouceKind = iResolveYamlFile.getResourceKind(jsonObject);
 
-        switch (resouceKind) {
-            case "Service":
+        switch (resouceKind.toLowerCase()) {
+            case "service":
                 return creatServiceResource(masterIP, client, yaml);
-            case "Deployment":
+            case "deployment":
                 return creatCustomResource(masterIP, client, yaml);
-            case "StatefulSet":
+            case "statefulset":
                 return creatCustomResource(masterIP, client, yaml);
             default:
                 return creatOthersResource(client, yaml);

@@ -129,10 +129,17 @@ public class OfflineRegulateControlServiceImp implements IOfflineRegulateControl
     @Override
     public int regulate(Node node) {
         double maxCpuUsage = getLastPeriodMaxCpuUsage(node.getMasterIp(), node.getHostName());
+        LOGGER.info("---------------" + node.toString() + " maxCpuUsage is " + maxCpuUsage);
+
         double maxMemUsage = getLastPeriodMaxMemUsage(node.getMasterIp(), node.getHostName());
+        LOGGER.info("---------------" + node.toString() + " maxMemUsage is " + maxMemUsage);
 
         double cpuTotal = nodeDao.getNodeCpuTotal(node.getMasterIp(), node.getHostName());
+        LOGGER.info("---------------" + node.toString() + " cpuTotal is " + cpuTotal);
+
+
         double memTotal = nodeDao.getNodeMemTotal(node.getMasterIp(), node.getHostName());
+        LOGGER.info("---------------" + node.toString() + " memTotal is " + memTotal);
 
         if (maxCpuUsage < cpuUsageMinThreshold && maxMemUsage < memUsageMinThreshold) {
             return calculateDilatationNums(cpuTotal, memTotal, maxCpuUsage, maxMemUsage);
