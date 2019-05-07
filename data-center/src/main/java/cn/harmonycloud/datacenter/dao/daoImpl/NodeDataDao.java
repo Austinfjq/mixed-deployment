@@ -18,6 +18,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.InternalDateRange;
 import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
 import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -225,8 +227,9 @@ public class NodeDataDao implements INodeDataDao {
         //	"_source":["nodeConditions"]
         //}
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("nodeName",nodeName));
-        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("nodeIP",nodeIP));
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("nodeName",nodeName))
+                        .must(QueryBuilders.matchPhraseQuery("nodeIP",nodeIP))
+                        .must(QueryBuilders.matchPhraseQuery("time",getRecentTime()));
         String[] includes = {"nodeConditions"};
         FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
@@ -335,5 +338,175 @@ public class NodeDataDao implements INodeDataDao {
         }
         elasticsearchTemplate.clearScroll(scrollId);
         return resultList;
+    }
+
+//    @Override
+//    public double getNodeCpuCores(String clusterMasterIP, String nodeName) {
+//        //{
+//        //	"query": {
+//        //		"bool": {
+//        //			"must": [{
+//        //				"match_phrase": {
+//        //					"time": "2019-05-07 10:44:05"
+//        //				}
+//        //			},
+//        //			{
+//        //				"match_phrase": {
+//        //					"clusterMasterIP": "10.10.102.25"
+//        //				}
+//        //			},
+//        //			{
+//        //				"match_phrase": {
+//        //					"nodeName": "10.10.103.31-share"
+//        //				}
+//        //			}]
+//        //		}
+//        //	},
+//        //	"_source": ["cpuCores"]
+//        //}
+//
+//        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+//        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",getRecentTime()))
+//                        .must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP))
+//                        .must(QueryBuilders.matchPhraseQuery("nodeName",nodeName));
+//        String[] includes = {"cpuCores"};
+//        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+//        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+//                .withQuery(boolQueryBuilder)
+//                .withIndices(NODE_INDEX)
+//                .withTypes(NODE_TYPE)
+//                .withSourceFilter(fetchSourceFilter)
+//                .withSearchType(SearchType.DEFAULT)
+//                .build();
+//        SearchResponse searchResponse = elasticsearchTemplate.query(searchQuery, response -> response);
+//        SearchHits searchHits = searchResponse.getHits();
+//        if(searchHits.getTotalHits()>0){
+//            for(SearchHit searchHit : searchHits){
+//                Map map = searchHit.getSourceAsMap();
+//                return (double) map.get("cpuCores");
+//            }
+//        }
+//        return 0;
+//    }
+
+    public Object getFieldValueByClusterMasterIPAndNodeName(String clusterMasterIP, String nodeName, String fieldName){
+        //{
+        //	"query": {
+        //		"bool": {
+        //			"must": [{
+        //				"match_phrase": {
+        //					"time": "2019-05-07 10:44:05"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"clusterMasterIP": "10.10.102.25"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"nodeName": "10.10.103.31-share"
+        //				}
+        //			}]
+        //		}
+        //	},
+        //	"_source": [fieldName]
+        //}
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",getRecentTime()))
+                .must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP))
+                .must(QueryBuilders.matchPhraseQuery("nodeName",nodeName));
+        String[] includes = {fieldName};
+        FetchSourceFilter fetchSourceFilter = new FetchSourceFilter(includes,null);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(NODE_INDEX)
+                .withTypes(NODE_TYPE)
+                .withSourceFilter(fetchSourceFilter)
+                .withSearchType(SearchType.DEFAULT)
+                .build();
+        SearchResponse searchResponse = elasticsearchTemplate.query(searchQuery, response -> response);
+        SearchHits searchHits = searchResponse.getHits();
+        if(searchHits.getTotalHits()>0){
+            for(SearchHit searchHit : searchHits){
+                Map map = searchHit.getSourceAsMap();
+                return map.get(fieldName);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Object getLastPeriodMaxFiledValue(String clusterMasterIP, String nodeName, String startTime, String endTime, String fieldName) {
+        //{
+        //	"query": {
+        //		"bool": {
+        //			"must": [{
+        //				"match_phrase": {
+        //					"clusterMasterIP": "10.10.102.25"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"nodeName": "10.10.103.31-share"
+        //				}
+        //			}]
+        //		}
+        //	},
+        //	"aggs": {
+        //		"group_by_time": {
+        //			"range": {
+        //				"field": "time",
+        //				"ranges": [{
+        //					"from": "2019-04-19 17:00:00",
+        //					"to": "2019-05-29 19:00:00"
+        //				}]
+        //			},
+        //			"aggs": {
+        //				"max_value": {
+        //					"max": {
+        //						"field": fieldName
+        //					}
+        //				}
+        //			}
+        //		}
+        //	}
+        //}
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("nodeName",nodeName))
+                        .must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP));
+
+        MaxAggregationBuilder maxRequestConnections = AggregationBuilders.max("max_value").field(fieldName);
+        DateRangeAggregationBuilder dateRangeAggregationBuilder = AggregationBuilders
+                .dateRange("group_by_time")
+                .field("time")
+                .addRange(startTime, endTime);
+        dateRangeAggregationBuilder.subAggregation(maxRequestConnections);
+
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(NODE_INDEX)
+                .withTypes(NODE_TYPE)
+                .withSearchType(SearchType.DEFAULT)
+                .withPageable(PageRequest.of(0,1))//不返回Hits
+                .addAggregation(dateRangeAggregationBuilder)
+                .build();
+
+        Aggregations aggregations = elasticsearchTemplate.query(searchQuery, response -> response.getAggregations());
+        InternalDateRange internalDateRange = aggregations.get("group_by_time");
+        if(internalDateRange.getBuckets().size()>0){
+            double max_value = 0.0;
+            for (InternalDateRange.Bucket bk : internalDateRange.getBuckets()) {
+                long count = bk.getDocCount();
+                //得到所有子聚合
+                Map subaggmap = bk.getAggregations().asMap();
+                //获取指标的值，并返回
+                max_value = ((InternalMax) subaggmap.get("max_value")).getValue();
+            }
+            return max_value;
+        }else{
+            return null;
+        }
     }
 }

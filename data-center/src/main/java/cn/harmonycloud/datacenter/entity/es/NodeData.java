@@ -31,7 +31,7 @@ public class NodeData {
     @Field(type = FieldType.Double)
     private Double cpuCores;
     @Field(type = FieldType.Double)
-    private Double cpuUsage;
+    private Double cpuUsage;//cpu利用率
     @Field(type = FieldType.Double)
     private Double allocatableCpuCores;
     @Field(type = FieldType.Double)

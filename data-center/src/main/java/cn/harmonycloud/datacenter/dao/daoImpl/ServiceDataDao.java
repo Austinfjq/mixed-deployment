@@ -223,7 +223,7 @@ public class ServiceDataDao implements IServiceDataDao {
         } while(scrollResp.getHits().getHits().length != 0);
         return resultList;
 
-        //默认的spring-data-elasticsearch scroll api中没有添加addSort的办法，无法进行排序
+        //TODO: 默认的spring-data-elasticsearch scroll api中没有添加addSort的办法，无法进行排序
 //        List<DataPoint> resultList = new ArrayList<>();
 //
 //        final SearchResultMapper dataPointResultMapper = new SearchResultMapper() {
@@ -851,5 +851,158 @@ public class ServiceDataDao implements IServiceDataDao {
             }
         }
         return new HashMap<>();
+    }
+
+    @Override
+    public List<Map> getOnlineServicesByClusterMasterIP(String clusterMasterIP) {
+        //{
+        //	"query": {
+        //		"bool": {
+        //			"must": [{
+        //				"match_phrase": {
+        //					"time": "2019-04-30 16:35:54"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"clusterMasterIP": "10.10.102.25"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"onlineType": "online"
+        //				}
+        //			}]
+        //		}
+        //	}
+        //}
+        List<Map> resultList = new ArrayList<>();
+
+        final SearchResultMapper onlineServicesResultMapper = new SearchResultMapper() {
+            @Override
+            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
+                List<Map> result = new ArrayList<>();
+                for (SearchHit searchHit : response.getHits()) {
+                    if (response.getHits().getHits().length <= 0) {
+                        return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+                    }
+                    Map map = searchHit.getSourceAsMap();
+                    Map<String, Object> values = new HashMap<>();
+                    values.put("clusterIp", map.get("clusterMasterIP"));
+                    values.put("namespace", map.get("namespace"));
+                    values.put("serviceName", map.get("serviceName"));
+                    values.put("serviceType", map.get("serviceType"));
+
+                    result.add(values);
+                }
+                if (result.size() > 0) {
+                    return new AggregatedPageImpl<T>((List<T>) result, response.getScrollId());
+                }
+                return new AggregatedPageImpl<T>(Collections.EMPTY_LIST, response.getScrollId());
+            }
+        };
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("time",getRecentTime()))
+                        .must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP))
+                        .must(QueryBuilders.matchPhraseQuery("onlineType","online"));
+
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(SERVICE_INDEX)
+                .withTypes(SERVICE_TYPE)
+                .withPageable(PageRequest.of(0,10))
+                .withSearchType(SearchType.DEFAULT)
+                .build();
+        Page<Map> scroll = elasticsearchTemplate.startScroll(1000, searchQuery, Map.class,onlineServicesResultMapper);
+        String scrollId = ((ScrolledPage) scroll).getScrollId();
+        while (scroll.hasContent()) {
+            resultList.addAll(scroll.getContent());
+            scrollId = ((ScrolledPage) scroll).getScrollId();
+            scroll = elasticsearchTemplate.continueScroll(scrollId, 1000, Map.class,onlineServicesResultMapper);
+        }
+        elasticsearchTemplate.clearScroll(scrollId);
+
+        return resultList;
+    }
+
+    @Override
+    public int getLastPeriodMaxRequestNums(String clusterMasterIP, String namespace, String serviceName, String startTime, String endTime) {
+        //{
+        //	"query": {
+        //		"bool": {
+        //			"must": [{
+        //				"match_phrase": {
+        //					"clusterMasterIP": "10.10.102.25"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"namespace": "wordpress"
+        //				}
+        //			},
+        //			{
+        //				"match_phrase": {
+        //					"serviceName": "wordpress-wp"
+        //				}
+        //			}]
+        //		}
+        //	},
+        //	"aggs": {
+        //		"group_by_time": {
+        //			"range": {
+        //				"field": "time",
+        //				"ranges": [{
+        //					"from": "2019-04-19 17:00:00",
+        //					"to": "2019-05-29 19:00:00"
+        //				}]
+        //			},
+        //			"aggs": {
+        //				"max_connection": {
+        //					"max": {
+        //						"field": "requestConnections"
+        //					}
+        //				}
+        //			}
+        //		}
+        //	}
+        //}
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("namespace",namespace))
+                        .must(QueryBuilders.matchPhraseQuery("serviceName",serviceName))
+                        .must(QueryBuilders.matchPhraseQuery("clusterMasterIP",clusterMasterIP));
+
+        MaxAggregationBuilder maxRequestConnections = AggregationBuilders.max("lastPeriodMaxRequestNums").field("requestConnections");
+        DateRangeAggregationBuilder dateRangeAggregationBuilder = AggregationBuilders
+                .dateRange("group_by_time")
+                .field("time")
+                .addRange(startTime, endTime);
+        dateRangeAggregationBuilder.subAggregation(maxRequestConnections);
+
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withIndices(SERVICE_INDEX)
+                .withTypes(SERVICE_TYPE)
+                .withSearchType(SearchType.DEFAULT)
+                .withPageable(PageRequest.of(0,1))//不返回Hits
+                .addAggregation(dateRangeAggregationBuilder)
+                .build();
+
+        Aggregations aggregations = elasticsearchTemplate.query(searchQuery, response -> response.getAggregations());
+        InternalDateRange internalDateRange = aggregations.get("group_by_time");
+        if(internalDateRange.getBuckets().size()>0){
+            int lastPeriodMaxRequestNums = 0;
+            for (InternalDateRange.Bucket bk : internalDateRange.getBuckets()) {
+                long count = bk.getDocCount();
+                //得到所有子聚合
+                Map subaggmap = bk.getAggregations().asMap();
+                //获取指标的均值，并返回
+                lastPeriodMaxRequestNums = (int) ((InternalMax) subaggmap.get("lastPeriodMaxRequestNums")).getValue();
+            }
+            return lastPeriodMaxRequestNums;
+        }else{
+            return 0;
+        }
     }
 }

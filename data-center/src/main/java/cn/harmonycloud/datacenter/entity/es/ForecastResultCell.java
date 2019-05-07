@@ -18,7 +18,7 @@ import static cn.harmonycloud.datacenter.tools.Constant.FORECAST_RESULT_CELL_TYP
 public class ForecastResultCell {
     @Id
     private String id;
-    private String forecastResultCellID;
+    private String forecastResultCellID;//Node(clusterIp&hostName),Service(clusterIp&namespace&serviceName)
     private String forecastingIndex;
     @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
     private String date;
