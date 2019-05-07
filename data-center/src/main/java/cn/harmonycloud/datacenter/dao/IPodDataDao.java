@@ -1,11 +1,11 @@
 package cn.harmonycloud.datacenter.dao;
 
-import cn.harmonycloud.datacenter.entity.es.NodeData;
 import cn.harmonycloud.datacenter.entity.es.PodData;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Map;
+
 /**
 *@Author: shaodilong
 *@Description:
@@ -15,5 +15,10 @@ import java.util.List;
 @Repository
 public interface IPodDataDao {
     public List<PodData> findAllPodDatas();
+
     public List<PodData> getNowPods();
+
+    public List<Map> getPodNamesByNodeAndService(String clusterMasterIP, String namespace, String serviceName, String nodeName);
+
+    public List<Map> getNodeByClusterMasterIP(String clusterMasterIP);
 }

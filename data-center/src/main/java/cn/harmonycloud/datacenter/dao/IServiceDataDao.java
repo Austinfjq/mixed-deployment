@@ -42,4 +42,8 @@ public interface IServiceDataDao {
     public List<ServiceData> getNowServices();
     //获取Service的管理方式信息
     public Map<String,Object> getManagement(String namespace, String serviceName, String clusterMasterIP);
+    //获取某个集群下所有的在线应用
+    public List<Map> getOnlineServicesByClusterMasterIP(String clusterMasterIP);
+    //获取某个服务在过去一段时间的最大请求量
+    public int getLastPeriodMaxRequestNums(String clusterMasterIP, String namespace, String serviceName, String startTime, String endTime);
 }

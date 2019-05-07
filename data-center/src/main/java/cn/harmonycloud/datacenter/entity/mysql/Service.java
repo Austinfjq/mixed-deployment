@@ -1,4 +1,7 @@
 package cn.harmonycloud.datacenter.entity.mysql;
+
+import java.util.UUID;
+
 /**
 *@Author: shaodilong
 *@Description:
@@ -20,6 +23,18 @@ public class Service {
     private int type;
 
     public Service() {
+        serviceId= UUID.randomUUID().toString();
+        serviceName="";
+        namespace="";
+        clusterIp="";
+        ownerType="";
+        ownerName="";
+        cpuRequest=0;
+        cpuLimit=0;
+        memRequest=0;
+        period=0;
+        responseTime="";
+        type=0;
     }
 
     public String getServiceId() {

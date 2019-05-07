@@ -8,30 +8,36 @@ package cn.harmonycloud.beans;
  * @version:1.0
  **/
 public class Node {
+    private String clusterMasterIp;
+    private String nodeName;
 
-    private String masterIp;
-    private String hostName;
-
-    public String getMasterIp() {
-        return masterIp;
+    public String getNodeName() {
+        return nodeName;
     }
 
-    public void setMasterIp(String masterIp) {
-        this.masterIp = masterIp;
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 
-    public String getHostName() {
-        return hostName;
+
+
+    public String getClusterMasterIp() {
+        return clusterMasterIp;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    public void setClusterMasterIp(String clusterMasterIp) {
+        this.clusterMasterIp = clusterMasterIp;
     }
+
+
+
+
+
     @Override
     public String toString() {
         return "Node{" +
-                "masterIp='" + masterIp + '\'' +
-                ", hostName='" + hostName + '\'' +
+                "clusterMasterIp='" + clusterMasterIp + '\'' +
+                ", nodeName='" + nodeName + '\'' +
 
                 '}';
     }

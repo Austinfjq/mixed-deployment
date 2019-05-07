@@ -1,13 +1,10 @@
 package cn.harmonycloud.datacenter.controller;
 
-import cn.harmonycloud.datacenter.entity.ServiceLoad;
-import cn.harmonycloud.datacenter.entity.mysql.ForecastCell;
+import cn.harmonycloud.datacenter.entity.DataPoint;
 import cn.harmonycloud.datacenter.entity.es.ForecastResultCell;
-import cn.harmonycloud.datacenter.service.IForecastCellService;
-import cn.harmonycloud.datacenter.service.IForecastDataService;
-import cn.harmonycloud.datacenter.service.IForecastResultCellService;
+import cn.harmonycloud.datacenter.entity.mysql.ForecastCell;
+import cn.harmonycloud.datacenter.service.*;
 import com.google.common.collect.Lists;
-import org.apache.ibatis.annotations.Insert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,24 +13,63 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 /**
- *@Author: shaodilong
- *@Description:
- *@Date: Created in 2019/1/24 16:18
- *@Modify By:
- */
-
+*@Author: shaodilong
+*@Description: 负载预测模块接口
+*@Date: Created in 2019/5/6 19:07
+*@Modify By:
+*/
 @RestController
-public class ForecastDataController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ForecastDataController.class);
+public class LoadForecastingController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadForecastingController.class);
+    @Autowired
+    private IForecastCellService forecastCellService;
+    @Autowired
+    private IServiceDataService serviceDataService;
+    @Autowired
+    private INodeDataService nodeDataService;
     @Autowired
     private IForecastResultCellService forecastResultCellService;
 
-    @Autowired
-    private IForecastCellService forecastCellService;
+    /**
+     * 返回所有的ForecastCell
+     *
+     * @return
+     */
+    @GetMapping("/forecastCellList")
+    public List<ForecastCell> getAllForecastCells(){
+        return forecastCellService.getAllForecastCells();
+    }
 
-    @Autowired
-    private IForecastDataService forecastDataService;
+    /**
+     * 取某个指标的历史数据值
+     *
+     * @param requestMap
+     * @return
+     */
+    @PostMapping("/indexData")
+    public List<DataPoint> getIndexDatas(@RequestBody Map<String, Object> requestMap){
 
+        int type = Integer.parseInt(requestMap.get("type").toString());
+        String id = (String) requestMap.get("id");
+        String indexName = (String) requestMap.get("index");//需要获取的指标名
+        String startTime = (String) requestMap.get("startTime");
+        String endTime = (String) requestMap.get("endTime");
+
+        if(type == 0){//id = clusterMasterIP&namespace&serviceName
+            return serviceDataService.getIndexDatas(id,indexName,startTime,endTime);
+        }else if(type == 1){//id = clusterMasterIP&nodeName
+            return nodeDataService.getIndexDatas(id,indexName,startTime,endTime);
+        }else{
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 保存ForecastResultCell对象数组
+     *
+     * @param requestList
+     * @return
+     */
     @PutMapping("/forecastResultCells")
     public Map<String, Object> saveAllForecastResultCells(@RequestBody List<ForecastResultCell> requestList){
         Map<String,Object> responseMap = new HashMap<>();
@@ -54,12 +90,30 @@ public class ForecastDataController {
         return responseMap;
     }
 
-    @GetMapping("/forecastCellList")
-    public List<ForecastCell> getAllForecastCells(){
-        return forecastCellService.getAllForecastCells();
+    /**
+     * 获得某个在线服务的某个指标在某段时间段的均值
+     *
+     * @param requestMap
+     * @return
+     */
+    @PostMapping("/service/getServiceIndex")
+    public Map<String, Object> getIndexTimeSeries(@RequestBody Map<String, Object> requestMap){
+        Map<String, Object> responseMap = new HashMap<>();
+        String namespace = (String) requestMap.get("namespace");
+        String serviceName = (String) requestMap.get("serviceName");
+        String indexName = (String) requestMap.get("indexName");
+        String startTime = (String) requestMap.get("startTime");
+        String endTime = (String) requestMap.get("endTime");
+
+        Double avg_index = serviceDataService.getIndexTimeSeries(namespace,serviceName,indexName,startTime,endTime);
+        if(avg_index != null){
+            responseMap.put("indexTimeSeries",avg_index);
+        }else{ }
+        return responseMap;
     }
 
     /**
+     * 获取某一个ForecastCell
      * 根据ID,type,indexName获取对应的ForecastCell
      *
      * @param cellId
@@ -75,28 +129,9 @@ public class ForecastDataController {
     }
 
     /**
-     * 获得所有service和node的所有指标的预测数据
-     *
-     * @param startTime
-     * @param endTime
-     * @return
-     */
-    @GetMapping("/forecast/forecastValues")
-    public List getAllForecastValue(@RequestParam("id") String id,
-                                    @RequestParam("startTime") String startTime,
-                                    @RequestParam("endTime") String endTime){
-        if(id.equals("service")){
-            return forecastDataService.getAllServiceLoads(startTime,endTime);
-        }else if(id.equals("node")){
-            return forecastDataService.getAllNodeLoads(startTime,endTime);
-        }else{
-            return Collections.EMPTY_LIST;
-        }
-    }
-
-    /**
      * 保存ForecastCell的预测模型
      * 将生成的预测模型名称和参数持久化到数据库中
+     *
      * @param requestMap
      * @return
      */
@@ -125,6 +160,7 @@ public class ForecastDataController {
 
     /**
      * 保存ForecastCell完成预测的未来最远时间点
+     *
      * @param requestMap
      * @return
      */

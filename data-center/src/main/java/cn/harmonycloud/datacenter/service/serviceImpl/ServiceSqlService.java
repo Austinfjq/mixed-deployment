@@ -3,6 +3,7 @@ package cn.harmonycloud.datacenter.service.serviceImpl;
 import cn.harmonycloud.datacenter.entity.es.SearchPod;
 import cn.harmonycloud.datacenter.entity.mysql.Service;
 import cn.harmonycloud.datacenter.entity.mysql.services;
+import cn.harmonycloud.datacenter.mapper.ServiceLoadMappingPodInstancesMapper;
 import cn.harmonycloud.datacenter.mapper.ServiceMapper;
 import cn.harmonycloud.datacenter.service.IServiceSqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class ServiceSqlService implements IServiceSqlService {
     @Autowired
     private ServiceMapper serviceMapper;
+    @Autowired
+    private ServiceLoadMappingPodInstancesMapper serviceLoadMappingPodInstancesMapper;
     @Override
     public Map<String, Object> getOwnerTypeAndName(String namespace, String serviceName) {
         Service service = serviceMapper.findServiceByNamespaceAndServiceName(namespace,serviceName);
@@ -45,7 +48,7 @@ public class ServiceSqlService implements IServiceSqlService {
     }
     @Override
     public int getPodNumsByService(SearchPod searchPod){
-        return serviceMapper.findPodNumsByService(searchPod.getClusterIp(),
+        return serviceLoadMappingPodInstancesMapper.findPodNumsByService(searchPod.getClusterIp(),
                 searchPod.getNamespace(),searchPod.getServiceName());
     }
 }
