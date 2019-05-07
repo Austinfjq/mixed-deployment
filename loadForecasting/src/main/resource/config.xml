@@ -1,12 +1,12 @@
 <strategys>
     <node>
         <strategy>
-            <indexName>cpu</indexName>
+            <indexName>cpuUsage</indexName>
             <status>true</status>
             <description>node cpu usage!</description>
         </strategy>
         <strategy>
-            <indexName>memory</indexName>
+            <indexName>memUsage</indexName>
             <status>true</status>
             <description>node memory usage!</description>
         </strategy>
@@ -14,7 +14,7 @@
 
     <service>
         <strategy>
-            <indexName>responseTime</indexName>
+            <indexName>requestConnections</indexName>
             <status>true</status>
             <description>service response time!</description>
         </strategy>

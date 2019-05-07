@@ -44,7 +44,7 @@ public interface IData {
      * @Param
      * @return
      **/
-    String getIndexHistoryData(String ID, String type, String index, String startTime, String endTime);
+    String getIndexHistoryData(String ID, int type, String index, String startTime, String endTime);
 
 
     /**
@@ -54,7 +54,7 @@ public interface IData {
      * @Param
      * @return
      **/
-    ForecastCell getForecastCell(String ID, String type, String index);
+    ForecastCell getForecastCell(String ID, int type, String index);
 
 
     /**
@@ -64,7 +64,7 @@ public interface IData {
      * @Param
      * @return
      **/
-    boolean savaForecastModel(String ID, String type, String index, String forecastingModel, String modelParams);
+    boolean savaForecastModel(String ID, int type, String index, String forecastingModel, String modelParams);
 
 
 
@@ -75,5 +75,5 @@ public interface IData {
      * @Param
      * @return
      **/
-    boolean updateIndexLastForecastTime(String ID, String type, String index, String lastForecastTime);
+    boolean updateIndexLastForecastTime(String ID, int type, String index, String lastForecastTime);
 }

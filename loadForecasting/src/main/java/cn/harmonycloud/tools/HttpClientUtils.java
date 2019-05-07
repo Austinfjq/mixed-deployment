@@ -1,30 +1,21 @@
 package cn.harmonycloud.tools;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -338,5 +329,103 @@ public class HttpClientUtils {
 			httpClient.close();
 		}
 	}
+
+
+	public static String sendPost(String userUrl, String param) {
+
+		StringBuffer result = new StringBuffer("");
+		BufferedReader reader = null;
+		try {
+			URL url = new URL(userUrl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setUseCaches(false);
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Charset", "UTF-8");
+			conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			conn.setRequestProperty("accept", "application/json");
+			if (param != null) {
+				byte[] writebytes = param.getBytes();
+				conn.setRequestProperty("Content-Length", String.valueOf(writebytes.length));
+				OutputStream outwritestream = conn.getOutputStream();
+				outwritestream.write(param.getBytes());
+				outwritestream.flush();
+				outwritestream.close();
+			}
+			if (conn.getResponseCode() == 200) {
+				reader = new BufferedReader(
+						new InputStreamReader(conn.getInputStream()));
+				String line = reader.readLine();
+				while (line != null) {
+					result.append(line);
+					line = reader.readLine();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return result.toString();
+
+	}
+
+
+
+	public static String sendPut(String userUrl, String param) {
+
+		StringBuffer result = new StringBuffer("");
+		BufferedReader reader = null;
+		try {
+			URL url = new URL(userUrl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("PUT");
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setUseCaches(false);
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Charset", "UTF-8");
+			conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			conn.setRequestProperty("accept", "application/json");
+			if (param != null) {
+				byte[] writebytes = param.getBytes();
+				conn.setRequestProperty("Content-Length", String.valueOf(writebytes.length));
+				OutputStream outwritestream = conn.getOutputStream();
+				outwritestream.write(param.getBytes());
+				outwritestream.flush();
+				outwritestream.close();
+			}
+			if (conn.getResponseCode() == 200) {
+				reader = new BufferedReader(
+						new InputStreamReader(conn.getInputStream()));
+				String line = reader.readLine();
+				while (line != null) {
+					result.append(line);
+					line = reader.readLine();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return result.toString();
+
+	}
+
 
 }

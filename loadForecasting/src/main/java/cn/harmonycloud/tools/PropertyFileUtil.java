@@ -15,7 +15,7 @@ import java.util.Properties;
  **/
 public class PropertyFileUtil {
 
-    private static final String PROPERRY_FILE_PATH = "./usr/local/loadforecasting/application.properties";
+    private static final String PROPERRY_FILE_PATH = "F:\\ideaProjects\\mixed_deployment\\mixed-deployment\\loadForecasting\\src\\main\\resource\\application.properties";
 
     /**
      * @return

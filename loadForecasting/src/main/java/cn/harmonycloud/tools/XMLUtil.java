@@ -22,7 +22,7 @@ import java.util.List;
 public class XMLUtil {
     private final static Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
-    private static String fileName = PropertyFileUtil.getValue("CONFIG_FIME_NAME");
+    private static String fileName = "F:\\ideaProjects\\mixed_deployment\\mixed-deployment\\loadForecasting\\src\\main\\resource\\config.xml";
 
     public static Element getRootNode() {
         SAXReader reader = new SAXReader();
@@ -126,7 +126,7 @@ public class XMLUtil {
                 }
             }
 
-            ForecastIndex evaluateStrategy = null;
+            ForecastIndex evaluateStrategy = new ForecastIndex();
 
             evaluateStrategy.setIndexName(indexName);
             evaluateStrategy.setStatus(status);

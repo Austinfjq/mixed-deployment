@@ -42,11 +42,16 @@ public class ForecastImp implements IForecast {
             return null;
         }
 
+        if (dataSet.size() < 2*forecastCell.getNumberOfPerPeriod()) {
+            LOGGER.error("the history data is too small!");
+            return null;
+        }
+
         HoltWinters holtWinters = null;
-        if (forecastCell.getForecastingModel().equals("")) {
+        if (forecastCell.getForecastingModel() == null) {
             LOGGER.info("this forecastCell without forecastingModel!");
             holtWinters = new HoltWinters(dataSet);
-            iData.savaForecastModel(forecastCell.getID(), String.valueOf(forecastCell.getType()), forecastCell.getForecastingIndex(), holtWinters.getModelName(), holtWinters.getParams());
+            iData.savaForecastModel(forecastCell.getID(), forecastCell.getType(), forecastCell.getForecastingIndex(), holtWinters.getModelName(), holtWinters.getParams());
         } else if (forecastCell.getForecastingModel().equals("HoltWinters")){
             JSONObject jsonObject = JSONObject.parseObject(forecastCell.getModelParams());
             double alpha = jsonObject.getDouble("alpha");
@@ -84,12 +89,12 @@ public class ForecastImp implements IForecast {
 
         String endTime = forecastCell.getForcastingEndTime();
 
-        if (endTime.equals("")) {
+        if (endTime == null) {
             endTime = DateUtil.getCurrentTime();
         }
 
         String startTime = DateUtil.getStartTime(endTime, Integer.valueOf(PropertyFileUtil.getValue("HistoryDataPeriods"))*forecastCell.getNumberOfPerPeriod()*forecastCell.getTimeInterval());
-        String dataSetStr = iData.getIndexHistoryData(forecastCell.getID(), String.valueOf(forecastCell.getType()), forecastCell.getForecastingIndex(), startTime, endTime);
+        String dataSetStr = iData.getIndexHistoryData(forecastCell.getID(), forecastCell.getType(), forecastCell.getForecastingIndex(), startTime, endTime);
 
         Type type = new TypeReference<Collection<DataPoint>>() {}.getType();
         Collection<DataPoint> list = JSON.parseObject(dataSetStr, type);

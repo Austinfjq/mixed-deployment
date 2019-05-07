@@ -40,11 +40,15 @@ public class NodeTaskThreadExecutor implements Runnable{
         for (Node node:nodes) {
             for (ForecastIndex forecastIndex:nodeForecastIndices) {
                 String ID = node.getMasterIp()+"&"+node.getHostName();
-                ForecastCell forecastCell = iData.getForecastCell(ID,"1",forecastIndex.getIndexName());
+                ForecastCell forecastCell = iData.getForecastCell(ID,1,forecastIndex.getIndexName());
 
                 if (null == forecastCell) {
-                    LOGGER.error("the forecastCell:"+forecastCell.toString()+" is not exit!");
+                    LOGGER.error("the forecastCell is null!");
                     break;
+                }
+
+                if (!forecastCell.getID().equals("10.10.102.25&10.10.103.31-share") || !forecastCell.getForecastingIndex().equals("cpuUsage")) {
+                    continue;
                 }
 
                 List<ForecastResultCell> forecastResultCells = iForecast.forecast(forecastCell);

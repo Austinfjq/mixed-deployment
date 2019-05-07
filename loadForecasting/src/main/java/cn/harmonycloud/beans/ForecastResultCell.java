@@ -12,6 +12,9 @@ public class ForecastResultCell {
     private String date;
     private double value;
 
+    public ForecastResultCell() {
+    }
+
     public ForecastResultCell(String ID, String forecastingIndex, String date, double value) {
         this.ID = ID;
         this.forecastingIndex = forecastingIndex;

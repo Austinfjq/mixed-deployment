@@ -32,15 +32,17 @@ public class ServiceTaskThreadExecutor implements Runnable{
             LOGGER.error("get service list failed!");
         }
 
+        LOGGER.info("service list:" + services.toString());
+
         List<ForecastIndex> serviceForecastIndexs = AchieveForecastIndex.getServiceForecastIndexs();
 
         for (Service service:services) {
             for (ForecastIndex forecastIndex:serviceForecastIndexs) {
                 String ID = service.getMasterIp()+"&"+service.getNamespace()+"&"+service.getServiceName();
-                ForecastCell forecastCell = iData.getForecastCell(ID,"0",forecastIndex.getIndexName());
+                ForecastCell forecastCell = iData.getForecastCell(ID,0,forecastIndex.getIndexName());
 
                 if (null == forecastCell) {
-                    LOGGER.error("the forecastCell:"+forecastCell.toString()+" is not exit!");
+                    LOGGER.error("the forecastCell is null!");
                     break;
                 }
 
