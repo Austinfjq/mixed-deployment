@@ -11,8 +11,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -59,7 +60,7 @@ public class HttpClientUtils {
 
 	/**
 	 * 发送get请求；带请求头和请求参数
-	 * 
+	 *
 	 * @param url 请求地址
 	 * @param headers 请求头集合
 	 * @param params 请求参数集合
@@ -89,7 +90,7 @@ public class HttpClientUtils {
 		 */
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
 		httpGet.setConfig(requestConfig);
-		
+
 		// 设置请求头
 		packageHeader(headers, httpGet);
 
@@ -267,7 +268,7 @@ public class HttpClientUtils {
 
 	/**
 	 * Description: 封装请求参数
-	 * 
+	 *
 	 * @param params
 	 * @param httpMethod
 	 * @throws UnsupportedEncodingException
@@ -286,6 +287,7 @@ public class HttpClientUtils {
 			httpMethod.setEntity(new UrlEncodedFormEntity(nvps, ENCODING));
 		}
 	}
+
 
 	/**
 	 * Description: 获得响应结果
@@ -327,6 +329,49 @@ public class HttpClientUtils {
 		if (httpClient != null) {
 			httpClient.close();
 		}
+	}
+
+	public static String sendPost(String userUrl, String param) {
+
+		String result = "";
+		BufferedReader reader = null;
+		try {
+			URL url = new URL(userUrl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setUseCaches(false);
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Charset", "UTF-8");
+			conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			conn.setRequestProperty("accept", "application/json");
+			if (param != null) {
+				byte[] writebytes = param.getBytes();
+				conn.setRequestProperty("Content-Length", String.valueOf(writebytes.length));
+				OutputStream outwritestream = conn.getOutputStream();
+				outwritestream.write(param.getBytes());
+				outwritestream.flush();
+				outwritestream.close();
+			}
+			if (conn.getResponseCode() == 200) {
+				reader = new BufferedReader(
+						new InputStreamReader(conn.getInputStream()));
+				result = reader.readLine();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return result;
+
 	}
 
 }

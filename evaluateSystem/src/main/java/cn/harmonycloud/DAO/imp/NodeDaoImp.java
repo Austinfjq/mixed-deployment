@@ -69,27 +69,51 @@ public class NodeDaoImp implements NodeDAO {
 
     @Override
     public double getNodeIndexValue(String queryStr) {
-        Map<String,String> params = new HashMap<>();
-        params.put("queryString", queryStr);
-        String url = "http://"+ PropertyFileUtil.getValue("hostIp") + ":" + PropertyFileUtil.getValue("port") + "/queryData";
-        HttpClientResult httpClientResult = null;
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("queryString", queryStr);
+//        String url = "http://"+ PropertyFileUtil.getValue("hostIp") + ":" + PropertyFileUtil.getValue("port") + "/queryData";
+        String url = "http://10.10.102.25:31244/queryData";
+        String result = null;
         try {
-            httpClientResult =  HttpClientUtils.doPost(url,params);
+            result =  HttpClientUtils.sendPost(url,jsonObject.toJSONString());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (null == httpClientResult || httpClientResult.getCode() != 200) {
-            LOGGER.error("get node index data failed!");
-            return 0;
+        if (null == result || result.equals("")) {
+            LOGGER.error("get node index value failed!");
+            return -1;
         }
+        LOGGER.debug(result);
 
-        JSONObject jsonObject = JSONObject.parseObject(httpClientResult.getContent());
+        JSONObject resultJsonObject = JSONObject.parseObject(result);
 
-        if (!"success".equals(jsonObject.getString("status"))) {
+        if (!"success".equals(resultJsonObject.getString("status"))) {
             LOGGER.error("query node index value failed!");
         }
 
-        return Double.valueOf(jsonObject.getJSONObject("data").getJSONObject("result").getString(""));
+        System.out.println(result);
+
+        JSONObject dataJsonObject = resultJsonObject.getJSONObject("data");
+        JSONArray rsJsonObject = dataJsonObject.getJSONArray("result");
+
+        String value = null;
+        try {
+            value = rsJsonObject.getJSONObject(0).getJSONArray("value").getString(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Double.valueOf(value);
+    }
+
+
+    public static void main(String[] args) {
+
+        NodeDAO nodeDAO = new NodeDaoImp();
+        String queryStr = "sum(rate(node_cpu_seconds_total{kubernetes_pod_host_ip='10.10.102.26'}[5m]))by(kubernetes_pod_host_ip)";
+
+        double indexValue = nodeDAO.getNodeIndexValue(queryStr);
+        System.out.println(indexValue);
     }
 
     public static void main(String[] args) {
