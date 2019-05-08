@@ -8,20 +8,17 @@ package cn.harmonycloud.beans;
  * @version:1.0
  **/
 public class Service {
-    private String clusterMasterIp;
+    private String masterIp;
     private String namespace;
     private String serviceName;
-    private String onlineType; //service类型，online代表在线
+    private int serviceType;//service类型，1代表在线，2代表离线
 
-
-
-
-    public String getClusterMasterIp() {
-        return clusterMasterIp;
+    public String getMasterIp() {
+        return masterIp;
     }
 
-    public void setClusterMasterIp(String clusterMasterIp) {
-        this.clusterMasterIp = clusterMasterIp;
+    public void setMasterIp(String masterIp) {
+        this.masterIp = masterIp;
     }
 
 
@@ -33,6 +30,8 @@ public class Service {
         this.namespace = namespace;
     }
 
+
+
     public String getServiceName() {
         return serviceName;
     }
@@ -40,22 +39,32 @@ public class Service {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    public String getOnlineType() {
-        return onlineType;
+
+
+
+    public int getServiceType() {
+        return serviceType;
     }
 
-    public void setOnlineType(String onlineType) {
-        this.onlineType = onlineType;
+    public void setServiceType(int serviceType) {
+        this.serviceType = serviceType;
     }
+
+
+
+
+
+
+
 
 
     @Override
     public String toString() {
         return "Service{" +
-                "clusterMasterIp='" + clusterMasterIp + '\'' +
+                "masterIp='" + masterIp + '\'' +
                 ", namespace='" + namespace+ '\'' +
                 ", serviceName=" + serviceName +
-                ", onlineType='" + onlineType+ '\'' +
+                ", seviceType='" + serviceType+ '\'' +
                 '}';
     }
 

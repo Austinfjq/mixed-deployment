@@ -27,12 +27,8 @@ public class NodeDaoImp implements NodeDAO {
     @Override
     public List<Node> getNodeList(String clusterIp) {
         Map<String,String> params = new HashMap<>();
-        params.put("clusterMasterIP", clusterIp);
+        params.put("clusterIp", clusterIp);
         String url = "http://"+ PropertyFileUtil.getValue("hostIp") + ":" + PropertyFileUtil.getValue("port") + "/node/nodes";
-        //ip和port在配置文件中修改
-
-        //String url ="http://10.10.102.25:31286/nowNode";
-
         HttpClientResult httpClientResult = null;
         try {
             httpClientResult =  HttpClientUtils.doGet(url,params);
@@ -42,6 +38,7 @@ public class NodeDaoImp implements NodeDAO {
             e.printStackTrace();
         }
         if (null == httpClientResult || httpClientResult.getCode() != 200) {
+
             LOGGER.error("get node list data failed!");
             return null;
         }
@@ -54,10 +51,9 @@ public class NodeDaoImp implements NodeDAO {
 
 
         for (int i=0; i<jsonArray.size(); i++) {
-            //String clusterIP = jsonArray.getJSONObject(i).getString("clusterIp");
-            //String hostName = jsonArray.getJSONObject(i).getString("hostName");
-            String clusterIP = jsonArray.getJSONObject(i).getString("clusterMasterIP");
-            String hostName = jsonArray.getJSONObject(i).getString("nodeName");
+            String clusterIP = jsonArray.getJSONObject(i).getString("clusterIp");
+            String hostName = jsonArray.getJSONObject(i).getString("hostName");
+
             Node node = new Node();
             node.setMasterIp(clusterIP);
             node.setHostName(hostName);
@@ -65,15 +61,16 @@ public class NodeDaoImp implements NodeDAO {
         }
 
         return nodes;
-    }
+    }//接口可以获取数据
 
     @Override
     public double getNodeIndexValue(String queryStr) {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("queryString", queryStr);
-//        String url = "http://"+ PropertyFileUtil.getValue("hostIp") + ":" + PropertyFileUtil.getValue("port") + "/queryData";
-        String url = "http://10.10.102.25:31244/queryData";
+        String url = "http://"+ PropertyFileUtil.getValue("hostIp") + ":" + PropertyFileUtil.getValue("port") + "/queryData";
+
+
         String result = null;
         try {
             result =  HttpClientUtils.sendPost(url,jsonObject.toJSONString());
@@ -104,26 +101,13 @@ public class NodeDaoImp implements NodeDAO {
             e.printStackTrace();
         }
         return Double.valueOf(value);
-    }
-
-
-    public static void main(String[] args) {
-
-        NodeDAO nodeDAO = new NodeDaoImp();
-        String queryStr = "sum(rate(node_cpu_seconds_total{kubernetes_pod_host_ip='10.10.102.26'}[5m]))by(kubernetes_pod_host_ip)";
-
-        double indexValue = nodeDAO.getNodeIndexValue(queryStr);
-        System.out.println(indexValue);
-    }
-
+    }//接口正确
     public static void main(String[] args) {
         NodeDaoImp test1=new NodeDaoImp();
         List<Node> nodes = new ArrayList<>();
+        String str="sum(rate(node_cpu_seconds_total[5m]))by(kubernetes_pod_host_ip,kubernetes_pod_node_name)";
+        System.out.println(test1.getNodeIndexValue(str));
 
-        nodes=test1.getNodeList("10.10.102.31");
-        for (int i=0;i<nodes.size();i++){
-            System.out.println(nodes.get(i).toString());
-        }
 
 
     }
