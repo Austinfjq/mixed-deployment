@@ -1,5 +1,8 @@
 package cn.harmonycloud.tools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +18,8 @@ import java.util.Properties;
  **/
 public class PropertyFileUtil {
 
-    private static final String PROPERRY_FILE_PATH = "F:\\ideaProjects\\mixed_deployment\\mixed-deployment\\loadForecasting\\src\\main\\resource\\application.properties";
+    private final static Logger LOGGER = LoggerFactory.getLogger(PropertyFileUtil.class);
+    private static final String PROPERRY_FILE_PATH = "/root/mix-deploy/load-forecast/application.properties";
 
     /**
      * @return
