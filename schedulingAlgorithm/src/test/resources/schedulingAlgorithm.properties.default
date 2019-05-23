@@ -1,0 +1,22 @@
+# Settings
+PRIORITY_MAX_SCORE=10
+FILTER_PERCENTAGE=1.0
+# Gate
+LOG_DETAIL=true
+PARALLEL=false
+# URI
+URI_GET_SERVICE=http://10.10.101.115:8080/nowService
+URI_GET_POD=http://10.10.101.115:8080/nowPod
+URI_GET_NODE=http://10.10.101.115:8080/nowNode
+URI_GET_NODE_FORECAST=http://10.10.101.115:8080/forecast/forecastValues
+URI_GET_POD_CONSUME=http://hostname:port/service/getPodCosume
+URI_GET_SERVICE_TYPE=http://hostname:port/service/getServiceType
+URI_EXECUTE_ADD=http://10.10.101.115:8082/dispatching/createPod
+URI_EXECUTE_REMOVE=http://10.10.101.115:8082/dispatching/deletePod
+
+# Local Run
+#URI_GET_SERVICE=http://127.0.0.1:8081/nowService
+#URI_GET_POD=http://127.0.0.1:8081/nowPod
+#URI_GET_NODE=http://127.0.0.1:8081/nowNode
+#URI_EXECUTE_ADD=http://127.0.0.1:8080/dispatching/createPod
+#URI_EXECUTE_REMOVE=http://127.0.0.1:8080/dispatching/deletePod

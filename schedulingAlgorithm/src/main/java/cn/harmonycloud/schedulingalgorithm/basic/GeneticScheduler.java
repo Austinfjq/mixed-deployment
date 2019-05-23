@@ -35,6 +35,7 @@ public class GeneticScheduler implements Scheduler {
             LOGGER.info("GeneticScheduler getScoreWithFinalResource = " + b + "; hosts=" + greedySolution.getHosts());
             double improve = 1.0D * (a - b) / b;
             if (a < b) bad++;
+            else if (a == b) equal++;
             else good++;
             improvementList.add(improve);
         } catch (Exception e) {
@@ -45,6 +46,7 @@ public class GeneticScheduler implements Scheduler {
 
     private static List<Double> improvementList = new ArrayList<>();
     private static int good = 0;
+    private static int equal = 0;
     private static int bad = 0;
 
     public static void main(String[] args) {
@@ -53,17 +55,17 @@ public class GeneticScheduler implements Scheduler {
 //        for (int i = 0; i < 5; i++) {
 //            podList.add(new Pod(1, "wordpress", "wordpress-mysql"));
 //        }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             podList.add(new Pod(1, "wordpress", "wordpress-wp"));
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             GeneticScheduler geneticScheduler = new GeneticScheduler();
             geneticScheduler.schedule(podList);
-            LOGGER.info("improvementList=" + improvementList);
-            LOGGER.info("improvement=" + improvementList.stream().mapToDouble(Double::doubleValue).average().orElse(-9999D) * 100 + "%");
-            LOGGER.info("UseBothImprovement=" + improvementList.stream().mapToDouble(Double::doubleValue).map(d -> d < 0 ? 0 : d).average().orElse(-9999D) * 100 + "%");
-            LOGGER.info("good=" + good + ",bad=" + bad);
         }
+        LOGGER.info("improvementList=" + improvementList);
+        LOGGER.info("improvement=" + improvementList.stream().mapToDouble(Double::doubleValue).average().orElse(-9999D) * 100 + "%");
+        LOGGER.info("UseBothImprovement=" + improvementList.stream().mapToDouble(Double::doubleValue).map(d -> d < 0 ? 0 : d).average().orElse(-9999D) * 100 + "%");
+        LOGGER.info("good=" + good + ",equal=" + equal + ",bad=" + bad);
     }
 
     class GeneticConfig {

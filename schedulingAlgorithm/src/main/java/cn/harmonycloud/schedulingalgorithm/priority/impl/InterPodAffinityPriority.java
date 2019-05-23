@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class InterPodAffinityPriority implements PriorityRule {
     class Context {
-        Map<String, Double> counts = new HashMap<>();
+        Map<String, Double> counts = GlobalSetting.PARALLEL ? new ConcurrentHashMap<>() : new HashMap<>();
         ReentrantLock lock = new ReentrantLock();
         Pod pod;
         Affinity affinity;

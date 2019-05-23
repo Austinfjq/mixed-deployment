@@ -31,26 +31,27 @@ public class AnnealingScheduler implements Scheduler {
 //        for (int i = 0; i < 5; i++) {
 //            podList.add(new Pod(1, "wordpress", "wordpress-mysql"));
 //        }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             podList.add(new Pod(1, "wordpress", "wordpress-wp"));
         }
         Scheduler scheduler = new AnnealingScheduler();
         scheduler.schedule(podList);
         if (runManyTimes) {
-            for (int i = 0; i < 20; i++) {
+            for (int i = 1; i < 100; i++) {
                 Scheduler scheduler1 = new AnnealingScheduler();
                 scheduler1.schedule(podList);
             }
             LOGGER.info("improvementList=" + improvementList);
             LOGGER.info("improvement=" + improvementList.stream().mapToDouble(Double::doubleValue).average().orElse(-9999D) * 100 + "%");
             LOGGER.info("UseBothImprovement=" + improvementList.stream().mapToDouble(Double::doubleValue).map(d -> d < 0 ? 0 : d).average().orElse(-9999D) * 100 + "%");
-            LOGGER.info("good=" + good + ",bad=" + bad);
+            LOGGER.info("good=" + good + ", equal=" + equal + ",bad=" + bad);
         }
     }
 
     private static boolean runManyTimes = true;
     private static List<Double> improvementList = new ArrayList<>();
     private static int good = 0;
+    private static int equal = 0;
     private static int bad = 0;
 
     private static void showCacheResource() {
@@ -83,6 +84,7 @@ public class AnnealingScheduler implements Scheduler {
                 int b = greedySolution.getScoreWithFinalResource(cache);
                 double improve = 1.0D * (a - b) / b;
                 if (a < b) bad++;
+                else if (a == b) equal++;
                 else good++;
                 improvementList.add(improve);
             }

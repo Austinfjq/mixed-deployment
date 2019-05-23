@@ -95,6 +95,9 @@ public class Cache implements Cloneable {
 
         podMap = new HashMap<>();
         nodeMapPodList = new HashMap<>();
+        nodeList.forEach(n -> {
+            nodeMapPodList.put(n.getNodeName(), new ArrayList<>());
+        });
         podList.forEach(p -> {
             podMap.put(DOUtils.getPodFullName(p), p);
             if (nodeMapPodList.containsKey(p.getNodeName())) {
@@ -206,6 +209,7 @@ public class Cache implements Cloneable {
                 ContainerPort[] wantPorts = gson.fromJson(ports, ContainerPort[].class);
                 p.setWantPorts(wantPorts);
 
+                readAffinity(p);
                 // for debug 模拟 affinity
 //                Affinity affinity = new Affinity();
 //                affinity.setPodAntiAffinity(sp.getAffinityObject() == null ? null : sp.getAffinityObject().getPodAntiAffinity());

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultGreedyAlgorithm.class);
@@ -132,7 +133,9 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
 
     @Override
     public List<Node> predicates(Pod pod, Cache cache) {
-        LOGGER.info("start predicates!");
+        if (GlobalSetting.LOG_DETAIL) {
+            LOGGER.info("start predicates!");
+        }
         if (GlobalSetting.LOG_DETAIL) {
             List<PredicateRule> rules = pod.getOperation().equals(Constants.OPERATION_DELETE) ? predicateRulesOnDelete : predicateRules;
             LOGGER.info("predicate rule list: " + rules.stream().map(r -> RuleUtil.getLastName(r.toString())).collect(Collectors.joining(", ")));
@@ -143,10 +146,11 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
         if (cache.getNodeList().size() > 50) {
             enough = (long) (cache.getNodeList().size() * GlobalSetting.FILTER_PERCENTAGE);
         }
-        return cache.getNodeList().stream()
+        Stream<Node> stream = GlobalSetting.PARALLEL ? cache.getNodeList().parallelStream() : cache.getNodeList().stream();
+        return stream
                 .filter(node -> {
                     boolean res = runAllPredicates(pod, node, cache);
-                    if (res) {
+                    if (res && GlobalSetting.LOG_DETAIL) {
                         LOGGER.info(node.getNodeName() + " predicate success for " + DOUtils.getServiceFullName(pod));
                     }
                     return res;
@@ -248,7 +252,9 @@ public class DefaultGreedyAlgorithm implements GreedyAlgorithm {
      */
     @Override
     public HostPriority selectHost(List<HostPriority> hostPriorityList, Cache cache) {
-        LOGGER.info("start selectHost!");
+        if (GlobalSetting.LOG_DETAIL) {
+            LOGGER.info("start selectHost!");
+        }
         return selectHostRule.selectHost(hostPriorityList);
     }
 }
